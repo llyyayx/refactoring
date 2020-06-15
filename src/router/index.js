@@ -46,117 +46,70 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/device',
     children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
+      path: 'device',
+      name: 'Device',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: 'device', icon: 'dashboard' }
     }]
-  },
+  }
+]
 
+export const asyncRoutes = [
   {
-    path: '/example',
+    path: '/system',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    redirect: '/system/project',
+    name: 'System',
+    meta: { title: 'system', icon: 'example', roles: ['editor', 'china'] },
     children: [
       {
-        path: 'table',
-        name: 'Table',
+        path: 'project',
+        name: 'Project',
         component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        meta: { title: 'project', icon: 'table', roles: ['editor'] }
       },
       {
-        path: 'tree',
-        name: 'Tree',
+        path: 'user',
+        name: 'User',
         component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/nested',
-    component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
+        meta: { title: 'user', icon: 'tree' }
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
+        path: 'alarm',
+        name: 'Alarm',
+        component: () => import('@/views/tree/index'),
+        meta: { title: 'alarm', icon: 'tree' }
+      },
+      {
+        path: 'equipment',
+        name: 'Equipment',
+        component: () => import('@/views/tree/index'),
+        meta: { title: 'equipment', icon: 'tree' }
       }
     ]
   },
 
   {
-    path: 'external-link',
+    path: '/arm',
     component: Layout,
+    meta: { roles: ['editor'] },
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'list',
+        name: 'ArmList',
+        component: () => import('@/views/form/index'),
+        meta: { title: 'armList', icon: 'form' }
       }
     ]
+  },
+
+  {
+    path: '/exit',
+    component: Layout,
+    name: 'Exit',
+    meta: { title: 'exit', icon: 'nested', roles: ['editor'] }
   },
 
   // 404 page must be placed at the end !!!

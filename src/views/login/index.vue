@@ -1,9 +1,11 @@
 <template>
   <div class="login-container">
+    <login-canvas />
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">{{ $t('login.title') }}</h3>
+        <lang-select class="set-language" />
       </div>
 
       <el-form-item prop="username">
@@ -13,11 +15,11 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          :placeholder="$t('login.username')"
           name="username"
           type="text"
           tabindex="1"
-          auto-complete="on"
+          auto-complete="off"
         />
       </el-form-item>
 
@@ -30,10 +32,10 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          :placeholder="$t('login.password')"
           name="password"
           tabindex="2"
-          auto-complete="on"
+          auto-complete="off"
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
@@ -41,41 +43,41 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登陆</el-button>
 
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-
+import LoginCanvas from './components/LoginCanvas'
+import LangSelect from '@/components/LangSelect'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Login',
+  components: {
+    LoginCanvas,
+    LangSelect
+  },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+      if (value.length < 1) {
+        callback(new Error(this.$t('login.tip1')))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+      if (value.length < 1) {
+        callback(new Error(this.$t('login.tip2')))
       } else {
         callback()
       }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -86,12 +88,22 @@ export default {
       redirect: undefined
     }
   },
+  computed: {
+    ...mapGetters([
+      'language'
+    ])
+  },
   watch: {
     $route: {
       handler: function(route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
+    },
+    language: {
+      handler: function() {
+        this.resetForm('loginForm')
+      }
     }
   },
   methods: {
@@ -120,6 +132,9 @@ export default {
           return false
         }
       })
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
     }
   }
 }
@@ -180,28 +195,19 @@ $light_gray:#eee;
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: $bg;
+  background: url("~@/assets/login_images/login.jpg");
+  background-size: cover;
   overflow: hidden;
 
   .login-form {
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
+    padding: 35px;
+    margin: 160px auto 0;
+    border-radius: 6px;
+    background-color: $bg;
     overflow: hidden;
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
   }
 
   .svg-container {
@@ -222,6 +228,16 @@ $light_gray:#eee;
       text-align: center;
       font-weight: bold;
     }
+
+    .set-language {
+      color: #fff;
+      position: absolute;
+      top: 3px;
+      font-size: 18px;
+      right: 0px;
+      cursor: pointer;
+    }
+
   }
 
   .show-pwd {
