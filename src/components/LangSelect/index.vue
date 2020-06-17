@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import getPageTitle from '@/utils/get-page-title'
+import translation from '@/utils/translation'
 export default {
   computed: {
     language() {
@@ -25,8 +27,9 @@ export default {
     handleSetLanguage(lang) {
       this.$i18n.locale = lang
       this.$store.dispatch('app/setLanguage', lang)
+      document.title = getPageTitle()
       this.$message({
-        message: lang === 'zh' ? '语言切换成功' : 'Switch Language Success',
+        message: translation('switch'),
         type: 'success'
       })
     }

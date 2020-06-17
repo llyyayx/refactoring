@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: 'title.name', // 国际化对应名称
 
   /**
    * @type {boolean} true | false
@@ -12,5 +12,12 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar
    */
-  sidebarLogo: true
+  sidebarLogo: true,
+
+  /**
+   * @type {boolean} true | false
+   * @description Whether need tagsView
+   */
+  tagsView: false
+
 }

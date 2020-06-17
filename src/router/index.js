@@ -46,12 +46,12 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/device',
+    redirect: '/deviceControl',
     children: [{
-      path: 'device',
-      name: 'Device',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'device', icon: 'dashboard' }
+      path: 'deviceControl',
+      name: 'DeviceControl',
+      component: () => import('@/views/deviceControl/index'),
+      meta: { title: 'DeviceControl', icon: 'dashboard', affix: true }
     }]
   }
 ]
@@ -62,31 +62,31 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/system/project',
     name: 'System',
-    meta: { title: 'system', icon: 'example', roles: ['editor', 'china'] },
+    meta: { title: 'System', icon: 'example', roles: ['editor', 'china'] },
     children: [
       {
         path: 'project',
         name: 'Project',
         component: () => import('@/views/table/index'),
-        meta: { title: 'project', icon: 'table', roles: ['editor'] }
+        meta: { title: 'Project', icon: 'table', roles: ['editor'] }
       },
       {
         path: 'user',
         name: 'User',
         component: () => import('@/views/tree/index'),
-        meta: { title: 'user', icon: 'tree' }
+        meta: { title: 'User', icon: 'tree' }
       },
       {
         path: 'alarm',
         name: 'Alarm',
         component: () => import('@/views/tree/index'),
-        meta: { title: 'alarm', icon: 'tree' }
+        meta: { title: 'Alarm', icon: 'tree' }
       },
       {
         path: 'equipment',
         name: 'Equipment',
         component: () => import('@/views/tree/index'),
-        meta: { title: 'equipment', icon: 'tree' }
+        meta: { title: 'Equipment', icon: 'tree' }
       }
     ]
   },
@@ -100,7 +100,7 @@ export const asyncRoutes = [
         path: 'list',
         name: 'ArmList',
         component: () => import('@/views/form/index'),
-        meta: { title: 'armList', icon: 'form' }
+        meta: { title: 'ArmList', icon: 'form' }
       }
     ]
   },
@@ -109,7 +109,7 @@ export const asyncRoutes = [
     path: '/exit',
     component: Layout,
     name: 'Exit',
-    meta: { title: 'exit', icon: 'nested', roles: ['editor'] }
+    meta: { title: 'Exit', icon: 'nested', roles: ['editor'] }
   },
 
   // 404 page must be placed at the end !!!

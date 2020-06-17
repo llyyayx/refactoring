@@ -1,13 +1,13 @@
 export default {
   route: {
-    device: 'Device Control',
-    system: 'System Settings',
-    project: 'Project Settings',
-    user: 'User Settings',
-    alarm: 'Alarm Settings',
-    equipment: 'Device Management',
-    armList: 'Alarm List',
-    exit: 'Log Out'
+    DeviceControl: 'Device Control',
+    System: 'System Settings',
+    Project: 'Project Settings',
+    User: 'User Settings',
+    Alarm: 'Alarm Settings',
+    Equipment: 'Device Management',
+    ArmList: 'Alarm List',
+    Exit: 'Log Out'
   },
   login: {
     title: 'Equipment Control Platform',
@@ -15,5 +15,9 @@ export default {
     password: 'Password',
     tip1: 'the user name cannot be empty',
     tip2: 'the password cannot be empty'
-  }
+  },
+  title: {
+    name: 'Control Platform'
+  },
+  switch: 'Switch Language Success'
 }

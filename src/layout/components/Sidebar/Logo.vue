@@ -24,8 +24,21 @@ export default {
   },
   data() {
     return {
-      title: '中农智冠',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      title: '中农智冠控制平台',
+      logo: require('@/assets/login_images/logo.png')
+    }
+  },
+  computed: {
+    language() {
+      return this.$store.getters.language
+    }
+  },
+  watch: {
+    language: {
+      handler: function(e) {
+        this.title = this.$t('title.name')
+      },
+      immediate: true
     }
   }
 }

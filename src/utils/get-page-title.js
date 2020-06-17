@@ -1,8 +1,10 @@
 import defaultSettings from '@/settings'
-
-const title = defaultSettings.title || 'Vue Admin Template'
+import translation from '@/utils/translation'
 
 export default function getPageTitle(pageTitle) {
+  const title = translation(defaultSettings.title) || 'Vue Admin Template'
+  pageTitle = pageTitle && translation('route.' + pageTitle)
+
   if (pageTitle) {
     return `${pageTitle} - ${title}`
   }
