@@ -19,5 +19,8 @@ export default {
   title: {
     name: '中农智冠控制平台'
   },
+  req: {
+    error: '请求发送失败'
+  },
   switch: '语言切换成功'
 }

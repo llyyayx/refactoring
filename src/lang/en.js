@@ -19,5 +19,8 @@ export default {
   title: {
     name: 'Control Platform'
   },
+  req: {
+    error: 'Request failed to send'
+  },
   switch: 'Switch Language Success'
 }

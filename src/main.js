@@ -19,6 +19,7 @@ import router from './router'
 import i18n from './lang' // internationalization
 import '@/icons' // icon
 import '@/permission' // permission control
+import config from './utils/config'
 
 /**
  * If you don't want to use mock-server
@@ -42,6 +43,8 @@ Vue.use(ElementUI, {
 // Vue.use(ElementUI)
 
 Vue.config.productionTip = false
+Vue.prototype.$Cookies = Cookies
+Vue.prototype.$config = config
 
 new Vue({
   el: '#app',

@@ -1,0 +1,12 @@
+// 配置文件
+
+export default {
+
+  DROPS_CLASS: 5,
+  DROPS_VALVE_CLASS: 13,
+  PUMP_CLASS: 3,
+  FERTILIZER_CLASS: 6,
+  SOIL_CLASS: 8,
+  WEATHER_CLASS: 7,
+  SPRAY_CLASS: 4
+}
