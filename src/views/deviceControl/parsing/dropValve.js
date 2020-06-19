@@ -12,9 +12,9 @@ export function dropValve(cells) {
     valve.forEach((item2, index2) => {
       switch (item2.dclass) {
         case config.DROPS_VALVE_CLASS : {
-          const { dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno } = item2
+          const { dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort } = item2
           store.dispatch('device/setDropsValve', {
-            dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno,
+            dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort,
             areaName: item.name, areaId: id
           })
         } break

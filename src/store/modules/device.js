@@ -6,7 +6,11 @@ const state = {
   fertilizer: [],
   soil: [],
   weather: [],
-  spray: []
+  spray: [],
+  sprayValve: [],
+  ndvi: [],
+  height: [],
+  canopy: []
 }
 
 const mutations = {
@@ -37,8 +41,25 @@ const mutations = {
   SET_WEATHER: (state, weather) => {
     state.weather.push(weather)
   },
+
   SET_SPRAY: (state, spray) => {
     state.spray.push(spray)
+  },
+
+  SET_SPRAY_VALVE: (state, valve) => {
+    state.sprayValve.push(valve)
+  },
+
+  SET_NDVI: (state, ndvi) => {
+    state.ndvi.push(ndvi)
+  },
+
+  SET_HEIGHT: (state, height) => {
+    state.height.push(height)
+  },
+
+  SET_CANOPY: (state, canopy) => {
+    state.canopy.push(canopy)
   }
 
 }
@@ -74,6 +95,22 @@ const actions = {
 
   setSpray({ commit }, spray) {
     commit('SET_SPRAY', spray)
+  },
+
+  setSprayValve({ commit }, valve) {
+    commit('SET_SPRAY_VALVE', valve)
+  },
+
+  setNdvi({ commit }, ndvi) {
+    commit('SET_NDVI', ndvi)
+  },
+
+  setHeight({ commit }, height) {
+    commit('SET_HEIGHT', height)
+  },
+
+  setCanopy({ commit }, canopy) {
+    commit('SET_CANOPY', canopy)
   }
 
 }

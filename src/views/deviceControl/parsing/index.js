@@ -4,4 +4,6 @@ export { fertilizer } from './fertilizer'
 export { soil } from './soil'
 export { weather } from './weather'
 export { spray } from './spray'
-
+export { ndvi } from './ndvi'
+export { height } from './height'
+export { canopy } from './canopy'

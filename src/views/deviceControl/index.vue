@@ -7,7 +7,7 @@
 <script>
 import Gmps from '@/components/GMaps'
 import { getDevice } from '@/api/deviceControl'
-import { drops, pump, fertilizer, soil, weather, spray } from './parsing'
+import { drops, pump, fertilizer, soil, weather, spray, ndvi, height, canopy } from './parsing'
 export default {
   name: 'DeviceControl',
   components: {
@@ -42,6 +42,9 @@ export default {
           case config.SOIL_CLASS: soil(item); break
           case config.WEATHER_CLASS: weather(item); break
           case config.SPRAY_CLASS: spray(item); break
+          case config.NDVI_CLASS: ndvi(item); break
+          case config.HEIGHT_CLASS: height(item); break
+          case config.CANOPY_CLASS: canopy(item); break
         }
       })
       console.log(this.$store.state.device.drops)
@@ -52,6 +55,10 @@ export default {
       console.log(this.$store.state.device.soil)
       console.log(this.$store.state.device.weather)
       console.log(this.$store.state.device.spray)
+      console.log(this.$store.state.device.sprayValve)
+      console.log(this.$store.state.device.ndvi)
+      console.log(this.$store.state.device.height)
+      console.log(this.$store.state.device.canopy)
     }
   }
 }
