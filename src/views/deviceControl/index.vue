@@ -1,45 +1,42 @@
 <template>
   <div class="device-container">
-    <Gmps :map-data="mapData" />
+    <Gmps ref="gmps" @load="load" />
+    <Spray />
   </div>
 </template>
 
 <script>
 import Gmps from '@/components/GMaps'
+import Spray from './components/spray'
 import { getDevice } from '@/api/deviceControl'
 import { drops, pump, fertilizer, soil, weather, spray, ndvi, height, canopy } from './parsing'
 export default {
   name: 'DeviceControl',
   components: {
-    Gmps
+    Gmps,
+    Spray
   },
   data() {
     return {
-      mapData: {
-        lat: 38.123456,
-        lng: 118.123456,
-        zoom: 15,
-        marginTop: 30
-      }
+      map: {}
     }
   },
   watch: {
 
   },
-  mounted() {
-    this.getContent()
-  },
   methods: {
     async getContent() {
       const response = await getDevice(1)
-      const { devices } = response[0]
+      const { lat, lng, devices } = response[0]
+      this.setMap(lat, lng)
       const config = this.$config
+      const self = this
       devices.forEach((item, index) => {
         switch (item.dclass) {
           case config.DROPS_CLASS: drops(item); break
           case config.PUMP_CLASS: pump(item); break
           case config.FERTILIZER_CLASS: fertilizer(item); break
-          case config.SOIL_CLASS: soil(item); break
+          case config.SOIL_CLASS: soil(item, self); break
           case config.WEATHER_CLASS: weather(item); break
           case config.SPRAY_CLASS: spray(item); break
           case config.NDVI_CLASS: ndvi(item); break
@@ -47,7 +44,7 @@ export default {
           case config.CANOPY_CLASS: canopy(item); break
         }
       })
-      console.log(this.$store.state.device.drops)
+      /* console.log(this.$store.state.device.drops)
       console.log(this.$store.state.device.dropsCell)
       console.log(this.$store.state.device.dropsValve)
       console.log(this.$store.state.device.pump)
@@ -58,7 +55,15 @@ export default {
       console.log(this.$store.state.device.sprayValve)
       console.log(this.$store.state.device.ndvi)
       console.log(this.$store.state.device.height)
-      console.log(this.$store.state.device.canopy)
+      console.log(this.$store.state.device.canopy) */
+    },
+    load(map) {
+      this.map = map
+      this.$store.dispatch('map/setMap', map)
+      this.getContent()
+    },
+    setMap(lat, lng) {
+      this.$refs.gmps.setCenter(lat, lng)
     }
   }
 }
@@ -67,6 +72,7 @@ export default {
 <style lang="scss" scoped>
 .device {
   &-container{
+    position: relative;
     height: 100%;
   }
   &-text {

@@ -7,3 +7,4 @@ export function sprayValve(portarrays) {
     store.dispatch('device/setSprayValve', { spraySerialno, rtuSerialno, port, ctlGroup, descri, idx })
   })
 }
+
