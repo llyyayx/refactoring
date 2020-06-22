@@ -7,6 +7,7 @@ const state = {
   soil: [],
   weather: [],
   spray: [],
+  // 格式: [ [{喷灌机1的喷头组},{.....}], [{喷灌机2的喷头组},{.....}] ]
   sprayValve: [],
   ndvi: [],
   height: [],

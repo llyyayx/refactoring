@@ -5,8 +5,8 @@ import { sprayValve } from './sprayValve'
 export function spray(item) {
   const { dname, latitude, longitude, dclass, serialno, extension, portarrays } = item
   store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension,
-    attr: attr })
-  if (portarrays) sprayValve(portarrays)
+    attr: attr, icon: require('@/icons/device/close/pg.png') })
+  if (portarrays) sprayValve(portarrays, { dname })
 }
 
 // 喷灌机属性
