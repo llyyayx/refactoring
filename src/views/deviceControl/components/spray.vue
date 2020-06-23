@@ -193,7 +193,7 @@ export default {
 .spray-container {
     background-color: rgba($color: #FFFFFF, $alpha: 0.9);
     width: 600px;
-    max-height: 800px;
+    max-height: 85%;
     overflow-y: auto;
     overflow-x: hidden;
     border-radius: 12px;
