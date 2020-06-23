@@ -1,5 +1,5 @@
 <template>
-  <div class="device-container">
+  <div v-loading="loading" class="device-container">
     <Gmps ref="gmps" @load="load" />
     <Spray />
   </div>
@@ -18,6 +18,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       map: {}
     }
   },
@@ -44,6 +45,7 @@ export default {
           case config.CANOPY_CLASS: canopy(item); break
         }
       })
+      this.loading = false
       /* console.log(this.$store.state.device.drops)
       console.log(this.$store.state.device.dropsCell)
       console.log(this.$store.state.device.dropsValve)

@@ -1,83 +1,132 @@
 <template>
-  <div v-cloak ref="spray" class="spray-container">
-    <!-- 顶部按钮 -->
-    <el-row class="spray__top">
-      <el-col :span="2" :offset="22" class="spray__icon" title="全屏">
-        <svg-icon icon-class="fullscreen" @click="full" />
-        <svg-icon icon-class="close" style="font-size:23px; margin-left: 10px" @click="full" />
-      </el-col>
-    </el-row>
-    <!-- 喷灌机部分go -->
-    <div v-show="spray.length > 0" class="spray__title">喷灌机</div>
-    <el-row v-for="(item,index) in spray" :key="index" type="flex" :gutter="20" class="spray__row">
-      <el-col :lg="4" :sm="2" :xs="2">
-        <div class="spray__imgBox">
-          <img :src="item.icon" alt="喷灌机图标">
-        </div>
-        <div class="spray__name">{{ item.dname }}</div>
-      </el-col>
-      <el-col :lg="20" :sm="22" :xs="22">
-        <el-row :gutter="10">
-          <el-col v-for="(attr,index2) in item.attr" :key="index2" :lg="pgSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb">
-            <div class="spray__value">{{ attr.val + attr.unit }}</div>
-            <div class="spray__attr">{{ attr.name }}</div>
+  <div class="spray-boxspray-container">
+    <transition name="el-fade-in">
+      <div v-show="show" ref="spray" class="spray-box">
+        <!-- 顶部按钮 -->
+        <el-row class="spray__top">
+          <el-col :span="2" :offset="22" class="spray__icon">
+            <el-tooltip content="全屏">
+              <svg-icon icon-class="fullscreen" @click="full" />
+            </el-tooltip>
+            <el-tooltip content="关闭">
+              <svg-icon icon-class="close" class="spray__icon--close" @click="show = !show" />
+            </el-tooltip>
           </el-col>
         </el-row>
-        <el-divider class="spray__divider" />
-      </el-col>
-    </el-row>
-    <!-- 喷灌机部分end -->
-    <!-- 灌机喷头部分go -->
-    <el-row v-show="sprayValve.length > 0" :gutter="6" align="middle" class="spray__pt">
-      <el-col :span="4">
-        <div>灌机喷头</div>
-      </el-col>
-      <el-col :span="8">
-        <el-switch
-          v-model="value"
-          active-text="阵列划分"
-          inactive-text="按跨划分"
-          inactive-color="#13ce66"
-        />
-      </el-col>
-    </el-row>
-    <!-- 喷头主体 -->
-    <div v-for="(pgValve, idx) in sprayValve" :key="'pg'+idx" class="nozzle">
-      <div class="spray__title">{{ pgValve[0].pname }}</div>
-      <el-row v-for="(item,index) in groups = valveCtrGroup(pgValve)" :key="'pt'+index" type="flex" :gutter="20" class="spray__row">
-        <el-col :lg="4" :sm="2" :xs="2">
-          <div class="spray__imgBox">
-            <img src="@/icons/device/run/fm.png" alt="喷头图标">
-          </div>
-          <div class="spray__name">{{ value ? item[0]['descri'] : '第' + ( index -1 + 2 ) + '跨' }}</div>
-        </el-col>
-        <el-col :lg="20" :sm="22" :xs="22">
-          <el-row :gutter="10">
-            <el-col v-for="(attr,index2) in item" :key="attr.spraySerialno" :lg="valveSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb">
-              <div class="spray__imgBox spray__imgBox2">
-                <img :src="attr.icon" alt="喷头图标">
+        <!-- 喷灌机部分go -->
+        <div v-show="spray.length > 0" class="spray__title">喷灌机</div>
+        <el-row v-for="(item,index) in spray" :key="index" type="flex" :gutter="20" class="spray__row">
+          <el-col :lg="4" :sm="2" :xs="2">
+            <div class="spray__imgBox">
+              <img :src="item.icon" alt="喷灌机图标">
+            </div>
+            <div class="spray__name">{{ item.dname }}</div>
+          </el-col>
+          <el-col :lg="20" :sm="22" :xs="22">
+            <el-row :gutter="10">
+              <el-col v-for="(attr,index2) in item.attr" :key="index2" :lg="pgSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb">
+                <div class="spray__value">{{ attr.val + attr.unit }}</div>
+                <div class="spray__attr">{{ attr.name }}</div>
+              </el-col>
+            </el-row>
+            <el-divider class="spray__divider" />
+          </el-col>
+        </el-row>
+        <!-- 喷灌机部分end -->
+        <!-- 灌机喷头部分go -->
+        <el-row v-show="sprayValve.length > 0" :gutter="6" align="middle" class="spray__pt">
+          <el-col :span="4">
+            <div>灌机喷头</div>
+          </el-col>
+          <el-col :span="8">
+            <el-switch
+              v-model="value"
+              active-text="阵列划分"
+              inactive-text="按跨划分"
+              inactive-color="#13ce66"
+            />
+          </el-col>
+        </el-row>
+        <!-- 喷头主体 -->
+        <div v-for="(pgValve, idx) in sprayValve" :key="'pg'+idx" class="nozzle">
+          <div class="spray__title">{{ pgValve[0].pname }}</div>
+          <el-row v-for="(item,index) in groups = valveCtrGroup(pgValve)" :key="'pt'+index" type="flex" :gutter="20" class="spray__row">
+            <el-col :lg="4" :sm="2" :xs="2">
+              <div class="spray__imgBox">
+                <img src="@/icons/device/run/fm.png" alt="喷头图标">
               </div>
-              <div class="spray__attr spray__attr2">{{ '喷头0' + (index == 0 ? index2 - 1 + 2 : length(groups,index) + index2 + 1) }}</div>
+              <div class="spray__name">{{ value ? item[0]['descri'] : '第' + ( index -1 + 2 ) + '跨' }}</div>
+            </el-col>
+            <el-col :lg="20" :sm="22" :xs="22">
+              <el-row :gutter="10">
+                <el-col v-for="(attr,index2) in item" :key="attr.spraySerialno" :lg="valveSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb menux" @dblclick.native="control">
+                  <div class="spray__imgBox spray__imgBox2">
+                    <img :src="attr.icon" alt="喷头图标">
+                  </div>
+                  <div class="spray__attr spray__attr2">{{ '喷头0' + (index == 0 ? index2 - 1 + 2 : length(groups,index) + index2 + 1) }}</div>
+                </el-col>
+              </el-row>
+              <el-divider class="spray__divider" />
             </el-col>
           </el-row>
-          <el-divider class="spray__divider" />
-        </el-col>
-      </el-row>
-    </div>
-    <!-- 灌机喷头部分go -->
+        </div>
+        <!-- 灌机喷头部分go -->
+      </div>
+    </transition>
+    <!-- 控制对话框go -->
+    <el-dialog :visible.sync="dialog" :show-close="false" width="30%">
+      <el-tabs type="border-card">
+        <el-tab-pane label="常开常关">
+          <el-tag effect="dark" closable>
+            喷头010
+          </el-tag>
+        </el-tab-pane>
+        <el-tab-pane label="脉冲模式">
+          <el-row class="demo-input-suffix" type="flex" align="middle">
+            <el-col :span="3">脉冲周期</el-col>
+            <el-col :span="12" :offset="1">
+              <el-input v-model="cycle" placeholder="请输入脉冲周期" maxlength="4" show-word-limit>
+                <template slot="append">秒</template>
+              </el-input>
+            </el-col>
+          </el-row>
+          <el-row class="demo-input-suffix" type="flex" align="middle">
+            <el-col :span="3">占空比</el-col>
+            <el-col :span="12" :offset="1">
+              <el-input v-model="ratio" placeholder="请输入占空比" maxlength="3" show-word-limit>
+                <template slot="append">%</template>
+              </el-input>
+            </el-col>
+          </el-row>
+          <el-tag effect="dark" closable>
+            喷头010
+          </el-tag>
+        </el-tab-pane>
+      </el-tabs>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialog = false">取 消</el-button>
+        <el-button type="primary" @click="dialog = false">开 启</el-button>
+      </span>
+    </el-dialog>
+    <!-- 控制对话框end -->
   </div>
 </template>
 
 <script>
 import Draggabilly from 'draggabilly'
+import { drag } from '@/utils/drag'
 export default {
   data() {
     return {
+      show: true,
       map: {},
       value: false,
       pgSpan: 4,
       valveSpan: 4,
-      fullScreen: false
+      fullScreen: false,
+      dialog: false,
+      cycle: '',
+      ratio: ''
     }
   },
   computed: {
@@ -88,8 +137,18 @@ export default {
       return this.$store.state.device.sprayValve
     }
   },
+  watch: {
+    sprayValve: function() {
+      this.$nextTick(() => {
+        drag('nozzle', 'menux', () => {
+          console.log(this.spray)
+        })
+      })
+    }
+  },
   mounted() {
-    new Draggabilly('.spray-container', {
+    // 拖动
+    new Draggabilly('.spray-box', {
       containment: true
     })
   },
@@ -145,6 +204,9 @@ export default {
       return len
     },
 
+    /**
+     * 全屏展示该组件
+     */
     full() {
       const deom = this.$refs.spray
       if (!this.fullScreen) {
@@ -163,6 +225,13 @@ export default {
         this.valveSpan = 4
         this.fullScreen = false
       }
+    },
+
+    /**
+     * 控制
+     */
+    control() {
+      this.dialog = true
     }
 
   }
@@ -190,7 +259,7 @@ export default {
 .animation {
   transition: all .3s linear;
 }
-.spray-container {
+.spray-box {
     background-color: rgba($color: #FFFFFF, $alpha: 0.9);
     width: 600px;
     max-height: 85%;
@@ -214,6 +283,10 @@ export default {
       text-align: right;
       color: #666;
       cursor: pointer;
+      & .spray__icon--close{
+        font-size:23px;
+        margin-left: 10px;
+      }
     }
     & .spray__title {
       font-size: 16px;
@@ -231,6 +304,10 @@ export default {
         margin: 10px 0;
         & .spray__col__mb{
             margin-bottom: 12px;
+        }
+        & .selected > .spray__attr{
+          color: #409EFF;
+          font-weight: 600;
         }
         & .spray__value {
             font-size: 15px;
@@ -273,10 +350,11 @@ export default {
     }
 }
 
-[v-cloak] {
-  display: none;
+.demo-input-suffix{
+  margin-bottom: 10px;
 }
 
+/* 重置滚动条 */
 ::scrollbar{width:8px; height:8px; border-radius:5px;}
 ::scrollbar-button{display:none;}
 ::scrollbar-track  {display:none;}
