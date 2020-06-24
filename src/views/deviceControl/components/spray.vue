@@ -49,7 +49,12 @@
         </el-row>
         <!-- 喷头主体 -->
         <div v-for="(pgValve, idx) in sprayValve" :key="'pg'+idx" class="nozzle">
-          <div class="spray__title">{{ pgValve[0].pname }}</div>
+          <div class="nozzle__heder">
+            <div class="spray__title">{{ pgValve[0].pname }}</div>
+            <transition name="el-fade-in">
+              <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="nozzle__btn" round @click="multi(idx)">控制已选中</el-button>
+            </transition>
+          </div>
           <el-row v-for="(item,index) in groups = valveCtrGroup(pgValve)" :key="'pt'+index" type="flex" :gutter="20" class="spray__row">
             <el-col :lg="4" :sm="2" :xs="2">
               <div class="spray__imgBox">
@@ -59,11 +64,11 @@
             </el-col>
             <el-col :lg="20" :sm="22" :xs="22">
               <el-row :gutter="10">
-                <el-col v-for="(attr,index2) in item" :key="attr.spraySerialno" :lg="valveSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb menux" @dblclick.native="control">
+                <el-col v-for="attr in item" :key="attr.spraySerialno" :lg="valveSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb menux" @dblclick.native="control([attr])">
                   <div class="spray__imgBox spray__imgBox2">
                     <img :src="attr.icon" alt="喷头图标">
                   </div>
-                  <div class="spray__attr spray__attr2">{{ '喷头0' + (index == 0 ? index2 - 1 + 2 : length(groups,index) + index2 + 1) }}</div>
+                  <div class="spray__attr spray__attr2">{{ '喷头0' + attr.idx }}</div>
                 </el-col>
               </el-row>
               <el-divider class="spray__divider" />
@@ -74,13 +79,9 @@
       </div>
     </transition>
     <!-- 控制对话框go -->
-    <el-dialog :visible="dialog" :show-close="false" width="30%" @click.stop @click.prevent="false">
-      <el-tabs type="border-card">
-        <el-tab-pane label="常开常关">
-          <el-tag effect="dark" closable>
-            喷头010
-          </el-tag>
-        </el-tab-pane>
+    <el-dialog :visible.sync="dialog" class="dialog" width="570px">
+      <el-tabs type="border-card" class="dialog__tabs">
+        <el-tab-pane label="常开常关" />
         <el-tab-pane label="脉冲模式">
           <el-row class="demo-input-suffix" type="flex" align="middle">
             <el-col :span="3" :xl="3" :md="5">脉冲周期</el-col>
@@ -98,14 +99,14 @@
               </el-input>
             </el-col>
           </el-row>
-          <el-tag effect="dark" closable>
-            喷头010
-          </el-tag>
         </el-tab-pane>
+        <el-tag v-for="(item, index) in ctrlDev" :key="item.idx" effect="dark" class="tag" closable @close="delValve(index)">
+          {{ '喷头0'+item.idx }}
+        </el-tag>
       </el-tabs>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog = false">取 消</el-button>
-        <el-button type="primary" @click="dialog = false">开 启</el-button>
+        <el-button @click="closeValve">关 阀</el-button>
+        <el-button type="primary" @click="dialog = false">开 阀</el-button>
       </span>
     </el-dialog>
     <!-- 控制对话框end -->
@@ -115,18 +116,32 @@
 <script>
 import Draggabilly from 'draggabilly'
 import { drag } from '@/utils/drag'
+import { action } from '@/api/deviceControl'
 export default {
   data() {
     return {
+      // 喷灌面板的显示隐藏
       show: true,
-      map: {},
+      // 用于判断分类模式：跨 || 阀控
       value: false,
+      // 全屏模式下：灌机属性lg列数
       pgSpan: 4,
+      // 全屏模式下：喷头lg列数
       valveSpan: 4,
+      // 是否全屏显示面板
       fullScreen: false,
+      // 框选的喷灌机序号(唯一)
+      subPray: -1,
+      // 每个喷灌机框选的喷头(二维)
+      subValve: [],
+      // 控制对话框显示隐藏
       dialog: false,
+      // 脉冲模式下的周期
       cycle: '',
-      ratio: ''
+      // 脉冲模式下的占空比
+      ratio: '',
+      // 选择要进行操控的喷头
+      ctrlDev: []
     }
   },
   computed: {
@@ -140,8 +155,18 @@ export default {
   watch: {
     sprayValve: function() {
       this.$nextTick(() => {
-        drag('nozzle', 'menux', () => {
-          // console.log(this.spray)
+        drag('nozzle', 'menux', (list, dom) => {
+          const group = this.valveCtrGroup(this.sprayValve[dom])
+          let len = []
+          for (let j = 0; j < group.length; j++) {
+            len = len.concat(group[j])
+          }
+          const ctrlDev = []
+          for (let i = 0; i < list.length; i++) {
+            ctrlDev.push(len[list[i]])
+          }
+          this.subPray = dom
+          this.$set(this.subValve, dom, ctrlDev)
         })
       })
     }
@@ -188,23 +213,6 @@ export default {
     },
 
     /**
-     * 方法: 查询二维数组前n项长度之和
-     * @param { Array } array 数组
-     * @return { Number } 返回和
-     */
-    length(array, index) {
-      let len = 0
-      for (var i = 0; i < array.length; i++) {
-        if (i < index) {
-          len += array[i].length
-        } else {
-          break
-        }
-      }
-      return len
-    },
-
-    /**
      * 全屏展示该组件
      */
     full() {
@@ -229,13 +237,32 @@ export default {
 
     /**
      * 控制
+     * @param { Array } device 需控制的设备列表
      */
-    control() {
+    control(device) {
+      const [...control] = device
+      this.ctrlDev = control
       this.dialog = true
     },
 
     /**
+     * 框选多开事件
+     * @param { Number } index 喷灌机序号
+    */
+    multi(index) {
+      if (this.subValve[index].length === 0) {
+        this.$message({
+          message: '至少选取一个阀门',
+          type: 'warning'
+        })
+        return
+      }
+      this.control(this.subValve[index])
+    },
+
+    /**
      * 验证输入周期
+     * @param { String } e 需验证的输入
      */
     cyclePut(e) {
       const reg = /^[0-9]*$/
@@ -250,6 +277,7 @@ export default {
 
     /**
      * 验证输入占空比
+     * @param { String } e 需验证的输入
      */
     ratioPut(e) {
       const reg = /^[0-9]*$/
@@ -260,6 +288,36 @@ export default {
           type: 'warning'
         })
       }
+    },
+
+    /**
+     * 去除已选喷头
+     * @param { Number } index 喷头序号
+     */
+    delValve(index) {
+      this.ctrlDev.splice(index, 1)
+    },
+
+    /**
+     * 关闭动作
+     */
+    closeValve() {
+      const ctrlDev = this.ctrlDev
+      console.log(ctrlDev)
+      ctrlDev.forEach((el) => {
+        action({
+          serialno: el.rtuSerialno,
+          actions: [{
+            namekey: 'Close_PulseValve_' + el.port,
+            params: true
+          }]
+        }).then((e) => {
+          console.log(e)
+        }).catch((e) => {
+          console.log(e)
+        })
+      })
+      this.dialog = false
     }
 
   }
@@ -376,10 +434,28 @@ export default {
       padding: 10px 0px 10px 10px;
       box-sizing: border-box;
     }
+    & .nozzle__heder{
+      display: flex;
+      align-items: center;
+      & .nozzle__btn{
+        margin-left: 20px;
+      }
+    }
 }
 
 .demo-input-suffix{
   margin-bottom: 10px;
+}
+
+.dialog {
+  & .el-dialog__body {
+    & .dialog__tabs {
+     box-shadow: inherit;
+     & .tag{
+       margin: 0 5px 5px 5px;
+     }
+    }
+  }
 }
 
 /* 重置滚动条 */

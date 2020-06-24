@@ -15,10 +15,10 @@ export function getDevice(groupId) {
  * 控制设备
  * @param { Object } params 控制对象
  */
-export function action(params) {
+export function action(data) {
   return request({
     url: '/actions',
     method: 'post',
-    params
+    data
   })
 }
