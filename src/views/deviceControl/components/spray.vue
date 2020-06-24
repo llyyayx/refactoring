@@ -1,5 +1,5 @@
 <template>
-  <div class="spray-boxspray-container">
+  <div class="spray-container">
     <transition name="el-fade-in">
       <div v-show="show" ref="spray" class="spray-box">
         <!-- 顶部按钮 -->
@@ -74,7 +74,7 @@
       </div>
     </transition>
     <!-- 控制对话框go -->
-    <el-dialog :visible.sync="dialog" :show-close="false" width="30%">
+    <el-dialog :visible="dialog" :show-close="false" width="30%" @click.stop @click.prevent="false">
       <el-tabs type="border-card">
         <el-tab-pane label="常开常关">
           <el-tag effect="dark" closable>
@@ -83,17 +83,17 @@
         </el-tab-pane>
         <el-tab-pane label="脉冲模式">
           <el-row class="demo-input-suffix" type="flex" align="middle">
-            <el-col :span="3">脉冲周期</el-col>
-            <el-col :span="12" :offset="1">
-              <el-input v-model="cycle" placeholder="请输入脉冲周期" maxlength="4" show-word-limit>
+            <el-col :span="3" :xl="3" :md="5">脉冲周期</el-col>
+            <el-col :span="12" :xl="12" :md="15" :offset="1">
+              <el-input v-model="cycle" placeholder="请输入脉冲周期" maxlength="4" show-word-limit @input="cyclePut">
                 <template slot="append">秒</template>
               </el-input>
             </el-col>
           </el-row>
           <el-row class="demo-input-suffix" type="flex" align="middle">
-            <el-col :span="3">占空比</el-col>
-            <el-col :span="12" :offset="1">
-              <el-input v-model="ratio" placeholder="请输入占空比" maxlength="3" show-word-limit>
+            <el-col :span="3" :xl="3" :md="5">占空比</el-col>
+            <el-col :span="12" :xl="12" :md="15" :offset="1">
+              <el-input v-model="ratio" placeholder="请输入占空比" maxlength="3" show-word-limit @input="ratioPut">
                 <template slot="append">%</template>
               </el-input>
             </el-col>
@@ -141,7 +141,7 @@ export default {
     sprayValve: function() {
       this.$nextTick(() => {
         drag('nozzle', 'menux', () => {
-          console.log(this.spray)
+          // console.log(this.spray)
         })
       })
     }
@@ -149,7 +149,7 @@ export default {
   mounted() {
     // 拖动
     new Draggabilly('.spray-box', {
-      containment: true
+      containment: '.device-container'
     })
   },
   methods: {
@@ -232,6 +232,34 @@ export default {
      */
     control() {
       this.dialog = true
+    },
+
+    /**
+     * 验证输入周期
+     */
+    cyclePut(e) {
+      const reg = /^[0-9]*$/
+      if (!reg.test(e)) {
+        this.cycle = ''
+        this.$message({
+          message: '只能输入纯数字',
+          type: 'warning'
+        })
+      }
+    },
+
+    /**
+     * 验证输入占空比
+     */
+    ratioPut(e) {
+      const reg = /^[0-9]*$/
+      if (!reg.test(e)) {
+        this.ratio = ''
+        this.$message({
+          message: '只能输入纯数字',
+          type: 'warning'
+        })
+      }
     }
 
   }
