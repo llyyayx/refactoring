@@ -12,11 +12,11 @@ export function spray(item, self) {
     canvas = draw({ latitude, longitude, extension, cells }, self)
   }
   // 地图标点
-  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/run/pg.png') })
+  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/pg.png') })
   clickEvent(mapSpot, self)
   // vuex管理
   store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, canvas,
-    attr: attr, icon: require('@/icons/device/close/pg.png') })
+    mapSpot, attr: attr, icon: require('@/icons/device/close/pg.png') })
   if (portarrays) sprayValve(portarrays, { dname })
 }
 
@@ -47,7 +47,7 @@ function draw(param, self) {
     }
   })
   var extension = JSON.parse(param.extension.replace(/"/g, ' ').replace(/'/g, '"'))
-  var long = extension.arm
+  var long = extension.arm || 150
   var lngC = 40030173
   var hu = param.latitude.split('.')[0] * Math.PI / 180
   var latC = 40030173 * Math.cos(hu)
@@ -81,7 +81,13 @@ function draw(param, self) {
   return view
 }
 
-// 创建地图标点
+/**
+ * 创建地图标点
+ * @param { Object } obj 点参数
+ * obj.lat 纬度
+ * obj.lng 经度
+ * icon 图标
+ */
 function marKer(obj) {
   return mapFun.setMarker(store.state.map.map, obj)
 }

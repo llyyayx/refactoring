@@ -1,7 +1,9 @@
 <template>
   <div v-loading="loading" class="device-container">
     <Gmps ref="gmps" @load="load" />
+    <quick />
     <Spray />
+    <Drops />
     <Toolkit />
     <sprayPlan />
     <canvas id="myCan" width="300" height="300" style="display:none;" />
@@ -11,8 +13,10 @@
 <script>
 import Gmps from '@/components/GMaps'
 import Spray from './components/spray'
+import Drops from './components/drops'
 import Toolkit from './components/toolkit'
 import sprayPlan from './components/sprayPlan'
+import quick from './components/quick'
 import mapFun from '@/utils/mapFun'
 import { getDevice } from '@/api/deviceControl'
 import { drops, pump, fertilizer, soil, weather, spray, ndvi, height, canopy } from './parsing'
@@ -21,8 +25,10 @@ export default {
   components: {
     Gmps,
     Spray,
+    Drops,
     Toolkit,
-    sprayPlan
+    sprayPlan,
+    quick
   },
   data() {
     return {
@@ -43,7 +49,7 @@ export default {
       const self = this
       devices.forEach((item, index) => {
         switch (item.dclass) {
-          case config.DROPS_CLASS: drops(item); break
+          case config.DROPS_CLASS: drops(item, self); break
           case config.PUMP_CLASS: pump(item); break
           case config.FERTILIZER_CLASS: fertilizer(item); break
           case config.SOIL_CLASS: soil(item, self); break

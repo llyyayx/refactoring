@@ -4,8 +4,10 @@ import mapFun from '@/utils/mapFun'
 // 解析土壤墒情传感器
 export function soil(item, self) {
   const { dclass, serialno, dname, latitude, longitude } = item
-  store.dispatch('device/setSoil', { dname, latitude, longitude, dclass, serialno })
-  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/run/fm.png') })
+  store.dispatch('device/setSoil', { dname, latitude, longitude, dclass, serialno,
+    icon: require('@/icons/device/close/sqz.png')
+  })
+  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/sqz.png') })
   clickEvent(mapSpot, self)
 }
 

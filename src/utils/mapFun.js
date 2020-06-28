@@ -38,6 +38,36 @@ export default {
   },
 
   /**
+   * 地图上绘制多边形
+   * @param { Object } map 地图实例化对象
+   * @param { Array } kml 区域经纬度数组-二维数组
+   * @param { String } color 区域颜色
+   */
+  mapPolygon(map, kml, color) {
+    // eslint-disable-next-line no-eval
+    const areaKml = eval(kml)
+    areaKml.forEach((item) => {
+      const child = item
+      const array = []
+      child.forEach((el, index) => {
+        array.push({
+          lng: parseFloat(el.lng),
+          lat: parseFloat(el.lat)
+        })
+      })
+      const bermudaTriangle = new google.maps.Polygon({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        paths: array
+      })
+      bermudaTriangle.setMap(map)
+    })
+  },
+
+  /**
    * 地图右上角添加选项按钮
    * @param { Object } map 地图对象
    * @param { String } name 按钮名称
