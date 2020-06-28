@@ -34,7 +34,8 @@ export default {
         zoom: this.mapData.zoom,
         center: { lat: this.mapData.lat, lng: this.mapData.lng },
         mapTypeId: 'hybrid',
-        gestureHandling: 'greedy'
+        gestureHandling: 'greedy',
+        fullscreenControl: false
       }
       // eslint-disable-next-line no-undef
       const map = new google.maps.Map(document.getElementById('Gmaps'), options)

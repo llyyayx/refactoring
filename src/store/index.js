@@ -8,6 +8,7 @@ import permission from './modules/permission'
 import tagsView from './modules/tagsView'
 import device from './modules/device'
 import map from './modules/map'
+import control from './modules/control'
 
 Vue.use(Vuex)
 
@@ -19,7 +20,8 @@ const store = new Vuex.Store({
     permission,
     tagsView,
     device,
-    map
+    map,
+    control
   },
   getters
 })

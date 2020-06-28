@@ -22,3 +22,14 @@ export function action(data) {
     data
   })
 }
+
+/**
+ * 获取计划
+ * @param { String } serialno 设备标识
+ */
+export function plans(serialno) {
+  return request({
+    url: `/plans/${serialno}`,
+    method: 'get'
+  })
+}

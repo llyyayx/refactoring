@@ -9,18 +9,18 @@
               <svg-icon icon-class="fullscreen" @click="full" />
             </el-tooltip>
             <el-tooltip content="关闭">
-              <svg-icon icon-class="close" class="spray__icon--close" @click="show = !show" />
+              <svg-icon icon-class="close" class="spray__icon--close" @click="closeSpray" />
             </el-tooltip>
           </el-col>
         </el-row>
         <!-- 喷灌机部分go -->
         <div v-show="spray.length > 0" class="spray__title">喷灌机</div>
         <el-row v-for="(item,index) in spray" :key="index" type="flex" :gutter="20" class="spray__row">
-          <el-col :lg="4" :sm="2" :xs="2">
-            <div class="spray__imgBox">
+          <el-col :lg="4" :sm="2" :xs="2" @dblclick.native="sprayCtrl(item)">
+            <div class="spray__imgBox pointer">
               <img :src="item.icon" alt="喷灌机图标">
             </div>
-            <div class="spray__name">{{ item.dname }}</div>
+            <div class="spray__name pointer">{{ item.dname }}</div>
           </el-col>
           <el-col :lg="20" :sm="22" :xs="22">
             <el-row :gutter="10">
@@ -65,10 +65,10 @@
             <el-col :lg="20" :sm="22" :xs="22">
               <el-row :gutter="10">
                 <el-col v-for="attr in item" :key="attr.spraySerialno" :lg="valveSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb menux" @dblclick.native="control([attr])">
-                  <div class="spray__imgBox spray__imgBox2">
+                  <div class="spray__imgBox spray__imgBox2 pointer">
                     <img :src="attr.icon" alt="喷头图标">
                   </div>
-                  <div class="spray__attr spray__attr2">{{ '喷头0' + attr.idx }}</div>
+                  <div class="spray__attr spray__attr2 pointer">{{ '喷头0' + attr.idx }}</div>
                 </el-col>
               </el-row>
               <el-divider class="spray__divider" />
@@ -78,7 +78,7 @@
         <!-- 灌机喷头部分go -->
       </div>
     </transition>
-    <!-- 控制对话框go -->
+    <!-- 喷头控制对话框go -->
     <el-dialog :visible.sync="dialog" class="dialog" width="570px">
       <el-tabs type="border-card" class="dialog__tabs">
         <el-tab-pane label="常开常关" />
@@ -106,22 +106,41 @@
       </el-tabs>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeValve">关 阀</el-button>
-        <el-button type="primary" @click="dialog = false">开 阀</el-button>
+        <el-button type="primary" @click="openValve">开 阀</el-button>
       </span>
     </el-dialog>
-    <!-- 控制对话框end -->
+    <!-- 喷头控制对话框end -->
+    <!-- 喷灌机控制对话框go -->
+    <el-dialog :visible.sync="sprayDialog" width="570px">
+      <div class="coler__box">
+        <div v-for="(item, index) in sprayCtr" :key="index" class="coler">
+          <div class="colf">{{ item.name }}</div>
+          <div class="corg">
+            <el-radio-group v-model="item.value" size="small" @change="(val) => sprayModel(val,index)">
+              <el-radio-button v-for="item2 in item.selete" :key="item2.label" :label="item2.label">{{ item2.title }}</el-radio-button>
+            </el-radio-group>
+          </div>
+        </div>
+        <div class="coler">
+          <div class="colf">行走速率</div>
+          <div class="corg" style="width: 110px">
+            <el-slider v-model="rate" @change="sprayRate" />
+          </div>
+        </div>
+      </div>
+    </el-dialog>
+    <!-- 喷灌机控制对话框end -->
   </div>
 </template>
 
 <script>
 import Draggabilly from 'draggabilly'
+import command from '@/utils/command'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
 export default {
   data() {
     return {
-      // 喷灌面板的显示隐藏
-      show: true,
       // 用于判断分类模式：跨 || 阀控
       value: false,
       // 全屏模式下：灌机属性lg列数
@@ -136,15 +155,38 @@ export default {
       subValve: [],
       // 控制对话框显示隐藏
       dialog: false,
+      // 喷灌机对话框显示隐藏
+      sprayDialog: false,
       // 脉冲模式下的周期
       cycle: '',
       // 脉冲模式下的占空比
       ratio: '',
       // 选择要进行操控的喷头
-      ctrlDev: []
+      ctrlDev: [],
+      // 选择准备控制的喷灌机
+      sprayObj: {},
+      // 喷灌机模式
+      sprayCtr: [
+        { name: '灌机控制', value: '0', selete: [{ title: '启动', label: 1 }, { title: '停止', label: 2 }], model: 'state' },
+        { name: '运行模式', value: '0', selete: [{ title: '手动', label: 1 }, { title: '自动', label: 2 }], model: 'model' },
+        { name: '行进方向', value: '0', selete: [{ title: '正向', label: 1 }, { title: '反向', label: 2 }], model: 'direction' },
+        { name: '行进方式', value: '0', selete: [{ title: '有水', label: 1 }, { title: '无水', label: 2 }], model: 'water' },
+        { name: '尾枪设置', value: '0', selete: [{ title: '打开', label: 1 }, { title: '关闭', label: 2 }], model: 'gun' }
+      ],
+      // 喷灌机行走速率
+      rate: 100,
+      // 指令发送结构
+      tip: {
+        success: '指令已发送',
+        error: '指令发送失败'
+      }
     }
   },
   computed: {
+    // 喷灌面板的显示隐藏
+    show() {
+      return this.$store.state.control.sprayShow
+    },
     spray() {
       return this.$store.state.device.spray
     },
@@ -235,8 +277,12 @@ export default {
       }
     },
 
+    closeSpray() {
+      this.$store.dispatch('control/sprayShow', false)
+    },
+
     /**
-     * 控制
+     * 喷头控制
      * @param { Array } device 需控制的设备列表
      */
     control(device) {
@@ -299,25 +345,179 @@ export default {
     },
 
     /**
-     * 关闭动作
+     * 成功提示框
+     * @param { String } text 可选,提示性文字
+     */
+    success(text) {
+      this.$notify.success({
+        title: '成功',
+        message: text || this.tip.success
+      })
+    },
+
+    /**
+     * 错误提示框
+     * @param { String } text 可选,提示性文字
+     */
+    error(text) {
+      this.$notify.error({
+        title: '错误',
+        message: text || this.tip.error
+      })
+    },
+
+    /**
+     * 喷头发送控制指令（单纯的提取一下）
+     * @param { Object } valve 喷头对象
+     * @param { String } mode 指令(打开或者关闭)
+     */
+    ctrlValve(valve, mode) {
+      action({
+        serialno: valve.rtuSerialno,
+        actions: [{
+          namekey: mode + valve.port,
+          params: true
+        }]
+      }).then((e) => {
+        this.success()
+      }).catch((e) => {
+        this.error()
+      })
+    },
+
+    /**
+     * 喷头关闭动作
      */
     closeValve() {
       const ctrlDev = this.ctrlDev
-      console.log(ctrlDev)
       ctrlDev.forEach((el) => {
-        action({
-          serialno: el.rtuSerialno,
-          actions: [{
-            namekey: 'Close_PulseValve_' + el.port,
-            params: true
-          }]
-        }).then((e) => {
-          console.log(e)
-        }).catch((e) => {
-          console.log(e)
-        })
+        this.ctrlValve(el, command.closeValve)
       })
       this.dialog = false
+    },
+
+    /**
+     * 喷头开启动作
+     */
+    openValve() {
+      const ctrlDev = this.ctrlDev
+      ctrlDev.forEach((el) => {
+        this.ctrlValve(el, command.openValve)
+      })
+      this.dialog = false
+    },
+
+    /**
+     * 打开喷灌机对话框
+     * @param { Object } item 喷灌机对象
+     */
+    sprayCtrl(item) {
+      this.sprayDialog = true
+      this.sprayObj = item
+    },
+
+    /**
+     * 喷灌机控制项-筛选对应
+     * @param { String } 用户选择的值
+     * @param { Number } 选择的第几项
+     */
+    sprayModel(val, index) {
+      this.sprayCtr[index].value = val
+      switch (this.sprayCtr[index].model) {
+        case 'state' : this.sprayState(val); break
+        case 'direction': this.sprayDirection(val); break
+        case 'water': this.sprayWater(val); break
+        case 'gun': this.sprayGun(val); break
+      }
+    },
+
+    /**
+     * 喷灌机发送控制指令（单纯的提取一下）
+     * @param { namekey } mode 指令
+     */
+    ctrlSpray(namekey) {
+      action({
+        serialno: this.sprayObj.serialno,
+        actions: [{
+          namekey: namekey,
+          params: true
+        }]
+      }).then((e) => {
+        this.success()
+      }).catch((e) => {
+        this.error()
+      })
+    },
+
+    /**
+     * 喷灌机启停控制
+     * @param { Number } 状态码,1启动2停止
+     */
+    sprayState(state) {
+      let namekey = command.openSpray
+      if (state === 2) namekey = command.closeSpray
+      this.ctrlSpray(namekey)
+    },
+
+    /**
+     * 喷灌机行进方向设置
+     * @param { Number } 状态码,1正向2反向
+     */
+    sprayDirection(state) {
+      let namekey = command.positive
+      if (state === 2) namekey = command.reverse
+      this.ctrlSpray(namekey)
+    },
+
+    /**
+     * 喷灌机行进方式设置
+     * @param { Number } 状态码,1有水行进2无水行进
+     */
+    sprayWater(state) {
+      let namekey = command.beWater
+      if (state === 2) namekey = command.noWater
+      this.ctrlSpray(namekey)
+    },
+
+    /**
+     * 喷灌机尾枪设置
+     * @param { Number } 状态码,1尾枪打开2尾枪关闭
+     */
+    sprayGun(state) {
+      let namekey = command.openGun
+      if (state === 2) namekey = command.closeGun
+      this.ctrlSpray(namekey)
+    },
+
+    /**
+     * 喷灌机行走速率设置
+     * @param { Number } 速率值
+     */
+    sprayRate(val) {
+      this.$confirm('您确定把行走速率设置为' + val + '% ?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+        const actions = []
+        const speed = command.speed
+        speed.forEach((el) => {
+          actions.push({
+            namekey: el,
+            params: val
+          })
+        })
+        action({
+          serialno: this.sprayObj.serialno,
+          actions: actions
+        }).then((e) => {
+          this.success()
+        }).catch((e) => {
+          this.error()
+        })
+      }).catch(() => {
+        this.rate = val
+      })
     }
 
   }
@@ -423,9 +623,11 @@ export default {
         width: 100%;
       }
     }
+    & .pointer{
+      cursor: pointer;
+    }
     & .spray__imgBox2 {
       width: 30px;
-      cursor: pointer;
     }
     & .spray__pt{
       font-size: 16px;
@@ -455,6 +657,22 @@ export default {
        margin: 0 5px 5px 5px;
      }
     }
+  }
+}
+
+.coler__box{
+  display: flex;
+  flex-wrap: wrap;
+}
+.coler{
+  display: flex;
+  margin-right: 40px;
+  align-items: center;
+  margin-bottom: 20px;
+  & .colf{
+    margin-right: 15px;
+    font-size: 14px;
+    font-weight: 600;
   }
 }
 
