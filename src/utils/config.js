@@ -12,6 +12,16 @@ export default {
   SPRAY_VALVE_CLASS: 13,
   NDVI_CLASS: 17,
   HEIGHT_CLASS: 18,
-  CANOPY_CLASS: 12
+  CANOPY_CLASS: 12,
+
+  MQTT_TOPIC: 'D/192.168.8.11_jiale/#',
+  MQTT_HOST: 'www.zesi.com.cn',
+  MQTT_PORT: 443,
+  MQTT_ADDR: '/mqtt',
+  MQTT_USETLS: true,
+  MQTT_USERNAME: 'user',
+  MQTT_PASSWORD: 'Dev1"3$5',
+  MQTT_CLEANSESSION: false,
+  MQTT_TIMEOUT: 10
 
 }

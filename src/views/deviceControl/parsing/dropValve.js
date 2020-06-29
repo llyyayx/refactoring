@@ -21,7 +21,8 @@ export function dropValve(cells, pname) {
           clickEvent(mapSpot)
           drops.push({
             dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort, mapSpot,
-            areaName: item.name, areaId: id, icon: require('@/icons/device/close/fm.png'), pname: pname
+            areaName: item.name, areaId: id, icon: require('@/icons/device/close/fm.png'), pname: pname,
+            idx: drops.length === 0 ? 1 : drops.length + 1
           })
         } break
       }
@@ -47,7 +48,7 @@ function marKer(obj) {
  * @param { Object } self 组件指针this
  */
 function clickEvent(mapSpot, self) {
-  /* mapFun.marKerClickEvent(mapSpot, () => {
-    self.$store.dispatch('control/sprayShow', true)
-  }) */
+  mapFun.marKerClickEvent(mapSpot, () => {
+    store.dispatch('control/dropShow', true)
+  })
 }

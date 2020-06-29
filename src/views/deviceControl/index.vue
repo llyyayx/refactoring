@@ -17,7 +17,9 @@ import Drops from './components/drops'
 import Toolkit from './components/toolkit'
 import sprayPlan from './components/sprayPlan'
 import quick from './components/quick'
+import state from './mixins/state'
 import mapFun from '@/utils/mapFun'
+import Paho from '@/utils/mqttws31'
 import { getDevice } from '@/api/deviceControl'
 import { drops, pump, fertilizer, soil, weather, spray, ndvi, height, canopy } from './parsing'
 export default {
@@ -30,6 +32,7 @@ export default {
     sprayPlan,
     quick
   },
+  mixins: [state],
   data() {
     return {
       loading: true,
@@ -49,7 +52,7 @@ export default {
       const self = this
       devices.forEach((item, index) => {
         switch (item.dclass) {
-          case config.DROPS_CLASS: drops(item, self); break
+          case config.DROPS_CLASS: drops(item); break
           case config.PUMP_CLASS: pump(item); break
           case config.FERTILIZER_CLASS: fertilizer(item); break
           case config.SOIL_CLASS: soil(item, self); break
@@ -60,7 +63,11 @@ export default {
           case config.CANOPY_CLASS: canopy(item); break
         }
       })
+      this.dropValveState()
+      this.sprayValveState()
+      this.mqttServer()
       this.loading = false
+
       /* console.log(this.$store.state.device.drops)
       console.log(this.$store.state.device.dropsCell)
       console.log(this.$store.state.device.dropsValve)
@@ -95,10 +102,99 @@ export default {
       this.$refs.gmps.setCenter(lat, lng)
     },
 
+    // 地图右上栏
     mapRgTop() {
       mapFun.mapRgTop(this.map, '工具箱', require('@/icons/device/tool.png'), () => {
         this.$store.dispatch('control/toolShow', true)
       })
+    },
+
+    // MQTT全设备状态监听
+    mqttServer() {
+      const _this = this
+      const config = this.$config
+      const client = new Paho.MQTT.Client(config.MQTT_HOST, config.MQTT_PORT, config.MQTT_ADDR, new Date().getTime().toString())
+      // 客户端连接
+      client.connect({
+        // 建立连接,马上发起订阅
+        onSuccess: function() {
+          client.subscribe(config.MQTT_TOPIC, { qos: 0 })
+        },
+        // 用户名
+        userName: config.MQTT_USERNAME,
+        // 密码
+        password: config.MQTT_PASSWORD,
+        // 属性配置
+        cleanSession: config.MQTT_CLEANSESSION,
+        useSSL: config.MQTT_USETLS,
+        timeout: config.MQTT_TIMEOUT
+      })
+      // 消息到达回调函数
+      client.onMessageArrived = function(msg) {
+        const data = JSON.parse(msg.payloadString)
+        console.log(data)
+        if (data.code || data.code === 4) {
+          const device = _this.mqttScreen(data)
+          _this.classify(data, device)
+        }
+      }
+      // 连接超时
+      client.onConnectionLost = function() {
+        const time = setTimeout(function() {
+          _this.mqttServer()
+          clearTimeout(time)
+        }, 1500)
+      }
+    },
+
+    /**
+     * 找到mqtt返回的设备对象
+     * @param { Object } res mqtt返回值
+     * @return { Object } 与之相匹配的设备
+     */
+    mqttScreen(res) {
+      const allDevice = this.$store.state.device
+      const keys = Object.keys(allDevice)
+      let result = false
+      let device = {}
+      for (let i = 0; i < keys.length; i++) {
+        if (result) break
+        const alone = allDevice[keys[i]]
+        // 循环全部设备
+        for (let j = 0; j < alone.length; j++) {
+          if (result) break
+          if (Object.prototype.toString.call(alone[j]) === '[object Array]') {
+            const fm = alone[j]
+            for (let z = 0; z < fm.length; z++) {
+              if (res.serialno === fm[z].serialno) {
+                device = alone[j][z]
+                result = true
+                break
+              }
+            }
+          } else {
+            if (res.serialno === alone[j].serialno) {
+              device = alone[j]
+              result = true
+              break
+            }
+          }
+        }
+      }
+      return device
+    },
+
+    /**
+     * 根据设备类型去解析
+     * @param { Object } data mqtt返回值
+     * @param { Object } 与返回相匹配的设备
+     */
+    classify(data, device) {
+      console.log(device)
+      const config = this.$config
+      switch (device.dclass) {
+        case config.DROPS_VALVE_CLASS: this.mqttJxValve(data, device); break
+      }
     }
 
   }

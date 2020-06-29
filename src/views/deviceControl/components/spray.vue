@@ -138,6 +138,7 @@ import Draggabilly from 'draggabilly'
 import command from '@/utils/command'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
+import { debounce } from '@/utils'
 export default {
   data() {
     return {
@@ -261,7 +262,7 @@ export default {
       const deom = this.$refs.spray
       if (!this.fullScreen) {
         deom.classList.add('animation')
-        deom.setAttribute('style', 'top:0; left:0; width:100%; max-height:100%; height:100%; border-radius:0')
+        deom.setAttribute('style', 'top:0; left:0; width:100%; max-height:100%; height:100%; border-radius:0; z-index: 10;')
         this.pgSpan = 2
         this.valveSpan = 2
         this.fullScreen = true
@@ -348,23 +349,23 @@ export default {
      * 成功提示框
      * @param { String } text 可选,提示性文字
      */
-    success(text) {
+    success: debounce(function(text) {
       this.$notify.success({
         title: '成功',
         message: text || this.tip.success
       })
-    },
+    }, 500, false),
 
     /**
      * 错误提示框
      * @param { String } text 可选,提示性文字
      */
-    error(text) {
+    error: debounce(function(text) {
       this.$notify.error({
         title: '错误',
         message: text || this.tip.error
       })
-    },
+    }, 500, false),
 
     /**
      * 喷头发送控制指令（单纯的提取一下）

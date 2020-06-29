@@ -7,7 +7,11 @@ import request from '@/utils/request'
 export function getDevice(groupId) {
   return request({
     url: `/projects/group/${groupId}`,
-    method: 'get'
+    method: 'get',
+    auth: {
+      username: 'admin',
+      password: 'admin'
+    }
   })
 }
 
@@ -30,6 +34,17 @@ export function action(data) {
 export function plans(serialno) {
   return request({
     url: `/plans/${serialno}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 查询设备状态
+ * @param { String } serialno 设备标识
+ */
+export function real(serialno) {
+  return request({
+    url: `/real/${serialno}`,
     method: 'get'
   })
 }

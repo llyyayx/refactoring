@@ -2,66 +2,18 @@
   <div class="quick-container">
     <!-- 顶部列表go -->
     <el-row type="flex" class="quick__box">
-      <el-col v-show="dropValve.length" class="quick__box--item" @click.native="setDevice('dropValve')">
+      <el-col v-for="(item, index) in quickList" v-show="deviceLen(item.obj)" :key="index" class="quick__box--item" @click.native="setDevice(item.obj)">
         <div class="img__box">
-          <img src="@/icons/device/run/fm.png">
+          <img :src="item.icon">
         </div>
-        <div class="quick__box--title">阀门</div>
-      </el-col>
-      <el-col v-show="weather.length" class="quick__box--item" @click.native="setDevice('weather')">
-        <div class="img__box">
-          <img src="@/icons/device/run/qxz.png">
-        </div>
-        <div class="quick__box--title">气象站</div>
-      </el-col>
-      <el-col v-show="soil.length" class="quick__box--item" @click.native="setDevice('soil')">
-        <div class="img__box">
-          <img src="@/icons/device/run/sqz.png">
-        </div>
-        <div class="quick__box--title">墒情站</div>
-      </el-col>
-      <el-col v-show="fertilizer.length" class="quick__box--item" @click.native="setDevice('fertilizer')">
-        <div class="img__box">
-          <img src="@/icons/device/run/sf.png">
-        </div>
-        <div class="quick__box--title">施肥机</div>
-      </el-col>
-      <el-col v-show="pump.length" class="quick__box--item" @click.native="setDevice('pump')">
-        <div class="img__box">
-          <img src="@/icons/device/run/sb.png">
-        </div>
-        <div class="quick__box--title">水泵</div>
-      </el-col>
-      <el-col v-show="spray.length" class="quick__box--item" @click.native="setDevice('spray')">
-        <div class="img__box">
-          <img src="@/icons/device/run/pg.png">
-        </div>
-        <div class="quick__box--title">喷灌机</div>
-      </el-col>
-      <el-col v-show="canopy.length" class="quick__box--item" @click.native="setDevice('canopy')">
-        <div class="img__box">
-          <img src="@/icons/device/run/sqz.png">
-        </div>
-        <div class="quick__box--title">灌层温度</div>
-      </el-col>
-      <el-col v-show="ndvi.length" class="quick__box--item" @click.native="setDevice('ndvi')">
-        <div class="img__box">
-          <img src="@/icons/device/run/sqz.png">
-        </div>
-        <div class="quick__box--title">NDVI</div>
-      </el-col>
-      <el-col v-show="height.length" class="quick__box--item" @click.native="setDevice('height')">
-        <div class="img__box">
-          <img src="@/icons/device/run/sqz.png">
-        </div>
-        <div class="quick__box--title">高度</div>
+        <div class="quick__box--title">{{ item.title }}</div>
       </el-col>
     </el-row>
     <el-divider class="divider2" />
     <!-- 顶部列表end -->
     <!-- 设备展示栏go -->
     <el-row :class="['quick__content', state]">
-      <el-col v-for="(item, index) in deviceList" :key="index" class="quick__content--item">
+      <el-col v-for="(item, index) in deviceList" :key="index" class="quick__content--item" @click.native="touch(item)">
         <div class="img_box2">
           <img :src="item.icon">
         </div>
@@ -83,13 +35,24 @@ export default {
     return {
       // 设备列表显示隐藏
       state: 'off',
+      quickList: [
+        { title: '滴灌', icon: require('@/icons/device/run/dg.png'), obj: 'drops' },
+        { title: '喷灌', icon: require('@/icons/device/run/pg.png'), obj: 'spray' },
+        { title: '气象站', icon: require('@/icons/device/run/qxz.png'), obj: 'weather' },
+        { title: '墒情站', icon: require('@/icons/device/run/sqz.png'), obj: 'soil' },
+        { title: '施肥机', icon: require('@/icons/device/run/sqz.png'), obj: 'fertilizer' },
+        { title: '灌层站', icon: require('@/icons/device/run/sqz.png'), obj: 'canopy' },
+        { title: 'NDVI', icon: require('@/icons/device/run/sqz.png'), obj: 'ndvi' },
+        { title: '水泵', icon: require('@/icons/device/run/sb.png'), obj: 'pump' },
+        { title: '高度', icon: require('@/icons/device/run/sqz.png'), obj: 'height' }
+      ],
       // 下拉设备列表
       deviceList: []
     }
   },
   computed: {
-    dropValve() {
-      return this.$store.state.device.dropsValve
+    drops() {
+      return this.$store.state.device.drops
     },
     weather() {
       return this.$store.state.device.weather
@@ -117,14 +80,17 @@ export default {
     }
   },
   methods: {
+
     // 打开快捷栏
     open() {
       this.state = 'on'
     },
+
     // 关闭快捷栏
     close() {
       this.state = 'off'
     },
+
     // 转换
     onOff() {
       if (this.state === 'off') {
@@ -133,6 +99,12 @@ export default {
         this.close(0)
       }
     },
+
+    // 返回对象长度>0的布尔值
+    deviceLen(name) {
+      return this[name].length > 0
+    },
+
     /**
      * 填充设备列表
      * @param { String } device 设备对象名称
@@ -140,7 +112,14 @@ export default {
     setDevice(device) {
       this.deviceList = this[device]
       this.open()
+    },
+
+    /* 快捷菜单控制设备 */
+    touch(item) {
+      // eslint-disable-next-line no-undef
+      google.maps.event.trigger(item.mapSpot, 'click')
     }
+
   }
 }
 </script>

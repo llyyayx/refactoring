@@ -1,8 +1,8 @@
 export default {
 
-  // 开阀门
+  // 开-阀门/喷头
   openValve: 'Open_PulseValve_',
-  // 关阀门
+  // 关-阀门/喷头
   closeValve: 'Close_PulseValve_',
   // 开喷灌机
   openSpray: 'start_Pivot',

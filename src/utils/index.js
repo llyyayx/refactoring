@@ -113,3 +113,29 @@ export function param2Obj(url) {
       '"}'
   )
 }
+
+/**
+ *
+ * @param { Function } func 需要防抖的函数
+ * @param { Number } wait 延迟时间
+ * @param { Boolean } immediate 是否立即执行
+ */
+export function debounce(func, wait, immediate) {
+  let timeout
+  return function(...args) {
+    const context = this
+    if (timeout) clearTimeout(timeout)
+
+    if (immediate) {
+      const callNow = !timeout
+      timeout = setTimeout(function() {
+        timeout = null
+      }, wait)
+      if (callNow) func.apply(context, args)
+    } else {
+      timeout = setTimeout(function() {
+        func.apply(context, args)
+      }, wait)
+    }
+  }
+}

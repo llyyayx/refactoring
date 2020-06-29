@@ -1,7 +1,7 @@
 <template>
   <div class="drops-container">
     <transition name="el-fade-in">
-      <div v-show="show" ref="spray" class="drops-box">
+      <div v-show="show" ref="drops" class="drops-box">
         <!-- 顶部按钮 -->
         <el-row class="drops__top">
           <el-col :span="2" :offset="22" class="drops__icon">
@@ -39,7 +39,7 @@
                   <div class="drops__imgBox drops__imgBox2 pointer">
                     <img :src="attr.icon" alt="阀门图标">
                   </div>
-                  <div class="drops__attr drops__attr2 pointer">{{ '阀门0' + attr.rtuPort }}</div>
+                  <div class="drops__attr drops__attr2 pointer">{{ attr.dname }}</div>
                 </el-col>
               </el-row>
               <el-divider class="drops__divider" />
@@ -52,8 +52,12 @@
     <!-- 阀门控制对话框go -->
     <el-dialog :visible.sync="dialog" class="dialog" width="570px">
       <el-tag v-for="(item, index) in ctrlDev" :key="item.idx" effect="dark" class="tag" closable @close="delValve(index)">
-        {{ '阀门0'+index }}
+        {{ '阀门0'+item.idx }}
       </el-tag>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeValve">关 阀</el-button>
+        <el-button type="primary" @click="openValve">开 阀</el-button>
+      </span>
     </el-dialog>
     <!-- 阀门控制对话框end -->
   </div>
@@ -62,6 +66,9 @@
 <script>
 import Draggabilly from 'draggabilly'
 import { drag } from '@/utils/drag'
+import { action } from '@/api/deviceControl'
+import command from '@/utils/command'
+import { debounce } from '@/utils'
 export default {
   data() {
     return {
@@ -69,36 +76,49 @@ export default {
       valveSpan: 4,
       // 是否全屏显示面板
       fullScreen: false,
-      // 每个喷灌机框选的喷头(二维)
+      // 每个滴灌分区框选的喷头(二维)
       subValve: [],
       // 选择要进行操控的喷头
       ctrlDev: [],
       // 控制对话框显示隐藏
       dialog: false,
-      dropValve: [
+      // 指令发送结构
+      tip: {
+        success: '指令已发送',
+        error: '指令发送失败'
+      }
+      /* dropValve: [
         [{ pname: '滴灌--test', serialno: '0104.0007.2019001000', rtuPort: 1, pserialno: '0104.0007.201900199', areaId: 1, areaName: '片区1',
           icon: require('@/icons/device/close/fm.png') },
         { pname: '滴灌--test', serialno: '0104.0007.2019001001', rtuPort: 2, pserialno: '0104.0007.201900199', areaId: 1, areaName: '片区1',
           icon: require('@/icons/device/close/fm.png') }]
-      ]
+      ] */
     }
   },
   computed: {
     // 滴灌面板的显示隐藏
     show() {
       return this.$store.state.control.dropShow
-    }
+    },
     // 滴灌阀门
-    /* dropValve() {
+    dropValve() {
       return this.$store.state.device.dropsValve
-    } */
+    }
   },
   watch: {
     dropValve: function() {
       this.$nextTick(() => {
         drag('dgzzle', 'menux', (list, dom) => {
-          console.log(list)
-          console.log(dom)
+          const group = this.valveCtrGroup(this.dropValve[dom])
+          let len = []
+          for (let j = 0; j < group.length; j++) {
+            len = len.concat(group[j])
+          }
+          const ctrlDev = []
+          for (let i = 0; i < list.length; i++) {
+            ctrlDev.push(len[list[i]])
+          }
+          this.$set(this.subValve, dom, ctrlDev)
         })
       })
     }
@@ -108,20 +128,6 @@ export default {
     new Draggabilly('.drops-box', {
       containment: '.device-container'
     })
-    this.$nextTick(() => {
-      drag('dgzzle', 'menux', (list, dom) => {
-        const group = this.valveCtrGroup(this.dropValve[dom])
-        let len = []
-        for (let j = 0; j < group.length; j++) {
-          len = len.concat(group[j])
-        }
-        const ctrlDev = []
-        for (let i = 0; i < list.length; i++) {
-          ctrlDev.push(len[list[i]])
-        }
-        this.$set(this.subValve, dom, ctrlDev)
-      })
-    })
   },
   methods: {
 
@@ -129,10 +135,10 @@ export default {
      * 全屏展示该组件
      */
     full() {
-      const deom = this.$refs.spray
+      const deom = this.$refs.drops
       if (!this.fullScreen) {
         deom.classList.add('animation')
-        deom.setAttribute('style', 'top:0; left:0; width:100%; max-height:100%; height:100%; border-radius:0')
+        deom.setAttribute('style', 'top:0; left:0; width:100%; max-height:100%; height:100%; border-radius:0; z-index: 10;')
         this.valveSpan = 2
         this.fullScreen = true
       } else {
@@ -146,8 +152,22 @@ export default {
       }
     },
 
+    /**
+     * 寻找数组前n项长度
+     * @param { Array } array 数组
+     * @param { Number } n 前几项
+     * @return { Number } 前n项长度
+     */
+    length(array, n) {
+      let len = 0
+      for (var i = 0; i <= n; i++) {
+        len += array[i].length
+      }
+      return len
+    },
+
     closeDrops() {
-      // this.$store.dispatch('control/dropShow', false)
+      this.$store.dispatch('control/dropShow', false)
     },
 
     /**
@@ -192,6 +212,77 @@ export default {
         return
       }
       this.control(this.subValve[index])
+    },
+
+    /**
+     * 去除已选喷头
+     * @param { Number } index 喷头序号
+     */
+    delValve(index) {
+      this.ctrlDev.splice(index, 1)
+    },
+
+    /**
+     * 成功提示框
+     * @param { String } text 可选,提示性文字
+     */
+    success: debounce(function(text) {
+      this.$notify.success({
+        title: '成功',
+        message: text || this.tip.success
+      })
+    }, 500, false),
+
+    /**
+     * 错误提示框
+     * @param { String } text 可选,提示性文字
+     */
+    error: debounce(function(text) {
+      this.$notify.error({
+        title: '错误',
+        message: text || this.tip.error
+      })
+    }, 500, false),
+
+    /**
+     * 喷头发送控制指令（单纯的提取一下）
+     * @param { Object } valve 喷头对象
+     * @param { String } mode 指令(打开或者关闭)
+     */
+    ctrlValve(valve, mode) {
+      action({
+        serialno: valve.rtuSerialno,
+        actions: [{
+          namekey: mode + valve.rtuPort,
+          params: true
+        }]
+      }).then((e) => {
+        this.success()
+      }).catch((e) => {
+        this.error()
+      })
+    },
+
+    /**
+     * 喷头关闭动作
+     */
+    closeValve() {
+      const ctrlDev = this.ctrlDev
+      ctrlDev.forEach((el) => {
+        this.ctrlValve(el, command.closeValve)
+      })
+      this.dialog = false
+    },
+
+    /**
+     * 喷头开启动作
+     */
+    openValve() {
+      const ctrlDev = this.ctrlDev
+      ctrlDev.forEach((el) => {
+        this.ctrlValve(el, command.openValve)
+      })
+      this.dialog = false
     }
 
   }
