@@ -1,26 +1,20 @@
 <template>
-  <div class="sensor-container">
-    <transition name="el-fade-in">
-      <div v-show="show" ref="drops" class="sensor-box">
-        <!-- 顶部按钮 -->
-        <el-row class="sensor__top">
-          <el-col :span="2" :offset="22" class="sensor__icon">
-            <el-tooltip content="全屏">
-              <svg-icon icon-class="fullscreen" @click="full" />
-            </el-tooltip>
-            <el-tooltip content="关闭">
-              <svg-icon icon-class="close" class="sensor__icon--close" @click="closeDrops" />
-            </el-tooltip>
-          </el-col>
-        </el-row>
-      </div>
-    </transition>
-  </div>
+  <panel :sub-class="'kill'" :child-class="'kill-box'" :show="true">
+    <div slot="main" @click="close">121212</div>
+  </panel>
 </template>
 
 <script>
+import panel from '@/components/Panel'
 export default {
-
+  components: {
+    panel
+  },
+  methods: {
+    close() {
+      alert(1212)
+    }
+  }
 }
 </script>
 

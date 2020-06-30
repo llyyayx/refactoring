@@ -1,145 +1,138 @@
 <template>
-  <div class="spray-container">
-    <transition name="el-fade-in">
-      <div v-show="show" ref="spray" class="spray-box">
-        <!-- 顶部按钮 -->
-        <el-row class="spray__top">
-          <el-col :span="2" :offset="22" class="spray__icon">
-            <el-tooltip content="全屏">
-              <svg-icon icon-class="fullscreen" @click="full" />
-            </el-tooltip>
-            <el-tooltip content="关闭">
-              <svg-icon icon-class="close" class="spray__icon--close" @click="closeSpray" />
-            </el-tooltip>
-          </el-col>
-        </el-row>
-        <!-- 喷灌机部分go -->
-        <div v-show="spray.length > 0" class="spray__title">喷灌机</div>
-        <el-row v-for="(item,index) in spray" :key="index" type="flex" :gutter="20" class="spray__row">
-          <el-col :lg="4" :sm="2" :xs="2" @dblclick.native="sprayCtrl(item)">
-            <div class="spray__imgBox pointer">
-              <img :src="item.icon" alt="喷灌机图标">
+  <Panel :sub-class="'spray-container'" :child-class="'spray-box'" :show="show">
+    <div slot="main">
+      <!-- 喷灌机部分go -->
+      <div v-show="spray.length > 0" class="spray__title">喷灌机</div>
+      <el-row v-for="(item,index) in spray" :key="index" type="flex" :gutter="20" class="spray__row">
+        <el-col :lg="4" :sm="2" :xs="2" @dblclick.native="sprayCtrl(item)">
+          <div class="spray__imgBox pointer">
+            <img :src="item.icon" alt="喷灌机图标">
+          </div>
+          <div class="spray__name pointer">{{ item.dname }}</div>
+        </el-col>
+        <el-col :lg="20" :sm="22" :xs="22">
+          <el-row :gutter="10">
+            <el-col v-for="(attr,index2) in item.attr" :key="index2" :lg="pgSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb">
+              <div class="spray__value">{{ attr.val + attr.unit }}</div>
+              <div class="spray__attr">{{ attr.name }}</div>
+            </el-col>
+          </el-row>
+          <el-divider class="spray__divider" />
+        </el-col>
+      </el-row>
+      <!-- 喷灌机部分end -->
+      <!-- 灌机喷头部分go -->
+      <el-row v-show="sprayValve.length > 0" :gutter="6" align="middle" class="spray__pt">
+        <el-col :span="4">
+          <div>灌机喷头</div>
+        </el-col>
+        <el-col :span="8">
+          <el-switch
+            v-model="value"
+            active-text="阵列划分"
+            inactive-text="按跨划分"
+            inactive-color="#13ce66"
+          />
+        </el-col>
+      </el-row>
+      <!-- 喷头主体 -->
+      <div v-for="(pgValve, idx) in sprayValve" :key="'pg'+idx" class="nozzle">
+        <div class="nozzle__heder">
+          <div class="spray__title">{{ pgValve[0].pname }}</div>
+          <transition name="el-fade-in">
+            <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="nozzle__btn" round @click="multi(idx)">控制已选中</el-button>
+          </transition>
+        </div>
+        <el-row v-for="(item,index) in groups = valveCtrGroup(pgValve)" :key="'pt'+index" type="flex" :gutter="20" class="spray__row">
+          <el-col :lg="4" :sm="2" :xs="2">
+            <div class="spray__imgBox">
+              <img src="@/icons/device/run/fm.png" alt="喷头图标">
             </div>
-            <div class="spray__name pointer">{{ item.dname }}</div>
+            <div class="spray__name">{{ value ? item[0]['descri'] : '第' + ( index -1 + 2 ) + '跨' }}</div>
           </el-col>
           <el-col :lg="20" :sm="22" :xs="22">
             <el-row :gutter="10">
-              <el-col v-for="(attr,index2) in item.attr" :key="index2" :lg="pgSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb">
-                <div class="spray__value">{{ attr.val + attr.unit }}</div>
-                <div class="spray__attr">{{ attr.name }}</div>
+              <el-col v-for="attr in item" :key="attr.spraySerialno" :lg="valveSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb menux" @dblclick.native="control([attr])">
+                <div class="spray__imgBox spray__imgBox2 pointer">
+                  <img :src="attr.icon" alt="喷头图标">
+                </div>
+                <div class="spray__attr spray__attr2 pointer">{{ '喷头0' + attr.idx }}</div>
               </el-col>
             </el-row>
             <el-divider class="spray__divider" />
           </el-col>
         </el-row>
-        <!-- 喷灌机部分end -->
-        <!-- 灌机喷头部分go -->
-        <el-row v-show="sprayValve.length > 0" :gutter="6" align="middle" class="spray__pt">
-          <el-col :span="4">
-            <div>灌机喷头</div>
-          </el-col>
-          <el-col :span="8">
-            <el-switch
-              v-model="value"
-              active-text="阵列划分"
-              inactive-text="按跨划分"
-              inactive-color="#13ce66"
-            />
-          </el-col>
-        </el-row>
-        <!-- 喷头主体 -->
-        <div v-for="(pgValve, idx) in sprayValve" :key="'pg'+idx" class="nozzle">
-          <div class="nozzle__heder">
-            <div class="spray__title">{{ pgValve[0].pname }}</div>
-            <transition name="el-fade-in">
-              <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="nozzle__btn" round @click="multi(idx)">控制已选中</el-button>
-            </transition>
-          </div>
-          <el-row v-for="(item,index) in groups = valveCtrGroup(pgValve)" :key="'pt'+index" type="flex" :gutter="20" class="spray__row">
-            <el-col :lg="4" :sm="2" :xs="2">
-              <div class="spray__imgBox">
-                <img src="@/icons/device/run/fm.png" alt="喷头图标">
-              </div>
-              <div class="spray__name">{{ value ? item[0]['descri'] : '第' + ( index -1 + 2 ) + '跨' }}</div>
-            </el-col>
-            <el-col :lg="20" :sm="22" :xs="22">
-              <el-row :gutter="10">
-                <el-col v-for="attr in item" :key="attr.spraySerialno" :lg="valveSpan" :md="3" :sm="4" :xs="6" class="spray__col__mb menux" @dblclick.native="control([attr])">
-                  <div class="spray__imgBox spray__imgBox2 pointer">
-                    <img :src="attr.icon" alt="喷头图标">
-                  </div>
-                  <div class="spray__attr spray__attr2 pointer">{{ '喷头0' + attr.idx }}</div>
-                </el-col>
-              </el-row>
-              <el-divider class="spray__divider" />
-            </el-col>
-          </el-row>
-        </div>
-        <!-- 灌机喷头部分go -->
       </div>
-    </transition>
-    <!-- 喷头控制对话框go -->
-    <el-dialog :visible.sync="dialog" class="dialog" width="570px">
-      <el-tabs type="border-card" class="dialog__tabs">
-        <el-tab-pane label="常开常关" />
-        <el-tab-pane label="脉冲模式">
-          <el-row class="demo-input-suffix" type="flex" align="middle">
-            <el-col :span="3" :xl="3" :md="5">脉冲周期</el-col>
-            <el-col :span="12" :xl="12" :md="15" :offset="1">
-              <el-input v-model="cycle" placeholder="请输入脉冲周期" maxlength="4" show-word-limit @input="cyclePut">
-                <template slot="append">秒</template>
-              </el-input>
-            </el-col>
-          </el-row>
-          <el-row class="demo-input-suffix" type="flex" align="middle">
-            <el-col :span="3" :xl="3" :md="5">占空比</el-col>
-            <el-col :span="12" :xl="12" :md="15" :offset="1">
-              <el-input v-model="ratio" placeholder="请输入占空比" maxlength="3" show-word-limit @input="ratioPut">
-                <template slot="append">%</template>
-              </el-input>
-            </el-col>
-          </el-row>
-        </el-tab-pane>
-        <el-tag v-for="(item, index) in ctrlDev" :key="item.idx" effect="dark" class="tag" closable @close="delValve(index)">
-          {{ '喷头0'+item.idx }}
-        </el-tag>
-      </el-tabs>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="closeValve">关 阀</el-button>
-        <el-button type="primary" @click="openValve">开 阀</el-button>
-      </span>
-    </el-dialog>
-    <!-- 喷头控制对话框end -->
-    <!-- 喷灌机控制对话框go -->
-    <el-dialog :visible.sync="sprayDialog" width="570px">
-      <div class="coler__box">
-        <div v-for="(item, index) in sprayCtr" :key="index" class="coler">
-          <div class="colf">{{ item.name }}</div>
-          <div class="corg">
-            <el-radio-group v-model="item.value" size="small" @change="(val) => sprayModel(val,index)">
-              <el-radio-button v-for="item2 in item.selete" :key="item2.label" :label="item2.label">{{ item2.title }}</el-radio-button>
-            </el-radio-group>
+    </div>
+    <!-- 灌机喷头部分go -->
+    <div slot="dialog">
+      <!-- 喷头控制对话框go -->
+      <el-dialog :visible.sync="dialog" class="dialog" width="570px">
+        <el-tabs type="border-card" class="dialog__tabs">
+          <el-tab-pane label="常开常关" />
+          <el-tab-pane label="脉冲模式">
+            <el-row class="demo-input-suffix" type="flex" align="middle">
+              <el-col :span="3" :xl="3" :md="5">脉冲周期</el-col>
+              <el-col :span="12" :xl="12" :md="15" :offset="1">
+                <el-input v-model="cycle" placeholder="请输入脉冲周期" maxlength="4" show-word-limit @input="cyclePut">
+                  <template slot="append">秒</template>
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="demo-input-suffix" type="flex" align="middle">
+              <el-col :span="3" :xl="3" :md="5">占空比</el-col>
+              <el-col :span="12" :xl="12" :md="15" :offset="1">
+                <el-input v-model="ratio" placeholder="请输入占空比" maxlength="3" show-word-limit @input="ratioPut">
+                  <template slot="append">%</template>
+                </el-input>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tag v-for="(item, index) in ctrlDev" :key="item.idx" effect="dark" class="tag" closable @close="delValve(index)">
+            {{ '喷头0'+item.idx }}
+          </el-tag>
+        </el-tabs>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeValve">关 阀</el-button>
+          <el-button type="primary" @click="openValve">开 阀</el-button>
+        </span>
+      </el-dialog>
+      <!-- 喷头控制对话框end -->
+      <!-- 喷灌机控制对话框go -->
+      <el-dialog :visible.sync="sprayDialog" width="570px">
+        <div class="coler__box">
+          <div v-for="(item, index) in sprayCtr" :key="index" class="coler">
+            <div class="colf">{{ item.name }}</div>
+            <div class="corg">
+              <el-radio-group v-model="item.value" size="small" @change="(val) => sprayModel(val,index)">
+                <el-radio-button v-for="item2 in item.selete" :key="item2.label" :label="item2.label">{{ item2.title }}</el-radio-button>
+              </el-radio-group>
+            </div>
+          </div>
+          <div class="coler">
+            <div class="colf">行走速率</div>
+            <div class="corg" style="width: 110px">
+              <el-slider v-model="rate" @change="sprayRate" />
+            </div>
           </div>
         </div>
-        <div class="coler">
-          <div class="colf">行走速率</div>
-          <div class="corg" style="width: 110px">
-            <el-slider v-model="rate" @change="sprayRate" />
-          </div>
-        </div>
-      </div>
-    </el-dialog>
-    <!-- 喷灌机控制对话框end -->
-  </div>
+      </el-dialog>
+      <!-- 喷灌机控制对话框end -->
+    </div>
+  </Panel>
 </template>
 
 <script>
+import Panel from '@/components/Panel'
 import Draggabilly from 'draggabilly'
 import command from '@/utils/command'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
 import { debounce } from '@/utils'
 export default {
+  components: {
+    Panel
+  },
   data() {
     return {
       // 用于判断分类模式：跨 || 阀控

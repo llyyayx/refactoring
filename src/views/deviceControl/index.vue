@@ -1,11 +1,12 @@
 <template>
   <div v-loading="loading" class="device-container">
     <Gmps ref="gmps" @load="load" />
-    <quick />
+    <Quick />
     <Spray />
     <Drops />
+    <Sensor />
     <Toolkit />
-    <sprayPlan />
+    <SprayPlan />
     <canvas id="myCan" width="300" height="300" style="display:none;" />
   </div>
 </template>
@@ -14,9 +15,10 @@
 import Gmps from '@/components/GMaps'
 import Spray from './components/spray'
 import Drops from './components/drops'
+import Sensor from './components/sensor'
 import Toolkit from './components/toolkit'
-import sprayPlan from './components/sprayPlan'
-import quick from './components/quick'
+import SprayPlan from './components/sprayPlan'
+import Quick from './components/quick'
 import state from './mixins/state'
 import mapFun from '@/utils/mapFun'
 import Paho from '@/utils/mqttws31'
@@ -28,9 +30,10 @@ export default {
     Gmps,
     Spray,
     Drops,
+    Sensor,
     Toolkit,
-    sprayPlan,
-    quick
+    SprayPlan,
+    Quick
   },
   mixins: [state],
   data() {
