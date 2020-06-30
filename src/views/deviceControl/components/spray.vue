@@ -1,5 +1,5 @@
 <template>
-  <Panel :sub-class="'spray-container'" :child-class="'spray-box'" :show="show">
+  <Panel :sub-class="'spray-container'" :child-class="'spray-box'" :show="show" @close="closeSpray" @full="full">
     <div slot="main">
       <!-- 喷灌机部分go -->
       <div v-show="spray.length > 0" class="spray__title">喷灌机</div>
@@ -64,7 +64,7 @@
         </el-row>
       </div>
     </div>
-    <!-- 灌机喷头部分go -->
+    <!-- 灌机喷头部分end -->
     <div slot="dialog">
       <!-- 喷头控制对话框go -->
       <el-dialog :visible.sync="dialog" class="dialog" width="570px">
@@ -124,7 +124,6 @@
 
 <script>
 import Panel from '@/components/Panel'
-import Draggabilly from 'draggabilly'
 import command from '@/utils/command'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
@@ -141,8 +140,6 @@ export default {
       pgSpan: 4,
       // 全屏模式下：喷头lg列数
       valveSpan: 4,
-      // 是否全屏显示面板
-      fullScreen: false,
       // 框选的喷灌机序号(唯一)
       subPray: -1,
       // 每个喷灌机框选的喷头(二维)
@@ -207,12 +204,6 @@ export default {
       })
     }
   },
-  mounted() {
-    // 拖动
-    new Draggabilly('.spray-box', {
-      containment: '.device-container'
-    })
-  },
   methods: {
 
     /**
@@ -251,23 +242,13 @@ export default {
     /**
      * 全屏展示该组件
      */
-    full() {
-      const deom = this.$refs.spray
-      if (!this.fullScreen) {
-        deom.classList.add('animation')
-        deom.setAttribute('style', 'top:0; left:0; width:100%; max-height:100%; height:100%; border-radius:0; z-index: 10;')
+    full(fullScreen) {
+      if (fullScreen) {
         this.pgSpan = 2
         this.valveSpan = 2
-        this.fullScreen = true
       } else {
-        deom.removeAttribute('style')
-        const time = setTimeout(() => {
-          deom.classList.remove('animation')
-          clearTimeout(time)
-        }, 300)
         this.pgSpan = 4
         this.valveSpan = 4
-        this.fullScreen = false
       }
     },
 
@@ -519,7 +500,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 @mixin nowrap {
   display: -webkit-box;
   display: -o-box;
@@ -536,107 +516,75 @@ export default {
   -moz-box-orient: vertical;
   -ms-box-orient: vertical;
 }
-.animation {
-  transition: all .3s linear;
+
+.spray__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding: 10px 0px 10px 10px;
+  box-sizing: border-box;
 }
-.spray-box {
-    background-color: rgba($color: #FFFFFF, $alpha: 0.9);
-    width: 600px;
-    max-height: 85%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-radius: 12px;
-    position: absolute;
-    top: 60px;
-    left: 10px;
-    padding: 10px;
-    box-sizing: border-box;
-    cursor: grab;
-    & .spray__top {
-      width: 100%;
-      top: 0;
+.spray__name {
+    padding-top: 4px;
+    font-size: 14px;
+    text-align: center;
+  }
+.spray__row {
+    margin: 10px 0;
+    & .spray__col__mb{
+        margin-bottom: 12px;
     }
-    & .spray__icon {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      text-align: right;
-      color: #666;
-      cursor: pointer;
-      & .spray__icon--close{
-        font-size:23px;
-        margin-left: 10px;
-      }
-    }
-    & .spray__title {
-      font-size: 16px;
+    & .selected > .spray__attr{
+      color: #409EFF;
       font-weight: 600;
-      color: #333;
-      padding: 10px 0px 10px 10px;
-      box-sizing: border-box;
     }
-    & .spray__name {
-        padding-top: 4px;
+    & .spray__value {
+        font-size: 15px;
+        color: #333333;
+        margin-bottom: 2px;
+        font-weight: 600;
+        @include nowrap
+    }
+    & .spray__attr {
         font-size: 14px;
+        color: #666666;
+        @include nowrap
+    }
+    & .spray__attr2 {
         text-align: center;
-     }
-    & .spray__row {
+        cursor: pointer;
+    }
+    & .spray__divider {
         margin: 10px 0;
-        & .spray__col__mb{
-            margin-bottom: 12px;
-        }
-        & .selected > .spray__attr{
-          color: #409EFF;
-          font-weight: 600;
-        }
-        & .spray__value {
-            font-size: 15px;
-            color: #333333;
-            margin-bottom: 2px;
-            font-weight: 600;
-            @include nowrap
-        }
-        & .spray__attr {
-            font-size: 14px;
-            color: #666666;
-            @include nowrap
-        }
-        & .spray__attr2 {
-            text-align: center;
-            cursor: pointer;
-        }
-        & .spray__divider {
-            margin: 10px 0;
-        }
     }
-    & .spray__imgBox {
-      margin: 0 auto;
-      width: 36px;
-      & img {
-        display: block;
-        width: 100%;
-      }
-    }
-    & .pointer{
-      cursor: pointer;
-    }
-    & .spray__imgBox2 {
-      width: 30px;
-    }
-    & .spray__pt{
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      padding: 10px 0px 10px 10px;
-      box-sizing: border-box;
-    }
-    & .nozzle__heder{
-      display: flex;
-      align-items: center;
-      & .nozzle__btn{
-        margin-left: 20px;
-      }
-    }
+}
+.spray__imgBox {
+  margin: 0 auto;
+  width: 36px;
+  & img {
+    display: block;
+    width: 100%;
+  }
+}
+.pointer{
+  cursor: pointer;
+}
+.spray__imgBox2 {
+  width: 30px;
+}
+.spray__pt{
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding: 10px 0px 10px 10px;
+  box-sizing: border-box;
+}
+.nozzle__heder{
+  display: flex;
+  align-items: center;
+  & .nozzle__btn{
+    margin-left: 20px;
+  }
 }
 
 .demo-input-suffix{
@@ -669,41 +617,4 @@ export default {
     font-weight: 600;
   }
 }
-
-/* 重置滚动条 */
-::scrollbar{width:8px; height:8px; border-radius:5px;}
-::scrollbar-button{display:none;}
-::scrollbar-track  {display:none;}
-::scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
-::scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
-::scrollbar-corner{display:none;}
-
-::-webkit-scrollbar{width:8px; height: 8px; border-radius:5px;}
-::-webkit-scrollbar-button{display:none;}
-::-webkit-scrollbar-track  {display:none;}
-::-webkit-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
-::-webkit-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
-::-webkit-scrollbar-corner{display:none;}
-
-::-moz-scrollbar{width:8px; height:8px; border-radius:5px;}
-::-moz-scrollbar-button{display:none;}
-::-moz-scrollbar-track  {display:none;}
-::-moz-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
-::-moz-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
-::-moz-scrollbar-corner{display:none;}
-
-::-o-scrollbar{width:8px; height:8px; border-radius:5px;}
-::-o-scrollbar-button{display:none;}
-::-o-scrollbar-track  {display:none;}
-::-o-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
-::-o-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
-::-o-scrollbar-corner{display:none;}
-
-::-ms-scrollbar{width:8px; height:8px; border-radius:5px;}
-::-ms-scrollbar-button{display:none;}
-::-ms-scrollbar-track  {display:none;}
-::-ms-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
-::-ms-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
-::-ms-scrollbar-corner{display:none;}
-
 </style>
