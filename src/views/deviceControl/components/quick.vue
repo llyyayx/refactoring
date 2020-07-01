@@ -41,7 +41,7 @@ export default {
         { title: '气象站', icon: require('@/icons/device/run/qxz.png'), obj: 'weather' },
         { title: '墒情站', icon: require('@/icons/device/run/sqz.png'), obj: 'soil' },
         { title: '施肥机', icon: require('@/icons/device/run/sqz.png'), obj: 'fertilizer' },
-        { title: '灌层站', icon: require('@/icons/device/run/sqz.png'), obj: 'canopy' },
+        { title: '冠层站', icon: require('@/icons/device/run/sqz.png'), obj: 'canopy' },
         { title: 'NDVI', icon: require('@/icons/device/run/sqz.png'), obj: 'ndvi' },
         { title: '水泵', icon: require('@/icons/device/run/sb.png'), obj: 'pump' },
         { title: '高度', icon: require('@/icons/device/run/sqz.png'), obj: 'height' }

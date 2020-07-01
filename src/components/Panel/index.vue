@@ -72,37 +72,38 @@ export default {
 .animation {
   transition: all .3s linear;
 }
-.panel-box {
-    background-color: rgba($color: #FFFFFF, $alpha: 0.9);
-    width: 600px;
-    max-height: 85%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-radius: 12px;
-    position: absolute;
-    top: 60px;
-    left: 10px;
-    padding: 10px;
-    box-sizing: border-box;
-    cursor: grab;
-    & .panel__top {
-      width: 100%;
-      top: 0;
-      & .panel__icon {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        text-align: right;
-        color: #666;
-        cursor: pointer;
-        & .panel__icon--close{
-            font-size:23px;
-            margin-left: 10px;
+.panel-container{
+  & .panel-box {
+      background-color: rgba($color: #FFFFFF, $alpha: 0.9);
+      width: 600px;
+      max-height: 85%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      border-radius: 12px;
+      position: absolute;
+      top: 60px;
+      left: 10px;
+      padding: 10px;
+      box-sizing: border-box;
+      cursor: grab;
+      & .panel__top {
+        width: 100%;
+        top: 0;
+        & .panel__icon {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          text-align: right;
+          color: #666;
+          cursor: pointer;
+          & .panel__icon--close{
+              font-size:23px;
+              margin-left: 10px;
+          }
         }
       }
-    }
+  }
 }
-
 /* 重置滚动条 */
 ::scrollbar{width:8px; height:8px; border-radius:5px;}
 ::scrollbar-button{display:none;}

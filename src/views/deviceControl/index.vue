@@ -52,22 +52,21 @@ export default {
       const { lat, lng, devices } = response[0]
       this.setMap(lat, lng)
       const config = this.$config
-      const self = this
       devices.forEach((item, index) => {
         switch (item.dclass) {
           case config.DROPS_CLASS: drops(item); break
           case config.PUMP_CLASS: pump(item); break
           case config.FERTILIZER_CLASS: fertilizer(item); break
-          case config.SOIL_CLASS: soil(item, self); break
+          case config.SOIL_CLASS: soil(item); break
           case config.WEATHER_CLASS: weather(item); break
-          case config.SPRAY_CLASS: spray(item, self); break
+          case config.SPRAY_CLASS: spray(item); break
           case config.NDVI_CLASS: ndvi(item); break
           case config.HEIGHT_CLASS: height(item); break
           case config.CANOPY_CLASS: canopy(item); break
         }
       })
-      this.dropValveState()
-      this.sprayValveState()
+      // this.dropValveState()
+      // this.sprayValveState()
       this.mqttServer()
       this.loading = false
 
@@ -135,7 +134,7 @@ export default {
       // 消息到达回调函数
       client.onMessageArrived = function(msg) {
         const data = JSON.parse(msg.payloadString)
-        console.log(data)
+        // console.log(data)
         if (data.code || data.code === 4) {
           const device = _this.mqttScreen(data)
           _this.classify(data, device)
@@ -193,10 +192,10 @@ export default {
      * @param { Object } 与返回相匹配的设备
      */
     classify(data, device) {
-      console.log(device)
       const config = this.$config
       switch (device.dclass) {
         case config.DROPS_VALVE_CLASS: this.mqttJxValve(data, device); break
+        case config.SPRAY_CLASS: this.mqttJxSpray(data, device); break
       }
     }
 

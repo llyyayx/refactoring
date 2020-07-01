@@ -4,24 +4,25 @@ import { sprayValve } from './sprayValve'
 import mapFun from '@/utils/mapFun'
 
 // 解析喷灌
-export function spray(item, self) {
-  const { dname, latitude, longitude, dclass, serialno, extension, portarrays, cells } = item
+export function spray(item) {
+  const { dname, latitude, longitude, dclass, serialno, extension, portarrays, cells, model } = item
   // 绘制喷灌圈
   let canvas = {}
   if (cells) {
-    canvas = draw({ latitude, longitude, extension, cells }, self)
+    canvas = draw({ latitude, longitude, extension, cells })
   }
   // 地图标点
-  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/pg.png') })
-  clickEvent(mapSpot, self)
+  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/run/pg.png') })
+  clickEvent(mapSpot)
+
   // vuex管理
   store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, canvas,
-    mapSpot, attr: attr, icon: require('@/icons/device/close/pg.png') })
+    mapSpot, attr: getAttr(model), icon: require('@/icons/device/run/pg.png') })
   if (portarrays) sprayValve(portarrays, { dname })
 }
 
 // 绘制喷灌圈
-function draw(param, self) {
+function draw(param) {
   let id
   const cells = param.cells
   const partition = []
@@ -69,7 +70,7 @@ function draw(param, self) {
     coreRadii: 5,
     complete: { start: 0, end: 0 },
     mapAdd: false,
-    mapObj: self.map,
+    mapObj: store.state.map.map,
     mapHorizontalSpacing: 200,
     textShow: true,
     displayDirection: true,
@@ -95,26 +96,171 @@ function marKer(obj) {
 /**
  * 标点点击事件
  * @param { Object } mapSpot 地图标点实例化对象
- * @param { Object } self 组件指针this
  */
-function clickEvent(mapSpot, self) {
+function clickEvent(mapSpot) {
   mapFun.marKerClickEvent(mapSpot, () => {
-    self.$store.dispatch('control/sprayShow', true)
+    store.dispatch('control/sprayShow', true)
   })
 }
 
-// 喷灌机属性
+/**
+ * @param { String } version 设备版本
+ * @return { Array } 属性列表
+ */
+function getAttr(version) {
+  const attribute = []
+  attr.forEach((el, index) => {
+    if (el.version[0] === '*' || el.version.includes(version)) {
+      el.nameKey = getNameKey(el.mark, version)
+      el.rules = getRules(el.mark, version)
+      attribute.push(el)
+    }
+  })
+  return attribute
+}
+
+/**
+ * 方法：根据版本得到属性的nameKey
+ * @param { String } mark 属性标识
+ * @param { String } version 设备版本
+ * @return { String } 与设备版本对应的nameKey
+ */
+function getNameKey(mark, version) {
+  let key
+  nameKey.forEach((el, index) => {
+    if (el.mark === mark) {
+      if (el.version[0] === '*' || el.version.includes(version)) {
+        key = el.key
+      }
+    }
+  })
+  return key
+}
+
+/**
+ * 方法：根据版本得到对应的规则（注意规则生效时，nameKey的值将被该方法返回值覆盖）
+ * @param { String } mark 属性标识
+ * @param { String } version 设备版本
+ * @return { Function } 与设备版本对应的规则
+ */
+function getRules(mark, version) {
+  let fun = false
+  rules.forEach((el, index) => {
+    if (el.mark === mark) {
+      if (el.version[0] === '*' || el.version.includes(version)) {
+        fun = el.fun
+      }
+    }
+  })
+  return fun
+}
+
+function stateIcon(el, vueX) {
+  let icon
+  if (el === '运行') {
+    icon = require('@/icons/device/run/pg.png')
+  } else {
+    icon = require('@/icons/device/close/pg.png')
+  }
+  vueX.icon && (vueX.icon = icon)
+  vueX.mapSpot && vueX.mapSpot.setIcon(icon)
+}
+
+// 属性
 const attr = [
-  { name: '设备状态', val: '停止', namekey: 'SafeCircuit_State', unit: '', valueType: 'boolean', mqtt: 1 },
-  { name: '运行模式', val: '手动模式', namekey: 'bool_format_arr', unit: '', valueType: 'boolean', mqtt: 1 },
-  { name: '行进方向', val: '正向行进', namekey: 'Running_Direction', unit: '', valueType: 'boolean', mqtt: 1 },
-  { name: '行进方式', val: '有水行进', unit: '', namekey: 'NoWater_HMI', valueType: 'boolean', mqtt: 1 },
-  { name: '尾枪状态', val: '尾枪打开', unit: '', namekey: 'EndGun_HMI', valueType: 'boolean', mqtt: 1 },
-  { name: '行进速率', val: '45', unit: '%', namekey: 'Pivot_Velocity', valueType: 'number', mqtt: 1 },
-  { name: '运行圈数', val: '0', unit: '', namekey: 'Running_Loops', valueType: 'number', mqtt: 1 },
-  { name: '当前角度', val: '0.00', unit: '°', namekey: 'Current_Angle', valueType: 'number', mqtt: 1 },
-  { name: '入机流量', val: '0.00', unit: 'm³/h', namekey: 'InFlow', valueType: 'number', mqtt: 1 },
-  { name: '入机压力', val: '1.6', unit: 'Mpa', namekey: 'InPressure', valueType: 'number', mqtt: 1 },
-  { name: '累计流量', val: '0.00', unit: 'm³', namekey: 'AccFlow', valueType: 'number', mqtt: 1 },
-  { name: '电池电压', val: '0.00', unit: 'V', namekey: 'BatteryVolt', valueType: 'number', mqtt: 1 }
+  {
+    mark: 'sprayState',
+    name: '设备状态',
+    type: 'boolean',
+    // 转换nameKey得到值
+    dataFun: (el) => {
+      return el ? '运行' : '停止'
+    },
+    nameKey: '',
+    val: '启动',
+    unit: '',
+    // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+    rules: false,
+    callback: [stateIcon],
+    version: ['V1.0', 'V2.0']
+  },
+  {
+    mark: 'sprayModel',
+    name: '运行模式',
+    type: 'boolean',
+    dataFun: (el) => {
+      return el ? '远程' : '本地'
+    },
+    nameKey: '',
+    val: '本地',
+    unit: '',
+    rules: false,
+    version: ['V1.0', 'V2.0']
+  },
+  {
+    mark: 'sprayPwm',
+    name: '行走速率',
+    type: 'Number',
+    dataFun: (el) => {
+      return el
+    },
+    nameKey: '',
+    val: '100',
+    unit: '%',
+    rules: false,
+    version: ['V1.0', 'V2.0']
+  },
+  {
+    mark: 'sprayAngle',
+    name: '当前角度',
+    type: 'Number',
+    dataFun: (el) => {
+      return Math.floor(el * 10) / 10
+    },
+    nameKey: '',
+    val: '100',
+    unit: '°',
+    rules: false,
+    version: ['V1.0', 'V2.0']
+  }
+
+]
+
+// 属性对应的nameKey根据版本返回
+const nameKey = [
+  {
+    mark: 'sprayState',
+    key: 'REG_RUN_STS',
+    version: ['V1.0', 'V2.0']
+  },
+  {
+    mark: 'sprayModel',
+    key: 'REMOTE_LOCAL',
+    version: ['V1.0', 'V2.0']
+  },
+  {
+    mark: 'sprayPwm',
+    key: 'REG_HMI_PWM',
+    version: ['V1.0', 'V2.0']
+  },
+  {
+    mark: 'sprayAngle',
+    key: 'Angle',
+    version: ['V1.0', 'V2.0']
+  }
+]
+
+// 属性对应的规则
+const rules = [
+  {
+    mark: 'sprayState',
+    fun: (el) => {
+      if (el.FWD_HMI || el.REV_HMI) {
+        return '运行'
+      } else {
+        return '停止'
+      }
+    },
+    version: ['V1.0', 'V2.0']
+  }
 ]

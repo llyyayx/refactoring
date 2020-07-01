@@ -207,6 +207,25 @@ export default {
   methods: {
 
     /**
+     * 全屏展示组件回调事件
+     * @param { Boolean } fullScreen 全屏true 非全屏false
+     */
+    full(fullScreen) {
+      if (fullScreen) {
+        this.pgSpan = 2
+        this.valveSpan = 2
+      } else {
+        this.pgSpan = 4
+        this.valveSpan = 4
+      }
+    },
+
+    // 关闭面板的回调事件
+    closeSpray() {
+      this.$store.dispatch('control/sprayShow', false)
+    },
+
+    /**
      * 方法：数组对象按属性分组
      * @param { Array } array 数组里边是对象
      * @param { String } attr 属性名称
@@ -237,23 +256,6 @@ export default {
     valveCtrGroup(valve) {
       const attr = this.value ? 'rtuSerialno' : 'ctlGroup'
       return this.group(valve, attr)
-    },
-
-    /**
-     * 全屏展示该组件
-     */
-    full(fullScreen) {
-      if (fullScreen) {
-        this.pgSpan = 2
-        this.valveSpan = 2
-      } else {
-        this.pgSpan = 4
-        this.valveSpan = 4
-      }
-    },
-
-    closeSpray() {
-      this.$store.dispatch('control/sprayShow', false)
     },
 
     /**

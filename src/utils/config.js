@@ -14,7 +14,7 @@ export default {
   HEIGHT_CLASS: 18,
   CANOPY_CLASS: 12,
 
-  MQTT_TOPIC: 'D/192.168.8.11_jiale/#',
+  MQTT_TOPIC: 'D/0103.0007.1921000133/#',
   MQTT_HOST: 'www.zesi.com.cn',
   MQTT_PORT: 443,
   MQTT_ADDR: '/mqtt',

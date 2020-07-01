@@ -44,6 +44,33 @@ export default {
       }
     },
 
+    /**
+     * matt订阅解析喷灌机状态
+     * @param { Object } res mqtt返回值
+     * @param { Object } spray 灌机对象
+     */
+    mqttJxSpray(res, spray) {
+      const attr = spray.attr
+      attr.forEach((el) => {
+        const val = res.regs[el.nameKey]
+        if (val !== undefined) {
+          let result
+          if (Object.prototype.toString.call(el.rules) === '[object Function]') {
+            result = el.rules(res, spray)
+          } else {
+            result = el.dataFun(val, spray)
+          }
+          el.val = result
+          // 属性回调事件
+          if (el.callback) {
+            el.callback.forEach((fun) => {
+              fun(result, spray)
+            })
+          }
+        }
+      })
+    },
+
     // 查询滴灌阀门状态
     dropValveState() {
       const _this = this

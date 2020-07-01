@@ -1,6 +1,7 @@
 <template>
-  <panel :sub-class="'kill'" :child-class="'kill-box'" :show="true">
-    <div slot="main" @click="close">121212</div>
+  <panel :sub-class="'sensor-container'" :child-class="'sensor-box'" :show="show" @close="closeSensor" @full="full">
+    <div slot="main">1212</div>
+    <div slot="dialog">1212</div>
   </panel>
 </template>
 
@@ -10,10 +11,27 @@ export default {
   components: {
     panel
   },
-  methods: {
-    close() {
-      alert(1212)
+  computed: {
+    // 滴灌面板的显示隐藏
+    show() {
+      return this.$store.state.control.sensorShow
     }
+  },
+  methods: {
+
+    /**
+     * 全屏展示组件回调事件
+     * @param { Boolean } fullScreen 全屏true 非全屏false
+     */
+    full(fullScreen) {
+      return
+    },
+
+    // 关闭面板的回调事件
+    closeSensor() {
+      this.$store.dispatch('control/sensorShow', false)
+    }
+
   }
 }
 </script>
