@@ -2,6 +2,7 @@ import store from '@/store'
 import area from '../area'
 import { sprayValve } from './sprayValve'
 import mapFun from '@/utils/mapFun'
+import { version } from 'mockjs'
 
 // 解析喷灌
 export function spray(item) {
@@ -16,8 +17,9 @@ export function spray(item) {
   clickEvent(mapSpot)
 
   // vuex管理
+  console.log(getCommand(model))
   store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, canvas,
-    mapSpot, attr: getAttr(model), icon: require('@/icons/device/run/pg.png') })
+    mapSpot, attr: getAttr(model), icon: require('@/icons/device/run/pg.png'), command: getCommand(model) })
   if (portarrays) sprayValve(portarrays, { dname })
 }
 
@@ -102,6 +104,8 @@ function clickEvent(mapSpot) {
     store.dispatch('control/sprayShow', true)
   })
 }
+
+/* -----------------------属性装载-------------------------- */
 
 /**
  * @param { String } version 设备版本
@@ -261,6 +265,85 @@ const rules = [
         return '停止'
       }
     },
+    version: ['V1.0', 'V2.0']
+  }
+]
+
+/* -----------------------控制装载-------------------------- */
+
+/**
+ * @param { String } version 设备版本
+ * @return { Array } 控制对象
+ */
+function getCommand(version) {
+  const sprayCommand = {}
+  command.forEach((el, index) => {
+    if (el.version[0] === '*' || el.version.includes(version)) {
+      el.nameKey = getActions(el.mark, version)
+      el.param = getParam(el.mark, version)
+      sprayCommand[el.mark] = el
+    }
+  })
+  return sprayCommand
+}
+
+/**
+ * 方法：根据版本得到控制的nameKey
+ * @param { String } mark 属性标识
+ * @param { String } version 设备版本
+ * @return { String } 与设备版本对应的nameKey
+ */
+function getActions(mark, version) {
+  let key
+  actions.forEach((el, index) => {
+    if (el.mark === mark) {
+      if (el.version[0] === '*' || el.version.includes(version)) {
+        key = el.key
+      }
+    }
+  })
+  return key
+}
+
+/**
+ * 方法：根据版本得到对应的param
+ * @param { String } mark 属性标识
+ * @param { String } version 设备版本
+ * @return { Function } 与设备版本对应的param值
+ */
+function getParam(mark, version) {
+  let fun = false
+  params.forEach((el, index) => {
+    if (el.mark === mark) {
+      if (el.version[0] === '*' || el.version.includes(version)) {
+        fun = el.fun
+      }
+    }
+  })
+  return fun
+}
+
+const command = [
+  {
+    mark: 'openSpray',
+    nameKey: '',
+    param: '',
+    version: ['V1.0', 'V2.0']
+  }
+]
+
+const actions = [
+  {
+    mark: 'openSpray',
+    key: 'REG_CMD_PWR',
+    version: ['V1.0', 'V2.0']
+  }
+]
+
+const params = [
+  {
+    mark: 'openSpray',
+    fun: () => { return 255 },
     version: ['V1.0', 'V2.0']
   }
 ]
