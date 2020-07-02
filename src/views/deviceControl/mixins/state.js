@@ -28,43 +28,27 @@ export default {
     },
 
     /**
-     * mqtt订阅解析阀门状态
+     * matt订阅解析全设备状态
      * @param { Object } res mqtt返回值
-     * @param { Object } valve 阀门对象
+     * @param { Object } device 设备对象
      */
-    mqttJxValve(res, valve) {
-      if (res.regs.DO) {
-        const run = require('@/icons/device/run/fm.png')
-        valve.icon = run
-        valve.mapSpot.setIcon(run)
-      } else {
-        const close = require('@/icons/device/close/fm.png')
-        valve.icon = close
-        valve.mapSpot.setIcon(close)
-      }
-    },
-
-    /**
-     * matt订阅解析喷灌机状态
-     * @param { Object } res mqtt返回值
-     * @param { Object } spray 灌机对象
-     */
-    mqttJxSpray(res, spray) {
-      const attr = spray.attr
+    mqttJxState(res, device) {
+      const attr = device.attr
+      if (Object.prototype.toString.call(attr) !== '[object Array]') return
       attr.forEach((el) => {
         const val = res.regs[el.nameKey]
         if (val !== undefined) {
           let result
           if (Object.prototype.toString.call(el.rules) === '[object Function]') {
-            result = el.rules(res, spray)
+            result = el.rules(res, device)
           } else {
-            result = el.dataFun(val, spray)
+            result = el.dataFun(val, device)
           }
           el.val = result
           // 属性回调事件
           if (el.callback) {
             el.callback.forEach((fun) => {
-              fun(result, spray)
+              fun(result, device)
             })
           }
         }

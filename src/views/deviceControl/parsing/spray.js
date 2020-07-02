@@ -2,7 +2,7 @@ import store from '@/store'
 import area from '../area'
 import { sprayValve } from './sprayValve'
 import mapFun from '@/utils/mapFun'
-import { version } from 'mockjs'
+import { getAttr, getCommand, getControlItem } from '@/utils/setDevice'
 
 // 解析喷灌
 export function spray(item) {
@@ -17,9 +17,9 @@ export function spray(item) {
   clickEvent(mapSpot)
 
   // vuex管理
-  console.log(getCommand(model))
   store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, canvas,
-    mapSpot, attr: getAttr(model), icon: require('@/icons/device/run/pg.png'), command: getCommand(model) })
+    mapSpot, attr: getAttr(deviceAttr, model || 'V1.0'), icon: require('@/icons/device/run/pg.png'), command: getCommand(deviceCommand, model || 'V1.0'),
+    controlItem: getControlItem(controlItem, model || 'V1.0') })
   if (portarrays) sprayValve(portarrays, { dname })
 }
 
@@ -108,57 +108,10 @@ function clickEvent(mapSpot) {
 /* -----------------------属性装载-------------------------- */
 
 /**
- * @param { String } version 设备版本
- * @return { Array } 属性列表
+ * 属性值加载回调：设置喷灌机图标
+ * @param { String } el 喷灌机状态属性值
+ * @param { Object } vueX 喷灌机设备对象
  */
-function getAttr(version) {
-  const attribute = []
-  attr.forEach((el, index) => {
-    if (el.version[0] === '*' || el.version.includes(version)) {
-      el.nameKey = getNameKey(el.mark, version)
-      el.rules = getRules(el.mark, version)
-      attribute.push(el)
-    }
-  })
-  return attribute
-}
-
-/**
- * 方法：根据版本得到属性的nameKey
- * @param { String } mark 属性标识
- * @param { String } version 设备版本
- * @return { String } 与设备版本对应的nameKey
- */
-function getNameKey(mark, version) {
-  let key
-  nameKey.forEach((el, index) => {
-    if (el.mark === mark) {
-      if (el.version[0] === '*' || el.version.includes(version)) {
-        key = el.key
-      }
-    }
-  })
-  return key
-}
-
-/**
- * 方法：根据版本得到对应的规则（注意规则生效时，nameKey的值将被该方法返回值覆盖）
- * @param { String } mark 属性标识
- * @param { String } version 设备版本
- * @return { Function } 与设备版本对应的规则
- */
-function getRules(mark, version) {
-  let fun = false
-  rules.forEach((el, index) => {
-    if (el.mark === mark) {
-      if (el.version[0] === '*' || el.version.includes(version)) {
-        fun = el.fun
-      }
-    }
-  })
-  return fun
-}
-
 function stateIcon(el, vueX) {
   let icon
   if (el === '运行') {
@@ -170,180 +123,346 @@ function stateIcon(el, vueX) {
   vueX.mapSpot && vueX.mapSpot.setIcon(icon)
 }
 
-// 属性
-const attr = [
-  {
-    mark: 'sprayState',
-    name: '设备状态',
-    type: 'boolean',
-    // 转换nameKey得到值
-    dataFun: (el) => {
-      return el ? '运行' : '停止'
+const deviceAttr = {
+  // 属性
+  attr: [
+    {
+      mark: 'sprayState',
+      name: '设备状态',
+      type: 'boolean',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        return el ? '运行' : '停止'
+      },
+      nameKey: '',
+      val: '启动',
+      unit: '',
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon],
+      version: ['V1.0', 'V2.0']
     },
-    nameKey: '',
-    val: '启动',
-    unit: '',
-    // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
-    rules: false,
-    callback: [stateIcon],
+    {
+      mark: 'sprayModel',
+      name: '运行模式',
+      type: 'boolean',
+      dataFun: (el) => {
+        return el ? '远程' : '本地'
+      },
+      nameKey: '',
+      val: '本地',
+      unit: '',
+      rules: false,
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'sprayPwm',
+      name: '行走速率',
+      type: 'Number',
+      dataFun: (el) => {
+        return el
+      },
+      nameKey: '',
+      val: '100',
+      unit: '%',
+      rules: false,
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'sprayAngle',
+      name: '当前角度',
+      type: 'Number',
+      dataFun: (el) => {
+        return Math.floor(el * 10) / 10
+      },
+      nameKey: '',
+      val: '100',
+      unit: '°',
+      rules: false,
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'direction',
+      name: '行进方向',
+      type: 'Number',
+      dataFun: (el) => {
+        return el ? '正向' : '反向'
+      },
+      nameKey: '',
+      val: '正向',
+      unit: '',
+      rules: false,
+      version: ['V1.0', 'V2.0']
+    }
+
+  ],
+
+  // 属性对应的nameKey根据版本返回
+  attrNameKey: [
+    {
+      mark: 'sprayState',
+      key: 'REG_RUN_STS',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'sprayModel',
+      key: 'REMOTE_LOCAL',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'sprayPwm',
+      key: 'REG_HMI_PWM',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'sprayAngle',
+      key: 'Angle',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'direction',
+      key: 'REG_RUN_STS',
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+
+  // 属性对应的规则
+  rules: [
+    {
+      mark: 'sprayState',
+      fun: (el) => {
+        if (el.FWD_HMI || el.REV_HMI) {
+          return '运行'
+        } else {
+          return '停止'
+        }
+      },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'direction',
+      fun: (el) => {
+        if (el.FWD_HMI) {
+          return '正向'
+        } else if (el.REV_HMI) {
+          return '反向'
+        } else {
+          return '未运行'
+        }
+      },
+      version: ['V1.0', 'V2.0']
+    }
+  ]
+}
+
+/* -----------------------控制指令装载-------------------------- */
+
+const deviceCommand = {
+  command: [
+    {
+      mark: 'openSpray',
+      name: '打开喷灌机',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closeSpray',
+      name: '关闭喷灌机',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'positive',
+      name: '正向行进',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'reverse',
+      name: '反向行进',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'reverse',
+      name: '反向行进',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'haveWater',
+      name: '有水行进',
+      nameKey: '',
+      param: '',
+      version: ['V1.0']
+    },
+    {
+      mark: 'noWater',
+      name: '无水行进',
+      nameKey: '',
+      param: '',
+      version: ['V1.0']
+    },
+    {
+      mark: 'openGun',
+      name: '打开尾枪',
+      nameKey: '',
+      param: '',
+      version: ['V1.0']
+    },
+    {
+      mark: 'closeGun',
+      name: '关闭尾枪',
+      nameKey: '',
+      param: '',
+      version: ['V1.0']
+    },
+    {
+      mark: 'sprayPwm',
+      name: '行走速率',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+
+  commandNameKey: [
+    {
+      mark: 'openSpray',
+      key: 'REG_CMD_PWR',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closeSpray',
+      key: 'REG_CMD_PWR',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'positive',
+      key: 'REG_CMD_FWD',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'reverse',
+      key: 'REG_CMD_RWS',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'haveWater',
+      key: 'Nowater_C',
+      version: ['V1.0']
+    },
+    {
+      mark: 'noWater',
+      key: 'Reset_Nowater_C',
+      version: ['V1.0']
+    },
+    {
+      mark: 'openGun',
+      key: 'Open_EndGun',
+      version: ['V1.0']
+    },
+    {
+      mark: 'closeGun',
+      key: 'Close_EndGun',
+      version: ['V1.0']
+    },
+    {
+      mark: 'sprayPwm',
+      key: 'REG_CMD_PWM',
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+
+  params: [
+    {
+      mark: 'openSpray',
+      fun: () => { return 255 },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closeSpray',
+      fun: () => { return 65280 },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'positive',
+      fun: () => { return 255 },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'reverse',
+      fun: () => { return 255 },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'haveWater',
+      fun: () => { return true },
+      version: ['V1.0']
+    },
+    {
+      mark: 'noWater',
+      fun: () => { return true },
+      version: ['V1.0']
+    },
+    {
+      mark: 'openGun',
+      fun: () => { return true },
+      version: ['V1.0']
+    },
+    {
+      mark: 'closeGun',
+      fun: () => { return true },
+      version: ['V1.0']
+    },
+    {
+      mark: 'sprayPwm',
+      fun: (val) => {
+        val = parseInt(val)
+        return parseInt('01' + val.toString(16), 16)
+      },
+      version: ['V1.0', 'V2.0']
+    }
+  ]
+}
+
+/* -----------------------控制项装载-------------------------- */
+
+const controlItem = [
+  {
+    mark: 'sprayRun',
+    name: '灌机控制',
     version: ['V1.0', 'V2.0']
   },
   {
-    mark: 'sprayModel',
-    name: '运行模式',
-    type: 'boolean',
-    dataFun: (el) => {
-      return el ? '远程' : '本地'
-    },
-    nameKey: '',
-    val: '本地',
-    unit: '',
-    rules: false,
+    mark: 'direction',
+    name: '行进方向',
     version: ['V1.0', 'V2.0']
+  },
+  {
+    mark: 'mode',
+    name: '行进方式',
+    version: ['V1.0']
+  },
+  {
+    mark: 'gunSetting',
+    name: '尾枪设置',
+    version: ['V1.0']
+  },
+  {
+    mark: 'plan',
+    name: '控制模式',
+    type: 'button',
+    version: ['V1.0']
   },
   {
     mark: 'sprayPwm',
     name: '行走速率',
-    type: 'Number',
-    dataFun: (el) => {
-      return el
-    },
-    nameKey: '',
-    val: '100',
-    unit: '%',
-    rules: false,
-    version: ['V1.0', 'V2.0']
-  },
-  {
-    mark: 'sprayAngle',
-    name: '当前角度',
-    type: 'Number',
-    dataFun: (el) => {
-      return Math.floor(el * 10) / 10
-    },
-    nameKey: '',
-    val: '100',
-    unit: '°',
-    rules: false,
-    version: ['V1.0', 'V2.0']
-  }
-
-]
-
-// 属性对应的nameKey根据版本返回
-const nameKey = [
-  {
-    mark: 'sprayState',
-    key: 'REG_RUN_STS',
-    version: ['V1.0', 'V2.0']
-  },
-  {
-    mark: 'sprayModel',
-    key: 'REMOTE_LOCAL',
-    version: ['V1.0', 'V2.0']
-  },
-  {
-    mark: 'sprayPwm',
-    key: 'REG_HMI_PWM',
-    version: ['V1.0', 'V2.0']
-  },
-  {
-    mark: 'sprayAngle',
-    key: 'Angle',
-    version: ['V1.0', 'V2.0']
-  }
-]
-
-// 属性对应的规则
-const rules = [
-  {
-    mark: 'sprayState',
-    fun: (el) => {
-      if (el.FWD_HMI || el.REV_HMI) {
-        return '运行'
-      } else {
-        return '停止'
-      }
-    },
-    version: ['V1.0', 'V2.0']
-  }
-]
-
-/* -----------------------控制装载-------------------------- */
-
-/**
- * @param { String } version 设备版本
- * @return { Array } 控制对象
- */
-function getCommand(version) {
-  const sprayCommand = {}
-  command.forEach((el, index) => {
-    if (el.version[0] === '*' || el.version.includes(version)) {
-      el.nameKey = getActions(el.mark, version)
-      el.param = getParam(el.mark, version)
-      sprayCommand[el.mark] = el
-    }
-  })
-  return sprayCommand
-}
-
-/**
- * 方法：根据版本得到控制的nameKey
- * @param { String } mark 属性标识
- * @param { String } version 设备版本
- * @return { String } 与设备版本对应的nameKey
- */
-function getActions(mark, version) {
-  let key
-  actions.forEach((el, index) => {
-    if (el.mark === mark) {
-      if (el.version[0] === '*' || el.version.includes(version)) {
-        key = el.key
-      }
-    }
-  })
-  return key
-}
-
-/**
- * 方法：根据版本得到对应的param
- * @param { String } mark 属性标识
- * @param { String } version 设备版本
- * @return { Function } 与设备版本对应的param值
- */
-function getParam(mark, version) {
-  let fun = false
-  params.forEach((el, index) => {
-    if (el.mark === mark) {
-      if (el.version[0] === '*' || el.version.includes(version)) {
-        fun = el.fun
-      }
-    }
-  })
-  return fun
-}
-
-const command = [
-  {
-    mark: 'openSpray',
-    nameKey: '',
-    param: '',
-    version: ['V1.0', 'V2.0']
-  }
-]
-
-const actions = [
-  {
-    mark: 'openSpray',
-    key: 'REG_CMD_PWR',
-    version: ['V1.0', 'V2.0']
-  }
-]
-
-const params = [
-  {
-    mark: 'openSpray',
-    fun: () => { return 255 },
     version: ['V1.0', 'V2.0']
   }
 ]

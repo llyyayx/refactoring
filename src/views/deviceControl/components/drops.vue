@@ -56,7 +56,6 @@
 import Panel from '@/components/Panel'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
-import command from '@/utils/command'
 import { debounce } from '@/utils'
 export default {
   components: {
@@ -239,7 +238,7 @@ export default {
     closeValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, command.closeValve)
+        // this.ctrlValve(el, command.closeValve)
       })
       this.dialog = false
     },
@@ -250,7 +249,7 @@ export default {
     openValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, command.openValve)
+        // this.ctrlValve(el, command.openValve)
       })
       this.dialog = false
     }

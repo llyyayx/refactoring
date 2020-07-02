@@ -134,11 +134,12 @@ export default {
       // 消息到达回调函数
       client.onMessageArrived = function(msg) {
         const data = JSON.parse(msg.payloadString)
-        // console.log(data)
-        if (data.code || data.code === 4) {
-          const device = _this.mqttScreen(data)
-          _this.classify(data, device)
-        }
+        new Promise((resolve, reject) => {
+          if (data.code) {
+            const obj = _this.mqttScreen(data)
+            if (obj.result) _this.classify(data, obj.device)
+          }
+        })
       }
       // 连接超时
       client.onConnectionLost = function() {
@@ -183,7 +184,7 @@ export default {
           }
         }
       }
-      return device
+      return { device, result }
     },
 
     /**
@@ -192,11 +193,12 @@ export default {
      * @param { Object } 与返回相匹配的设备
      */
     classify(data, device) {
-      const config = this.$config
-      switch (device.dclass) {
-        case config.DROPS_VALVE_CLASS: this.mqttJxValve(data, device); break
-        case config.SPRAY_CLASS: this.mqttJxSpray(data, device); break
-      }
+      this.mqttJxState(data, device)
+      // const config = this.$config
+      /* switch (device.dclass) {
+        case config.DROPS_VALVE_CLASS: this.mqttJxSpray(data, device); break
+        // case config.SPRAY_CLASS: this.mqttJxSpray(data, device); break
+      } */
     }
 
   }

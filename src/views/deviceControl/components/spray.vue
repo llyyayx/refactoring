@@ -101,7 +101,7 @@
       <!-- 喷灌机控制对话框go -->
       <el-dialog :visible.sync="sprayDialog" width="570px">
         <div class="coler__box">
-          <div v-for="(item, index) in sprayCtr" :key="index" class="coler">
+          <div v-for="(item, index) in sprayCtr" v-show="sprayObj.controlItem ? sprayObj.controlItem.includes(item.mark) : true" :key="index" class="coler">
             <div class="colf">{{ item.name }}</div>
             <div class="corg">
               <el-radio-group v-model="item.value" size="small" @change="(val) => sprayModel(val,index)">
@@ -109,7 +109,7 @@
               </el-radio-group>
             </div>
           </div>
-          <div class="coler">
+          <div v-show="sprayObj.controlItem ? sprayObj.controlItem.includes('sprayPwm') : true" class="coler">
             <div class="colf">行走速率</div>
             <div class="corg" style="width: 110px">
               <el-slider v-model="rate" @change="sprayRate" />
@@ -124,7 +124,6 @@
 
 <script>
 import Panel from '@/components/Panel'
-import command from '@/utils/command'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
 import { debounce } from '@/utils'
@@ -158,11 +157,11 @@ export default {
       sprayObj: {},
       // 喷灌机模式
       sprayCtr: [
-        { name: '灌机控制', value: '0', selete: [{ title: '启动', label: 1 }, { title: '停止', label: 2 }], model: 'state' },
-        { name: '运行模式', value: '0', selete: [{ title: '手动', label: 1 }, { title: '自动', label: 2 }], model: 'model' },
-        { name: '行进方向', value: '0', selete: [{ title: '正向', label: 1 }, { title: '反向', label: 2 }], model: 'direction' },
-        { name: '行进方式', value: '0', selete: [{ title: '有水', label: 1 }, { title: '无水', label: 2 }], model: 'water' },
-        { name: '尾枪设置', value: '0', selete: [{ title: '打开', label: 1 }, { title: '关闭', label: 2 }], model: 'gun' }
+        { name: '灌机控制', value: '0', selete: [{ title: '启动', label: 'openSpray' }, { title: '停止', label: 'closeSpray' }], mark: 'sprayRun' },
+        { name: '行进方向', value: '0', selete: [{ title: '正向', label: 'positive' }, { title: '反向', label: 'reverse' }], mark: 'direction' },
+        { name: '行进方式', value: '0', selete: [{ title: '有水', label: 'haveWater' }, { title: '无水', label: 'noWater' }], mark: 'mode' },
+        { name: '尾枪设置', value: '0', selete: [{ title: '打开', label: 'openGun' }, { title: '关闭', label: 'closeGun' }], mark: 'gunSetting' },
+        { name: '控制模式', value: '1', selete: [{ title: '手动', label: 1 }, { title: '自动', label: 2 }], mark: 'plan' }
       ],
       // 喷灌机行走速率
       rate: 100,
@@ -368,7 +367,7 @@ export default {
     closeValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, command.closeValve)
+        this.ctrlValve(el, el.command.closeValve.nameKey)
       })
       this.dialog = false
     },
@@ -379,7 +378,7 @@ export default {
     openValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, command.openValve)
+        this.ctrlValve(el, el.command.openValve.nameKey)
       })
       this.dialog = false
     },
@@ -394,30 +393,15 @@ export default {
     },
 
     /**
-     * 喷灌机控制项-筛选对应
-     * @param { String } 用户选择的值
-     * @param { Number } 选择的第几项
-     */
-    sprayModel(val, index) {
-      this.sprayCtr[index].value = val
-      switch (this.sprayCtr[index].model) {
-        case 'state' : this.sprayState(val); break
-        case 'direction': this.sprayDirection(val); break
-        case 'water': this.sprayWater(val); break
-        case 'gun': this.sprayGun(val); break
-      }
-    },
-
-    /**
      * 喷灌机发送控制指令（单纯的提取一下）
      * @param { namekey } mode 指令
      */
-    ctrlSpray(namekey) {
+    ctrlSpray(namekey, params) {
       action({
         serialno: this.sprayObj.serialno,
         actions: [{
           namekey: namekey,
-          params: true
+          params: params
         }]
       }).then((e) => {
         this.success()
@@ -427,43 +411,14 @@ export default {
     },
 
     /**
-     * 喷灌机启停控制
-     * @param { Number } 状态码,1启动2停止
+     * 喷灌机控制项-筛选对应
+     * @param { String } 控制项的label
+     * @param { Number } 选择的第几项
      */
-    sprayState(state) {
-      let namekey = command.openSpray
-      if (state === 2) namekey = command.closeSpray
-      this.ctrlSpray(namekey)
-    },
-
-    /**
-     * 喷灌机行进方向设置
-     * @param { Number } 状态码,1正向2反向
-     */
-    sprayDirection(state) {
-      let namekey = command.positive
-      if (state === 2) namekey = command.reverse
-      this.ctrlSpray(namekey)
-    },
-
-    /**
-     * 喷灌机行进方式设置
-     * @param { Number } 状态码,1有水行进2无水行进
-     */
-    sprayWater(state) {
-      let namekey = command.beWater
-      if (state === 2) namekey = command.noWater
-      this.ctrlSpray(namekey)
-    },
-
-    /**
-     * 喷灌机尾枪设置
-     * @param { Number } 状态码,1尾枪打开2尾枪关闭
-     */
-    sprayGun(state) {
-      let namekey = command.openGun
-      if (state === 2) namekey = command.closeGun
-      this.ctrlSpray(namekey)
+    sprayModel(val, index) {
+      this.sprayCtr[index].value = val
+      const command = this.sprayObj.command
+      this.ctrlSpray(command[val].nameKey, command[val].params())
     },
 
     /**
@@ -471,27 +426,13 @@ export default {
      * @param { Number } 速率值
      */
     sprayRate(val) {
+      const command = this.sprayObj.command
       this.$confirm('您确定把行走速率设置为' + val + '% ?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'info'
       }).then(() => {
-        const actions = []
-        const speed = command.speed
-        speed.forEach((el) => {
-          actions.push({
-            namekey: el,
-            params: val
-          })
-        })
-        action({
-          serialno: this.sprayObj.serialno,
-          actions: actions
-        }).then((e) => {
-          this.success()
-        }).catch((e) => {
-          this.error()
-        })
+        this.ctrlSpray(command.sprayPwm.nameKey, command.sprayPwm.params(val))
       }).catch(() => {
         this.rate = val
       })
