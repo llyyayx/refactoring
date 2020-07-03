@@ -2,7 +2,7 @@
  * 框选阀门
  * @param { String } sub 父类class(允许多个class)
  * @param { String } child 选择的子类class
- * @param { Function } callback 回调函数,返回的参数：1、选择的index列表，2、父类index
+ * @param { Function } callback 回调函数,返回的参数：1、选择的index列表，2、父类index (index=序号)
  */
 export function drag(sub, child, callback) {
   const subDomList = document.getElementsByClassName(sub)

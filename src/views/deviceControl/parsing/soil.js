@@ -37,7 +37,7 @@ const deviceAttr = {
       type: 'Number',
       // 转换nameKey得到值
       dataFun: (el) => {
-        return el
+        return (Math.floor(el * 10) / 10).toFixed(1)
       },
       nameKey: '',
       val: '0.0',

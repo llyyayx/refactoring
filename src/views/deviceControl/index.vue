@@ -134,6 +134,7 @@ export default {
       // 消息到达回调函数
       client.onMessageArrived = function(msg) {
         const data = JSON.parse(msg.payloadString)
+        console.log(data)
         new Promise((resolve, reject) => {
           if (data.code) {
             const obj = _this.mqttScreen(data)

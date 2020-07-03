@@ -139,3 +139,32 @@ export function debounce(func, wait, immediate) {
     }
   }
 }
+
+/**
+ * 深度拷贝对象
+ * @param { Object } obj 需要深度拷贝的对象
+ * @return { Object } 拷贝完成的对象
+ */
+export function clone(obj) {
+  var o
+  if (typeof obj === 'object') {
+    if (obj === null) {
+      o = null
+    } else {
+      if (obj instanceof Array) {
+        o = []
+        for (var i = 0, len = obj.length; i < len; i++) {
+          o.push(clone(obj[ i ]))
+        }
+      } else {
+        o = {}
+        for (var j in obj) {
+          o[ j ] = clone(obj[ j ])
+        }
+      }
+    }
+  } else {
+    o = obj
+  }
+  return o
+}

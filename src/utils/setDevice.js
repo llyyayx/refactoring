@@ -1,3 +1,4 @@
+import { clone } from './index'
 /**
  * 根据设备配置对象列表，返回与设备版本对应的属性集合
  * @param { Object } deviceAttr 设备属性配置对象
@@ -8,7 +9,7 @@
  * @return { Array } 属性列表
  */
 export function getAttr(deviceAttr, version) {
-  const { attr, attrNameKey, rules } = deviceAttr
+  const { attr, attrNameKey, rules } = clone(deviceAttr)
   const attribute = []
   const history = []
   attr.forEach((el, index) => {
@@ -37,7 +38,7 @@ export function getAttr(deviceAttr, version) {
  * @return { Array } 属性列表
  */
 export function getCommand(deviceCommand, version) {
-  const { command, commandNameKey, params } = deviceCommand
+  const { command, commandNameKey, params } = clone(deviceCommand)
   const sprayCommand = {}
   command.forEach((el, index) => {
     if (el.version[0] === '*' || el.version.includes(version)) {
