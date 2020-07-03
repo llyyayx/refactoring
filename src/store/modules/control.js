@@ -4,7 +4,7 @@ const state = {
   // deviceControl-滴灌面板显隐
   dropShow: true,
   // deviceControl-传感器面板显隐
-  sensorShow: false,
+  sensorShow: true,
   // deviceControl-工具箱显隐
   toolShow: false,
   // deviceControl-喷灌计划显隐

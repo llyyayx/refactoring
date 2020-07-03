@@ -471,6 +471,7 @@ export default {
     padding-top: 4px;
     font-size: 14px;
     text-align: center;
+    color: #333;
   }
 .spray__row {
     margin: 10px 0;

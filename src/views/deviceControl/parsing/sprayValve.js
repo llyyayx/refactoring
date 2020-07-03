@@ -68,6 +68,8 @@ const deviceAttr = {
   rules: []
 }
 
+/* -----------------------控制指令装载-------------------------- */
+
 const deviceCommand = {
   command: [
     {
