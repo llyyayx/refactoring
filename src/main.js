@@ -20,6 +20,7 @@ import i18n from './lang' // internationalization
 import '@/icons' // icon
 import '@/permission' // permission control
 import config from './utils/config'
+import echarts from 'echarts'
 
 /**
  * If you don't want to use mock-server
@@ -45,6 +46,7 @@ Vue.use(ElementUI, {
 Vue.config.productionTip = false
 Vue.prototype.$Cookies = Cookies
 Vue.prototype.$config = config
+Vue.prototype.$echarts = echarts
 
 new Vue({
   el: '#app',

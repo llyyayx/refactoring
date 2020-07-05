@@ -48,3 +48,13 @@ export function real(serialno) {
     method: 'get'
   })
 }
+
+/**
+ * 查询设备历史数据
+ */
+export function hist(serialno, nameKey, week) {
+  return request({
+    url: `/hist/${serialno}?name=${nameKey}&week=${week}`,
+    method: 'get'
+  })
+}

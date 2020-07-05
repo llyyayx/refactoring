@@ -37,12 +37,18 @@
       </el-row>
       <!-- 喷头主体 -->
       <div v-for="(pgValve, idx) in sprayValve" :key="'pg'+idx" class="nozzle">
-        <div class="nozzle__heder">
-          <div class="spray__title">{{ pgValve[0].pname }}</div>
-          <transition name="el-fade-in">
-            <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="nozzle__btn" round @click="multi(idx)">控制已选中</el-button>
-          </transition>
-        </div>
+        <el-row class="nozzle__heder">
+          <el-col :span="4" class="spray__title">{{ pgValve[0].pname }}</el-col>
+          <el-col :span="20">
+            <el-button-group class="nozzle__heder--pwm">
+              <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmSwitch(pgValve, true)">打开脉冲</el-button>
+              <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmSwitch(pgValve, false)">关闭脉冲</el-button>
+            </el-button-group>
+            <transition name="el-fade-in">
+              <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="nozzle__heder--btn nozzle__lf" round @click="multi(idx)">控制已选中</el-button>
+            </transition>
+          </el-col>
+        </el-row>
         <el-row v-for="(item,index) in groups = valveCtrGroup(pgValve)" :key="'pt'+index" type="flex" :gutter="20" class="spray__row">
           <el-col :lg="4" :sm="2" :xs="2">
             <div class="spray__imgBox">
@@ -68,7 +74,7 @@
     <div slot="dialog">
       <!-- 喷头控制对话框go -->
       <el-dialog :visible.sync="dialog" class="dialog" width="570px">
-        <el-tabs type="border-card" class="dialog__tabs">
+        <el-tabs type="border-card" class="dialog__tabs" @tab-click="valveMode">
           <el-tab-pane label="常开常关" />
           <el-tab-pane label="脉冲模式">
             <el-row class="demo-input-suffix" type="flex" align="middle">
@@ -93,8 +99,13 @@
           </el-tag>
         </el-tabs>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="closeValve">关 阀</el-button>
-          <el-button type="primary" @click="openValve">开 阀</el-button>
+          <div v-show="mode==='manual'">
+            <el-button @click="closeValve">关 阀</el-button>
+            <el-button type="primary" @click="openValve">开 阀</el-button>
+          </div>
+          <div v-show="mode==='auto'">
+            <el-button @click="setPwm">设 置</el-button>
+          </div>
         </span>
       </el-dialog>
       <!-- 喷头控制对话框end -->
@@ -147,10 +158,12 @@ export default {
       dialog: false,
       // 喷灌机对话框显示隐藏
       sprayDialog: false,
+      // 喷头模式
+      mode: 'manual',
       // 脉冲模式下的周期
-      cycle: '',
+      cycle: 60,
       // 脉冲模式下的占空比
-      ratio: '',
+      ratio: 50,
       // 选择要进行操控的喷头
       ctrlDev: [],
       // 选择准备控制的喷灌机
@@ -345,14 +358,15 @@ export default {
     /**
      * 喷头发送控制指令（单纯的提取一下）
      * @param { Object } valve 喷头对象
-     * @param { String } mode 指令(打开或者关闭)
+     * @param { String } command 指令
+     * @param { String } params 指令参数
      */
-    ctrlValve(valve, mode) {
+    ctrlValve(valve, command, params) {
       action({
         serialno: valve.rtuSerialno,
         actions: [{
-          namekey: mode + valve.port,
-          params: true
+          namekey: command + valve.port,
+          params: params
         }]
       }).then((e) => {
         this.success()
@@ -367,7 +381,7 @@ export default {
     closeValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, el.command.closeValve.nameKey)
+        this.ctrlValve(el, el.command.closeValve.nameKey, el.command.closeValve.params())
       })
       this.dialog = false
     },
@@ -378,7 +392,31 @@ export default {
     openValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, el.command.openValve.nameKey)
+        this.ctrlValve(el, el.command.openValve.nameKey, el.command.openValve.params())
+      })
+      this.dialog = false
+    },
+
+    /**
+     * 设置this.mode喷头模式
+     * @param { Object } e tab点击事件，index代表模式
+     */
+    valveMode(e) {
+      var index = parseInt(e.index)
+      if (index === 1) {
+        this.mode = 'auto'
+      } else if (index === 0) {
+        this.mode = 'manual'
+      }
+    },
+
+    /**
+     * 设置脉冲占空比
+     */
+    setPwm() {
+      const ctrlDev = this.ctrlDev
+      ctrlDev.forEach((el) => {
+        this.ctrlValve(el, el.command.setPwm.nameKey, el.command.setPwm.params(this.cycle, this.ratio))
       })
       this.dialog = false
     },
@@ -435,6 +473,54 @@ export default {
         this.ctrlSpray(command.sprayPwm.nameKey, command.sprayPwm.params(val))
       }).catch(() => {
         this.rate = val
+      })
+    },
+
+    /**
+     * 查找主设备下的阀控器
+     * @param { Array } 主设备喷头
+     * @param { String } 喷头的阀控标识
+     */
+    controller(valve, mark) {
+      // 存放现有循环的阀控
+      const existing = []
+      valve.forEach((el) => {
+        const state = existing.includes(el[mark])
+        if (!state) {
+          existing.push(el[mark])
+        }
+      })
+      return existing
+    },
+
+    /**
+     * 喷头阀控打开关闭脉冲
+     * @param { Array } 要切换的喷头列表，函数内会寻找喷头对应的阀控器
+     * @param { Boolean } state 状态：打开true 关闭false
+     */
+    pwmSwitch(pgValve, state) {
+      const control = this.controller(pgValve, 'rtuSerialno')
+      const command = pgValve[0].command
+      let nameKey, params
+      if (state) {
+        nameKey = command.openPwm.nameKey
+        params = command.openPwm.params()
+      } else {
+        nameKey = command.closePwm.nameKey
+        params = command.closePwm.params()
+      }
+      control.forEach((el) => {
+        action({
+          serialno: el,
+          actions: [{
+            namekey: nameKey,
+            params: params
+          }]
+        }).then((e) => {
+          this.success()
+        }).catch((e) => {
+          this.error()
+        })
       })
     }
 
@@ -526,7 +612,13 @@ export default {
 .nozzle__heder{
   display: flex;
   align-items: center;
-  & .nozzle__btn{
+  & .nozzle__heder--pwm{
+    margin-left: 10px;
+  }
+  & .nozzle__heder--btn{
+    padding: 7px 7px;
+  }
+  & .nozzle__lf{
     margin-left: 20px;
   }
 }

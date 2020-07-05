@@ -5,11 +5,14 @@ import { getAttr } from '@/utils/setDevice'
 // 解析土壤墒情传感器
 export function soil(item) {
   const { dclass, serialno, dname, latitude, longitude, model } = item
-  store.dispatch('device/setSoil', { dname, latitude, longitude, dclass, serialno,
-    icon: require('@/icons/device/close/sqz.png'), attr: getAttr(deviceAttr, model || 'V1.0')
-  })
   const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/sqz.png') })
   clickEvent(mapSpot)
+  const attr = getAttr(deviceAttr, model || 'V1.0')
+  const infowindow = mapFun.infowindow(store.state.map.map, mapSpot, attr, serialno)
+  store.dispatch('device/setSoil', { dname, latitude, longitude, dclass, serialno,
+    icon: require('@/icons/device/close/sqz.png'), attr: attr, infowindow: infowindow,
+    mapSpot: mapSpot
+  })
 }
 
 // 创建地图标点
@@ -28,6 +31,38 @@ function clickEvent(mapSpot) {
 }
 
 /* -----------------------属性装载-------------------------- */
+
+/**
+ * 属性值加载回调：设置喷头图标
+ * @param { String } el 喷头状态属性值
+ * @param { Object } vueX 喷头设备对象
+ */
+function stateIcon(el, vueX) {
+  if (el) {
+    const run = require('@/icons/device/run/sqz.png')
+    vueX.icon && (vueX.icon = run)
+    vueX.mapSpot && vueX.mapSpot.setIcon(run)
+  } else {
+    const close = require('@/icons/device/close/sqz.png')
+    vueX.icon && (vueX.icon = close)
+    vueX.mapSpot && vueX.mapSpot.setIcon(close)
+  }
+}
+
+/**
+ * 属性值加载回调：设置地图infowindow信息
+ * @param { String } el 喷头状态属性值
+ * @param { Object } vueX 喷头设备对象
+ */
+function setInfoWindow(el, vueX) {
+  let content = ''
+  vueX.attr.forEach((el) => {
+    content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
+      ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
+  })
+  vueX.infowindow.setContent(content)
+}
+
 const deviceAttr = {
 
   attr: [
@@ -44,6 +79,7 @@ const deviceAttr = {
       unit: '%',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
+      callback: [stateIcon, setInfoWindow],
       version: ['V1.0', 'V2.0']
     },
     {
@@ -59,6 +95,7 @@ const deviceAttr = {
       unit: '%',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
+      callback: [stateIcon, setInfoWindow],
       version: ['V1.0', 'V2.0']
     },
     {
@@ -74,6 +111,7 @@ const deviceAttr = {
       unit: '%',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
+      callback: [stateIcon, setInfoWindow],
       version: ['V1.0', 'V2.0']
     },
     {
@@ -89,6 +127,7 @@ const deviceAttr = {
       unit: '%',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
+      callback: [stateIcon, setInfoWindow],
       version: ['V1.0', 'V2.0']
     }
   ],

@@ -85,6 +85,26 @@ const deviceCommand = {
       nameKey: '',
       param: '',
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'openPwm',
+      name: '打开pwm模式',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closePwm',
+      name: '关闭pwm模式',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'setPwm',
+      name: '设置PWM值',
+      nameKey: '',
+      version: ['V1.0', 'V2.0']
     }
   ],
   commandNameKey: [
@@ -97,6 +117,21 @@ const deviceCommand = {
       mark: 'closeValve',
       key: 'Close_PulseValve_',
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'openPwm',
+      key: 'PWM_EN',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closePwm',
+      key: 'PWM_EN',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'setPwm',
+      key: 'PWM_',
+      version: ['V1.0', 'V2.0']
     }
   ],
   params: [
@@ -108,6 +143,26 @@ const deviceCommand = {
     {
       mark: 'closeValve',
       fun: () => { return true },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'openPwm',
+      fun: () => { return true },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closePwm',
+      fun: () => { return false },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'setPwm',
+      fun: (cycle, ratio) => {
+        cycle = parseInt(cycle)
+        ratio = parseInt(ratio)
+        const v16 = cycle.toString(16) + ratio.toString(16)
+        return parseInt(v16, 16)
+      },
       version: ['V1.0', 'V2.0']
     }
   ]

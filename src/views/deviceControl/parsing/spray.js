@@ -65,7 +65,7 @@ function draw(param) {
     neSpot: neSpot,
     canvasId: 'myCan',
     lineWidth: 1,
-    pgAngle: 60,
+    pgAngle: 0,
     pgWidth: 3,
     pgColor: 'rgba(132,209,73,1)',
     coreColor: '#000',
@@ -121,6 +121,13 @@ function stateIcon(el, vueX) {
   }
   vueX.icon && (vueX.icon = icon)
   vueX.mapSpot && vueX.mapSpot.setIcon(icon)
+}
+
+function setAngle(el, vueX) {
+  vueX.canvas.pgAngle = el
+  vueX.canvas.view.onRemove()
+  vueX.canvas.view.onAdd()
+  vueX.canvas.view.draw()
 }
 
 const deviceAttr = {
@@ -179,6 +186,7 @@ const deviceAttr = {
       val: '100',
       unit: '°',
       rules: false,
+      callback: [setAngle],
       version: ['V1.0', 'V2.0']
     },
     {
@@ -217,11 +225,6 @@ const deviceAttr = {
     {
       mark: 'sprayAngle',
       key: 'Angle',
-      version: ['V1.0', 'V2.0']
-    },
-    {
-      mark: 'direction',
-      key: 'REG_RUN_STS',
       version: ['V1.0', 'V2.0']
     }
   ],
@@ -276,13 +279,6 @@ const deviceCommand = {
     {
       mark: 'positive',
       name: '正向行进',
-      nameKey: '',
-      param: '',
-      version: ['V1.0', 'V2.0']
-    },
-    {
-      mark: 'reverse',
-      name: '反向行进',
       nameKey: '',
       param: '',
       version: ['V1.0', 'V2.0']

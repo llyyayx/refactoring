@@ -38,7 +38,7 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
+        const { data } = response = { data: { token: 'admin-token' }}
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         resolve()
@@ -51,7 +51,19 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      const data = { name: 'Super Admin', avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif', roles: ['admin'] }
+      const { name, avatar, roles } = data
+
+      // roles must be a non-empty array
+      if (!roles || roles.length <= 0) {
+        reject('getInfo: roles must be a non-null array!')
+      }
+
+      commit('SET_ROLES', roles)
+      commit('SET_NAME', name)
+      commit('SET_AVATAR', avatar)
+      resolve(data)
+      /* getInfo(state.token).then(response => {
         const { data } = response
 
         if (!data) {
@@ -71,7 +83,7 @@ const actions = {
         resolve(data)
       }).catch(error => {
         reject(error)
-      })
+      }) */
     })
   },
 

@@ -116,8 +116,17 @@ export default {
 
     /* 快捷菜单控制设备 */
     touch(item) {
-      // eslint-disable-next-line no-undef
-      google.maps.event.trigger(item.mapSpot, 'click')
+      const config = this.$config
+      switch (item.dclass) {
+        case config.SOIL_CLASS:
+          this.$store.dispatch('control/dataPanelShow', true)
+          this.$store.dispatch('control/dataPanelObj', item)
+          break
+        default:
+          // eslint-disable-next-line no-undef
+          google.maps.event.trigger(item.mapSpot, 'click')
+          break
+      }
     }
 
   }

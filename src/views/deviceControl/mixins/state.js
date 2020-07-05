@@ -36,21 +36,21 @@ export default {
       const attr = device.attr
       if (Object.prototype.toString.call(attr) !== '[object Array]') return
       attr.forEach((el) => {
-        const val = res.regs[el.nameKey]
-        if (val !== undefined) {
-          let result
-          if (Object.prototype.toString.call(el.rules) === '[object Function]') {
-            result = el.rules(res, device)
-          } else {
+        let result
+        if (Object.prototype.toString.call(el.rules) === '[object Function]') {
+          result = el.rules(res, device)
+        } else {
+          const val = res.regs[el.nameKey]
+          if (val !== undefined) {
             result = el.dataFun(val, device)
           }
-          el.val = result
-          // 属性回调事件
-          if (el.callback) {
-            el.callback.forEach((fun) => {
-              fun(result, device)
-            })
-          }
+        }
+        if (result !== undefined) el.val = result
+        // 属性回调事件
+        if (el.callback && result !== undefined) {
+          el.callback.forEach((fun) => {
+            fun(result, device)
+          })
         }
       })
     },

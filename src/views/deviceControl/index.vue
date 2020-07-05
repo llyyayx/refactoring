@@ -7,6 +7,7 @@
     <Sensor />
     <Toolkit />
     <SprayPlan />
+    <DataPanel />
     <canvas id="myCan" width="300" height="300" style="display:none;" />
   </div>
 </template>
@@ -19,9 +20,10 @@ import Sensor from './components/sensor'
 import Toolkit from './components/toolkit'
 import SprayPlan from './components/sprayPlan'
 import Quick from './components/quick'
+import DataPanel from './components/dataPanel'
 import state from './mixins/state'
 import mapFun from '@/utils/mapFun'
-import Paho from '@/utils/mqttws31'
+import Paho from './mqttws31'
 import { getDevice } from '@/api/deviceControl'
 import { drops, pump, fertilizer, soil, weather, spray, ndvi, height, canopy } from './parsing'
 export default {
@@ -33,7 +35,8 @@ export default {
     Sensor,
     Toolkit,
     SprayPlan,
-    Quick
+    Quick,
+    DataPanel
   },
   mixins: [state],
   data() {
@@ -134,7 +137,7 @@ export default {
       // 消息到达回调函数
       client.onMessageArrived = function(msg) {
         const data = JSON.parse(msg.payloadString)
-        console.log(data)
+        // console.log(data)
         new Promise((resolve, reject) => {
           if (data.code) {
             const obj = _this.mqttScreen(data)
@@ -216,5 +219,8 @@ export default {
     font-size: 30px;
     line-height: 46px;
   }
+}
+.flex {
+  display: flex;
 }
 </style>

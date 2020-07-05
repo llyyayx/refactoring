@@ -3,7 +3,55 @@
     <div slot="main">
       <div v-show="soil.length > 0" class="sensor__title">墒情站</div>
       <el-row :gutter="20" type="flex" class="sensor__list">
-        <el-col v-for="(item, index) in soil" :key="index" :span="8" class="sensor__block">
+        <el-col v-for="(item, index) in soil" :key="index" :span="column" class="sensor__block">
+          <div class="sensor__block--img">
+            <img :src="item.icon">
+            <div class="sensor__block--name">{{ item.dname }}</div>
+          </div>
+          <div class="sensor__block--item">
+            <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
+              <div class="sensor__block--namekey">{{ item2.name }}：</div>
+              <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+      <el-divider class="sensor__divider" />
+      <div v-show="canopy.length > 0" class="sensor__title">NDVI</div>
+      <el-row :gutter="20" type="flex" class="sensor__list">
+        <el-col v-for="(item, index) in ndvi" :key="index" :span="column" class="sensor__block">
+          <div class="sensor__block--img">
+            <img :src="item.icon">
+            <div class="sensor__block--name">{{ item.dname }}</div>
+          </div>
+          <div class="sensor__block--item">
+            <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
+              <div class="sensor__block--namekey minlimit">{{ item2.name }}：</div>
+              <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+      <el-divider class="sensor__divider" />
+      <div v-show="canopy.length > 0" class="sensor__title">冠层站</div>
+      <el-row :gutter="20" type="flex" class="sensor__list">
+        <el-col v-for="(item, index) in canopy" :key="index" :span="column" class="sensor__block">
+          <div class="sensor__block--img">
+            <img :src="item.icon">
+            <div class="sensor__block--name">{{ item.dname }}</div>
+          </div>
+          <div class="sensor__block--item">
+            <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
+              <div class="sensor__block--namekey">{{ item2.name }}：</div>
+              <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+      <el-divider class="sensor__divider" />
+      <div v-show="canopy.length > 0" class="sensor__title">高度</div>
+      <el-row :gutter="20" type="flex" class="sensor__list">
+        <el-col v-for="(item, index) in height" :key="index" :span="column" class="sensor__block">
           <div class="sensor__block--img">
             <img :src="item.icon">
             <div class="sensor__block--name">{{ item.dname }}</div>
@@ -26,6 +74,11 @@ export default {
   components: {
     panel
   },
+  data() {
+    return {
+      column: 8
+    }
+  },
   computed: {
     // 滴灌面板的显示隐藏
     show() {
@@ -33,11 +86,15 @@ export default {
     },
     soil() {
       return this.$store.state.device.soil
-    }
-  },
-  watch: {
-    soil() {
-      console.log(this.soil)
+    },
+    ndvi() {
+      return this.$store.state.device.ndvi
+    },
+    canopy() {
+      return this.$store.state.device.canopy
+    },
+    height() {
+      return this.$store.state.device.height
     }
   },
   methods: {
@@ -47,7 +104,11 @@ export default {
      * @param { Boolean } fullScreen 全屏true 非全屏false
      */
     full(fullScreen) {
-      return
+      if (fullScreen) {
+        this.column = 6
+      } else {
+        this.column = 8
+      }
     },
 
     // 关闭面板的回调事件
@@ -71,13 +132,15 @@ export default {
 
 .sensor__list {
   margin: 10px 0;
+  padding: 0 10px;
+  box-sizing: border-box;
   flex-wrap: wrap;
   & .sensor__block {
     display: flex;
     align-items: flex-start;
     margin-bottom: 10px;
     & .sensor__block--img {
-      padding-right: 16px;
+      padding-right: 10px;
       & img{
         width: 36px;
         display: block;
@@ -100,6 +163,9 @@ export default {
         color: #666;
         padding-right: 2px;
       }
+      & .minlimit {
+        min-width: 78px;
+      }
       & .sensor__block--val {
         font-size: 14px;
         color: #333;
@@ -107,6 +173,10 @@ export default {
       }
     }
   }
+}
+
+.sensor__divider {
+  margin: 0 auto 10px;
 }
 
 </style>

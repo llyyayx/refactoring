@@ -8,7 +8,11 @@ const state = {
   // deviceControl-工具箱显隐
   toolShow: false,
   // deviceControl-喷灌计划显隐
-  pgPlanShow: false
+  pgPlanShow: false,
+  // deviceControl-数据面板显隐
+  dataPanelShow: false,
+  // 数据面板控制对象
+  dataPanelObj: {}
 }
 
 const mutations = {
@@ -26,6 +30,12 @@ const mutations = {
   },
   SET_SENSORSHOW: (state, show) => {
     state.sensorShow = show
+  },
+  SET_DATAPANELSHOW: (state, show) => {
+    state.dataPanelShow = show
+  },
+  SET_DATAPANELOBJ: (state, show) => {
+    state.dataPanelObj = show
   }
 }
 
@@ -44,6 +54,12 @@ const actions = {
   },
   sensorShow: ({ commit }, show) => {
     commit('SET_SENSORSHOW', show)
+  },
+  dataPanelShow: ({ commit }, show) => {
+    commit('SET_DATAPANELSHOW', show)
+  },
+  dataPanelObj: ({ commit }, show) => {
+    commit('SET_DATAPANELOBJ', show)
   }
 }
 
