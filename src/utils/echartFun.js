@@ -8,6 +8,17 @@ export default {
     })
     const myChart = echarts.init(dom)
     const option = {
+      tooltip: {
+        trigger: 'axis',
+        type: 'cross',
+        position: function(pt) {
+          return [pt[0], '10%']
+        }
+      },
+      grid: {
+        left: '50px',
+        right: '50px'
+      },
       title: {
         left: 'center',
         text: name
@@ -49,7 +60,7 @@ export default {
       }],
       series: [
         {
-          name: '模拟数据',
+          name: name,
           type: 'line',
           smooth: true,
           symbol: 'none',

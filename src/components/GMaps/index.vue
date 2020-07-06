@@ -16,7 +16,7 @@ export default {
         return {
           lat: 38.123456,
           lng: 118.123456,
-          zoom: 15
+          zoom: 20
         }
       }
     }

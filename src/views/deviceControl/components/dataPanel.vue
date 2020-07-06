@@ -149,7 +149,6 @@ export default {
     },
 
     draw(attrItem, data) {
-      debugger
       echartFun.brokenLine(this.$echarts, document.getElementById(attrItem.nameKey), data, attrItem.name)
     }
 
@@ -211,8 +210,9 @@ export default {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
+        margin-top: 20px;
         & .dataMain--list {
-          width: 32%;
+          width: 50%;
           height: 400px;
         }
     }

@@ -109,17 +109,19 @@ export default {
   },
 
   infowindow(map, mapSpot, attr, serialno) {
-    let content = ''
-    attr.forEach((el) => {
-      content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
-      ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
-    })
-    const window = new google.maps.InfoWindow({
-      disableAutoPan: true,
-      content: '<div class="' + serialno + '">' + content + '</div>'
-    })
-    window.open(map, mapSpot)
-    return window
+    if (Object.prototype.toString.call(attr) === '[object Array]' && attr.length > 0) {
+      let content = ''
+      attr.forEach((el) => {
+        content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
+        ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
+      })
+      const window = new google.maps.InfoWindow({
+        disableAutoPan: true,
+        content: '<div class="' + serialno + '">' + content + '</div>'
+      })
+      window.open(map, mapSpot)
+      return window
+    }
   }
 
 }
