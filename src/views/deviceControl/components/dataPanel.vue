@@ -164,6 +164,8 @@ export default {
     top: 0;
     bottom: 0;
     background-color: rgba(255, 255, 255, .9);
+    overflow-x: hidden;
+    overflow-y: auto;
     & .dataPanel__top {
         width: 100%;
         top: 5px;
@@ -221,4 +223,40 @@ export default {
         height: 400px;
     }
 }
+
+/* 重置滚动条 */
+::scrollbar{width:8px; height:8px; border-radius:5px;}
+::scrollbar-button{display:none;}
+::scrollbar-track  {display:none;}
+::scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
+::scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
+::scrollbar-corner{display:none;}
+
+::-webkit-scrollbar{width:8px; height: 8px; border-radius:5px;}
+::-webkit-scrollbar-button{display:none;}
+::-webkit-scrollbar-track  {display:none;}
+::-webkit-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
+::-webkit-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
+::-webkit-scrollbar-corner{display:none;}
+
+::-moz-scrollbar{width:8px; height:8px; border-radius:5px;}
+::-moz-scrollbar-button{display:none;}
+::-moz-scrollbar-track  {display:none;}
+::-moz-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
+::-moz-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
+::-moz-scrollbar-corner{display:none;}
+
+::-o-scrollbar{width:8px; height:8px; border-radius:5px;}
+::-o-scrollbar-button{display:none;}
+::-o-scrollbar-track  {display:none;}
+::-o-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
+::-o-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
+::-o-scrollbar-corner{display:none;}
+
+::-ms-scrollbar{width:8px; height:8px; border-radius:5px;}
+::-ms-scrollbar-button{display:none;}
+::-ms-scrollbar-track  {display:none;}
+::-ms-scrollbar-track-piece {background-color: transparent; margin: 12px 0;}
+::-ms-scrollbar-thumb {background-color:#e3e3e3; border-radius:15px;}
+::-ms-scrollbar-corner{display:none;}
 </style>

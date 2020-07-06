@@ -39,12 +39,14 @@ export default {
       },
       yAxis: {
         type: 'value',
+        min: 'dataMin',
+        max: 'dataMax',
         boundaryGap: [0, '100%']
       },
       dataZoom: [{
         type: 'inside',
         start: 0,
-        end: 10
+        end: 100
       }, {
         start: 0,
         end: 10,
@@ -63,8 +65,8 @@ export default {
           name: name,
           type: 'line',
           smooth: true,
+          showSymbol: true,
           symbol: 'none',
-          sampling: 'average',
           itemStyle: {
             color: 'rgb(255, 70, 131)'
           },
