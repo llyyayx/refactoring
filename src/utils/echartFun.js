@@ -1,12 +1,27 @@
 export default {
-  brokenLine(echarts, dom, data, name) {
+
+  /**
+   * echarts折线图封装--样式1
+   * @param { Object } echarts 插件对象
+   * @param { Object } config 设置项
+   * config.dom 图标实例化的dom对象
+   * config.name 图标名称
+   * config.data 数据源 格式：[{createdAt:2020-01-01, val: 20}]
+   * config.unit 单位
+   * config.max y轴允许最大值
+   * config.min y轴允许最小值
+   * @return echarts实例化对象
+   */
+  brokenLine(echarts, config) {
     const date = []
     const value = []
-    data.forEach((el) => {
-      date.push(el.createdAt)
-      value.push(el.val)
-    })
-    const myChart = echarts.init(dom)
+    if (config.data.length > 0) {
+      config.data.forEach((el) => {
+        date.push(el.createdAt)
+        value.push(el.val)
+      })
+    }
+    const myChart = echarts.init(config.dom)
     const option = {
       tooltip: {
         trigger: 'axis',
@@ -21,7 +36,7 @@ export default {
       },
       title: {
         left: 'center',
-        text: name
+        text: config.name + config.unit
       },
       toolbox: {
         feature: {
@@ -39,8 +54,8 @@ export default {
       },
       yAxis: {
         type: 'value',
-        min: 'dataMin',
-        max: 'dataMax',
+        min: config.min,
+        max: config.max,
         boundaryGap: [0, '100%']
       },
       dataZoom: [{
@@ -62,7 +77,7 @@ export default {
       }],
       series: [
         {
-          name: name,
+          name: config.name,
           type: 'line',
           smooth: true,
           showSymbol: true,
@@ -84,5 +99,6 @@ export default {
       ]
     }
     myChart.setOption(option)
+    return myChart
   }
 }

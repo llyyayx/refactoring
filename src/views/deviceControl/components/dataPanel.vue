@@ -90,7 +90,9 @@ export default {
       // 模式选择值
       modeValue: 1,
       // 历史数据
-      histData: {}
+      histData: {},
+      // echarts实例化对象
+      ecObj: {}
     }
   },
   computed: {
@@ -121,7 +123,7 @@ export default {
     },
     show(e) {
       this.device = this.$store.state.control.dataPanelObj
-      if (e) this.getData()
+      if (e) this.draw()
     }
   },
   mounted() {
@@ -148,8 +150,21 @@ export default {
       })
     },
 
-    draw(attrItem, data) {
-      echartFun.brokenLine(this.$echarts, document.getElementById(attrItem.nameKey), data, attrItem.name)
+    draw() {
+      const attr = this.device.attr
+      const self = this
+      attr.forEach((el) => {
+        const newObj = echartFun.brokenLine(this.$echarts, {
+          dom: document.getElementById(el.nameKey),
+          name: el.dname,
+          data: [],
+          unit: el.unit,
+          max: el.max,
+          min: el.min
+        })
+        newObj.showLoading()
+        self.ecObj[el.nameKey] = newObj
+      })
     }
 
   }

@@ -77,6 +77,8 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
+      max: 100,
+      min: 0,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],
@@ -93,6 +95,8 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
+      max: 100,
+      min: 0,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],
@@ -109,6 +113,8 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
+      max: 100,
+      min: 0,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],
@@ -125,6 +131,8 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
+      max: 100,
+      min: 0,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],
