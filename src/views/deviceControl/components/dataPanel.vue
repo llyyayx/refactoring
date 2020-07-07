@@ -150,9 +150,12 @@ export default {
       })
     },
 
+    /**
+     * 实例化属性的echarts对象
+     */
     draw() {
-      const attr = this.device.attr
       const self = this
+      const attr = this.device.attr
       attr.forEach((el) => {
         const newObj = echartFun.brokenLine(this.$echarts, {
           dom: document.getElementById(el.nameKey),
