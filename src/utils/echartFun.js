@@ -6,21 +6,14 @@ export default {
    * @param { Object } config 设置项
    * config.dom 图标实例化的dom对象
    * config.name 图标名称
-   * config.data 数据源 格式：[{createdAt:2020-01-01, val: 20}]
+   * config.date 数据源--x轴日期
+   * config.value 数据源--数据
    * config.unit 单位
    * config.max y轴允许最大值
    * config.min y轴允许最小值
    * @return echarts实例化对象
    */
   brokenLine(echarts, config) {
-    const date = []
-    const value = []
-    if (config.data.length > 0) {
-      config.data.forEach((el) => {
-        date.push(el.createdAt)
-        value.push(el.val)
-      })
-    }
     const myChart = echarts.init(config.dom)
     const option = {
       tooltip: {
@@ -50,7 +43,7 @@ export default {
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: date
+        data: config.date
       },
       yAxis: {
         type: 'value',
@@ -94,7 +87,7 @@ export default {
               color: 'rgb(255, 70, 131)'
             }])
           },
-          data: value
+          data: config.value
         }
       ]
     }

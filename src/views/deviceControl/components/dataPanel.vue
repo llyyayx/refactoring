@@ -123,11 +123,10 @@ export default {
     },
     show(e) {
       this.device = this.$store.state.control.dataPanelObj
-      if (e) this.draw()
+      this.$nextTick(() => {
+        if (e) this.draw()
+      })
     }
-  },
-  mounted() {
-    // echartFun.brokenLine(this.$echarts, this.$refs.data1, data, 'test')
   },
   methods: {
 
@@ -135,19 +134,8 @@ export default {
      * 关闭面板
      */
     closePanel() {
+      this.clearEc()
       this.$store.dispatch('control/dataPanelShow', false)
-    },
-
-    getData() {
-      const attr = this.device.attr
-      attr.forEach((el) => {
-        new Promise((resolve, reject) => {
-          hist(this.device.serialno, el.nameKey, this.cycleValue).then((res) => {
-            this.histData[res.ch.namekey] = res.items
-            this.draw(el, res.items)
-          })
-        })
-      })
     },
 
     /**
@@ -167,6 +155,60 @@ export default {
         })
         newObj.showLoading()
         self.ecObj[el.nameKey] = newObj
+      })
+      this.getData()
+    },
+
+    /**
+     * 方法：历史数据按照格式返回
+     * @param { Array } 接口返回的历史数据 [{createdAt:2020-01-01, val:20}]
+     * @return { Object } 格式化好的对象
+     */
+    fromatting(data) {
+      const date = []
+      const value = []
+      if (data.length > 0) {
+        data.forEach((el) => {
+          date.push(el.createdAt)
+          value.push(el.val)
+        })
+      }
+      return { date, value }
+    },
+
+    /**
+     * 获取设备历史数据，并且异步赋值echarts对象数据
+     */
+    getData() {
+      const self = this
+      const attr = this.device.attr
+      attr.forEach((el) => {
+        new Promise((resolve, reject) => {
+          hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
+            self.histData[res.ch.namekey] = res.items
+            const dataObj = self.fromatting(res.items)
+            self.ecObj[el.nameKey].setOption({
+              xAxis: {
+                data: dataObj.date
+              },
+              series: [{
+                data: dataObj.value
+              }]
+            })
+            self.ecObj[el.nameKey].hideLoading()
+          })
+        })
+      })
+    },
+
+    /**
+     * 清楚echarts图表
+     */
+    clearEc() {
+      const ecObj = this.ecObj
+      Object.keys(ecObj).forEach((key) => {
+        ecObj[key].hideLoading()
+        ecObj[key].clear()
       })
     }
 
