@@ -54,7 +54,8 @@ export default {
       dataZoom: [{
         type: 'inside',
         start: 0,
-        end: 100
+        end: 100,
+        zoomOnMouseWheel: 'ctrl'
       }, {
         start: 0,
         end: 10,

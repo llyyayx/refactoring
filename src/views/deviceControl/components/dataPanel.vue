@@ -84,15 +84,15 @@ export default {
       cycleValue: 1,
       // 展示模式
       mode: [
-        { value: 1, label: '展开' },
-        { value: 2, label: '合并' }
+        { value: 'an', label: '展开' },
+        { value: 'merge', label: '合并' }
       ],
       // 模式选择值
-      modeValue: 1,
+      modeValue: 'an',
       // 历史数据
       histData: {},
-      // echarts实例化对象
-      ecObj: {}
+      // 展开模式：echarts实例化对象
+      AnEcObj: {}
     }
   },
   computed: {
@@ -124,7 +124,11 @@ export default {
     show(e) {
       this.device = this.$store.state.control.dataPanelObj
       this.$nextTick(() => {
-        if (e) this.draw()
+        if (e) {
+          // 初始化所以模式
+          this.an()
+          this.getData()
+        }
       })
     }
   },
@@ -134,29 +138,71 @@ export default {
      * 关闭面板
      */
     closePanel() {
-      this.clearEc()
+      this.anClearEc()
       this.$store.dispatch('control/dataPanelShow', false)
     },
 
     /**
-     * 实例化属性的echarts对象
+     * 展开模式：实例化下属性的echarts对象
      */
-    draw() {
+    an() {
       const self = this
       const attr = this.device.attr
       attr.forEach((el) => {
         const newObj = echartFun.brokenLine(this.$echarts, {
           dom: document.getElementById(el.nameKey),
-          name: el.dname,
+          name: el.name,
           data: [],
           unit: el.unit,
           max: el.max,
           min: el.min
         })
         newObj.showLoading()
-        self.ecObj[el.nameKey] = newObj
+        self.AnEcObj[el.nameKey] = newObj
       })
-      this.getData()
+    },
+
+    /**
+     * 展开模式：给实例化对象赋值（值是ajax异步获取）
+     */
+    anSetData(attrName) {
+      const dataObj = this.fromatting(this.histData[attrName])
+      this.AnEcObj[attrName].setOption({
+        xAxis: {
+          data: dataObj.date
+        },
+        series: [{
+          data: dataObj.value
+        }]
+      })
+      this.AnEcObj[attrName].hideLoading()
+    },
+
+    /**
+     * 展开模式：清楚echarts图表
+     */
+    anClearEc() {
+      const AnEcObj = this.AnEcObj
+      Object.keys(AnEcObj).forEach((key) => {
+        AnEcObj[key].hideLoading()
+        AnEcObj[key].clear()
+      })
+    },
+
+    /**
+     * 获取设备历史数据，并且异步赋值echarts对象数据
+     */
+    getData() {
+      const self = this
+      const attr = this.device.attr
+      attr.forEach((el) => {
+        new Promise((resolve, reject) => {
+          hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
+            self.histData[res.ch.namekey] = res.items
+            self.selectMode(res.ch.namekey)
+          })
+        })
+      })
     },
 
     /**
@@ -177,39 +223,13 @@ export default {
     },
 
     /**
-     * 获取设备历史数据，并且异步赋值echarts对象数据
+     * 选择数据展示模式
      */
-    getData() {
-      const self = this
-      const attr = this.device.attr
-      attr.forEach((el) => {
-        new Promise((resolve, reject) => {
-          hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
-            self.histData[res.ch.namekey] = res.items
-            const dataObj = self.fromatting(res.items)
-            self.ecObj[el.nameKey].setOption({
-              xAxis: {
-                data: dataObj.date
-              },
-              series: [{
-                data: dataObj.value
-              }]
-            })
-            self.ecObj[el.nameKey].hideLoading()
-          })
-        })
-      })
-    },
-
-    /**
-     * 清楚echarts图表
-     */
-    clearEc() {
-      const ecObj = this.ecObj
-      Object.keys(ecObj).forEach((key) => {
-        ecObj[key].hideLoading()
-        ecObj[key].clear()
-      })
+    selectMode(attrName) {
+      var mode = this.modeValue
+      if (mode === 'an') {
+        this.anSetData(attrName)
+      }
     }
 
   }
