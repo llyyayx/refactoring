@@ -168,3 +168,12 @@ export function clone(obj) {
   }
   return o
 }
+
+/**
+ * 生成指定范围的随机数
+ * @param { Number } m 随机数指定开始位置
+ * @param { Number } n 随机数指定结束位置
+ */
+export function random(m, n) {
+  return Math.floor(Math.random() * (n - m)) + m
+}

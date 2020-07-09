@@ -52,7 +52,12 @@
       </el-row>
       <!-- 数据展示主体go -->
       <div class="dataMain">
-        <div v-for="(item,index) in device.attr" :id="item.nameKey" :key="index" class="dataMain--list" />
+        <div v-show="modeValue==='an'" class="an">
+          <div v-for="(item,index) in device.attr" :id="item.nameKey" :key="index" class="dataMain--list" />
+        </div>
+        <div v-show="modeValue==='merge'" class="merge">
+          <div id="mergeEc" />
+        </div>
       </div>
       <!-- 数据展示主体end -->
     </div>
@@ -89,6 +94,8 @@ export default {
       ],
       // 模式选择值
       modeValue: 'an',
+      // 是否已经加载历史数据，不同设备改为false
+      load: false,
       // 历史数据
       histData: {},
       // 展开模式：echarts实例化对象
@@ -125,10 +132,14 @@ export default {
       this.device = this.$store.state.control.dataPanelObj
       this.$nextTick(() => {
         if (e) {
-          // 初始化所以模式
-          this.an()
-          this.getData()
+          // 初始化默认模式
+          this.selectInit()
         }
+      })
+    },
+    modeValue() {
+      this.$nextTick(() => {
+        this.selectInit()
       })
     }
   },
@@ -138,7 +149,14 @@ export default {
      * 关闭面板
      */
     closePanel() {
+      // 清除echarts实例化对象
       this.anClearEc()
+      this.mergeClearEc()
+      // 清空echarts缓存
+      this.AnEcObj = {}
+      // 清除缓存历史数据
+      this.histData = {}
+      this.load = false
       this.$store.dispatch('control/dataPanelShow', false)
     },
 
@@ -152,30 +170,35 @@ export default {
         const newObj = echartFun.brokenLine(this.$echarts, {
           dom: document.getElementById(el.nameKey),
           name: el.name,
-          data: [],
+          date: [],
+          value: [],
           unit: el.unit,
           max: el.max,
           min: el.min
         })
-        newObj.showLoading()
         self.AnEcObj[el.nameKey] = newObj
+        newObj.showLoading()
       })
     },
 
     /**
      * 展开模式：给实例化对象赋值（值是ajax异步获取）
+     *
      */
-    anSetData(attrName) {
-      const dataObj = this.fromatting(this.histData[attrName])
-      this.AnEcObj[attrName].setOption({
-        xAxis: {
-          data: dataObj.date
-        },
-        series: [{
-          data: dataObj.value
-        }]
+    anSetData() {
+      const attr = this.device.attr
+      attr.forEach((el) => {
+        const dataObj = this.fromatting(this.histData[el.nameKey])
+        this.AnEcObj[el.nameKey].setOption({
+          xAxis: {
+            data: dataObj.date
+          },
+          series: [{
+            data: dataObj.value
+          }]
+        })
+        this.AnEcObj[el.nameKey].hideLoading()
       })
-      this.AnEcObj[attrName].hideLoading()
     },
 
     /**
@@ -184,9 +207,61 @@ export default {
     anClearEc() {
       const AnEcObj = this.AnEcObj
       Object.keys(AnEcObj).forEach((key) => {
-        AnEcObj[key].hideLoading()
-        AnEcObj[key].clear()
+        if (AnEcObj[key]) {
+          AnEcObj[key].hideLoading()
+          AnEcObj[key].clear()
+        }
       })
+    },
+
+    /**
+     * 合并模式：实例化对象
+     */
+    merge() {
+      const newObj = echartFun.mergeLine(this.$echarts, {
+        dom: document.getElementById('mergeEc'),
+        name: '',
+        date: [],
+        dataList: [],
+        legend: []
+      })
+      this.AnEcObj.merge = newObj
+      newObj.showLoading()
+    },
+
+    /**
+     * 合并模式：给实例化对象赋值
+     */
+    mergeSetData() {
+      const attr = this.device.attr
+      const array = []
+      const legend = []
+      attr.forEach((el) => {
+        const dataObj = this.fromatting(this.histData[el.nameKey])
+        array.push({
+          name: el.name,
+          type: el.ecType,
+          data: dataObj.value
+        })
+        legend.push(el.name)
+      })
+      this.AnEcObj.merge.setOption({
+        legend: {
+          data: legend
+        },
+        xAxis: {
+          data: this.fromatting(this.histData[attr[0].nameKey]).date
+        },
+        series: array
+      })
+      this.AnEcObj.merge.hideLoading()
+    },
+
+    mergeClearEc() {
+      if (this.AnEcObj.merge) {
+        this.AnEcObj.merge.hideLoading()
+        this.AnEcObj.merge.clear()
+      }
     },
 
     /**
@@ -195,12 +270,19 @@ export default {
     getData() {
       const self = this
       const attr = this.device.attr
-      attr.forEach((el) => {
+      attr.forEach((el, index) => {
         new Promise((resolve, reject) => {
           hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
             self.histData[res.ch.namekey] = res.items
-            self.selectMode(res.ch.namekey)
+            resolve(index)
           })
+        }).then((e) => {
+          // 必须等所有数据加载完在执行
+          const len = Object.keys(self.histData).length
+          if (len === attr.length) {
+            this.load = true
+            self.selectMode()
+          }
         })
       })
     },
@@ -222,13 +304,37 @@ export default {
       return { date, value }
     },
 
-    /**
-     * 选择数据展示模式
-     */
-    selectMode(attrName) {
-      var mode = this.modeValue
+    // 根据展示模式,实例化echarts
+    selectInit() {
+      const mode = this.modeValue
+      const keys = Object.keys(this.AnEcObj)
       if (mode === 'an') {
-        this.anSetData(attrName)
+        const attr = this.device.attr
+        if (!keys.includes(attr[0].nameKey)) {
+          this.an()
+        }
+      } else if (mode === 'merge') {
+        if (!keys.includes('merge')) {
+          this.merge()
+        }
+      }
+      if (!this.load) {
+        this.getData()
+      } else {
+        this.selectMode()
+      }
+    },
+
+    /**
+     * 对实例化的echarts进行赋值操作
+     * @param { String } attrName 属性名称
+     */
+    selectMode() {
+      const mode = this.modeValue
+      if (mode === 'an') {
+        this.anSetData()
+      } else if (mode === 'merge') {
+        this.mergeSetData()
       }
     }
 
@@ -288,15 +394,24 @@ export default {
         }
     }
     & .dataMain{
+      margin-top: 20px;
+      & .an{
         width: 100%;
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
-        margin-top: 20px;
         & .dataMain--list {
           width: 50%;
           height: 400px;
         }
+      }
+      & .merge{
+        width: 100%;
+        display: block;
+        & #mergeEc{
+          height: calc(100vh - 150px);
+        }
+      }
     }
     & #data1{
         width: 600px;
