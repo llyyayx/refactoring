@@ -13,6 +13,7 @@ export function sprayValve(portarrays, parent) {
       icon: require('@/icons/device/close/fm.png'),
       status: 'close',
       pname: parent.dname,
+      pSerialno: parent.serialno,
       attr: getAttr(deviceAttr, model || 'V1.0'),
       command: getCommand(deviceCommand, model || 'V1.0')
     })

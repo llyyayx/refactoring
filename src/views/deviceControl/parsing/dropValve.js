@@ -3,7 +3,7 @@ import config from '@/utils/config'
 import mapFun from '@/utils/mapFun'
 
 // 解析分区 => 解析滴灌阀门
-export function dropValve(cells, pname) {
+export function dropValve(cells, parent) {
   const drops = []
   cells.forEach((item, index) => {
     const { name, id, idx, color, kml } = item
@@ -21,7 +21,8 @@ export function dropValve(cells, pname) {
           clickEvent(mapSpot)
           drops.push({
             dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort, mapSpot,
-            areaName: item.name, areaId: id, icon: require('@/icons/device/close/fm.png'), pname: pname,
+            areaName: item.name, areaId: id, icon: require('@/icons/device/close/fm.png'), pname: parent.dname,
+            dSerialno: parent.serialno,
             idx: drops.length === 0 ? 1 : drops.length + 1
           })
         } break

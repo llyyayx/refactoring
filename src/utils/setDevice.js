@@ -38,12 +38,13 @@ export function getAttr(deviceAttr, version) {
  * @return { Array } 属性列表
  */
 export function getCommand(deviceCommand, version) {
-  const { command, commandNameKey, params } = clone(deviceCommand)
+  const { command, commandNameKey, params, actions } = clone(deviceCommand)
   const sprayCommand = {}
   command.forEach((el, index) => {
     if (el.version[0] === '*' || el.version.includes(version)) {
       el.nameKey = getCommandNameKey(commandNameKey, el.mark, version)
       el.params = getCommandParams(params, el.mark, version)
+      el.actions = getCommandActions(actions, el.mark, version)
       sprayCommand[el.mark] = el
     }
   })
@@ -145,6 +146,26 @@ function getCommandParams(params, mark, version) {
   if (Object.prototype.toString.call(params) !== '[object Array]') return () => { return true }
   let fun = () => { return true }
   params.forEach((el, index) => {
+    if (el.mark === mark) {
+      if (el.version[0] === '*' || el.version.includes(version)) {
+        fun = el.fun
+      }
+    }
+  })
+  return fun
+}
+
+/**
+ * 方法：根据版本得到API的actions（应对一个控制需要设置多个actions）
+ * @param { Array } actions 设备属性的actions列表
+ * @param { String } mark 属性标识
+ * @param { String } version 设备版本
+ * @return { Function } 与设备版本对应的规则
+ */
+function getCommandActions(actions, mark, version) {
+  if (Object.prototype.toString.call(actions) !== '[object Array]') return false
+  let fun = false
+  actions.forEach((el, index) => {
     if (el.mark === mark) {
       if (el.version[0] === '*' || el.version.includes(version)) {
         fun = el.fun

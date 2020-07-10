@@ -174,7 +174,8 @@ export default {
           value: [],
           unit: el.unit,
           max: el.max,
-          min: el.min
+          min: el.min,
+          type: el.ecType
         })
         self.AnEcObj[el.nameKey] = newObj
         newObj.showLoading()
@@ -295,7 +296,7 @@ export default {
     fromatting(data) {
       const date = []
       const value = []
-      if (data.length > 0) {
+      if (data !== undefined && data.length > 0) {
         data.forEach((el) => {
           date.push(el.createdAt)
           value.push(el.val)

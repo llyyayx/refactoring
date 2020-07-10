@@ -3,7 +3,7 @@
     <div slot="main">
       <!-- 喷灌机部分go -->
       <div v-show="spray.length > 0" class="spray__title">喷灌机</div>
-      <el-row v-for="(item,index) in spray" :key="index" type="flex" :gutter="20" class="spray__row">
+      <el-row v-for="(item,index) in screenSpray(spray, sprayDevice)" :key="index" type="flex" :gutter="20" class="spray__row">
         <el-col :lg="4" :sm="2" :xs="2" @dblclick.native="sprayCtrl(item)">
           <div class="spray__imgBox pointer">
             <img :src="item.icon" alt="喷灌机图标">
@@ -36,7 +36,7 @@
         </el-col>
       </el-row>
       <!-- 喷头主体 -->
-      <div v-for="(pgValve, idx) in sprayValve" :key="'pg'+idx" class="nozzle">
+      <div v-for="(pgValve, idx) in screenValve(sprayValve, sprayDevice)" :key="'pg'+idx" class="nozzle">
         <el-row class="nozzle__heder">
           <el-col :span="4" class="spray__title">{{ pgValve[0].pname }}</el-col>
           <el-col :span="20">
@@ -120,11 +120,11 @@
               </el-radio-group>
             </div>
           </div>
-          <div v-show="sprayObj.controlItem ? sprayObj.controlItem.includes('sprayPwm') : true" class="coler">
-            <div class="colf">行走速率</div>
-            <div class="corg" style="width: 110px">
-              <el-slider v-model="rate" @change="sprayRate" />
-            </div>
+        </div>
+        <div v-show="sprayObj.controlItem ? sprayObj.controlItem.includes('sprayPwm') : true" class="coler">
+          <div class="colf">行走速率</div>
+          <div class="corg" style="width: 100%">
+            <el-slider v-model="rate" @change="sprayRate" />
           </div>
         </div>
       </el-dialog>
@@ -195,6 +195,9 @@ export default {
     },
     sprayValve() {
       return this.$store.state.device.sprayValve
+    },
+    sprayDevice() {
+      return this.$store.state.control.sprayDevice
     }
   },
   watch: {
@@ -235,6 +238,38 @@ export default {
     // 关闭面板的回调事件
     closeSpray() {
       this.$store.dispatch('control/sprayShow', false)
+    },
+
+    /**
+     * 筛选出选择的喷灌机
+     * @param { Array } device 喷灌机集合
+     * @param { Object } condition 选择的喷灌机对象
+     * @return { Array } 筛选结果
+     */
+    screenSpray(device, condition) {
+      const array = []
+      device.forEach((el) => {
+        if (el.serialno === condition.serialno) {
+          array.push(el)
+        }
+      })
+      return array
+    },
+
+    /**
+     * 筛选出选择的喷灌机的喷头
+     * @param { Array } device 喷头集合
+     * @param { Object } condition 选择的喷灌机对象
+     * @return { Array } 筛选结果
+     */
+    screenValve(device, condition) {
+      const array = []
+      device.forEach((el) => {
+        if (el[0].pSerialno === condition.serialno) {
+          array.push(el)
+        }
+      })
+      return array
     },
 
     /**
@@ -432,15 +467,23 @@ export default {
 
     /**
      * 喷灌机发送控制指令（单纯的提取一下）
-     * @param { namekey } mode 指令
+     * @param { String } namekey 指令
+     * @param { String || Number } params 参数
+     * @param { Boolean || Function } actions 多指令控制
      */
-    ctrlSpray(namekey, params) {
-      action({
-        serialno: this.sprayObj.serialno,
-        actions: [{
+    ctrlSpray(namekey, params, actions) {
+      let array
+      if (Object.prototype.toString.call(actions) === '[object Function]') {
+        array = actions(namekey, params)
+      } else {
+        array = [{
           namekey: namekey,
           params: params
         }]
+      }
+      action({
+        serialno: this.sprayObj.serialno,
+        actions: array
       }).then((e) => {
         this.success()
       }).catch((e) => {
@@ -456,7 +499,7 @@ export default {
     sprayModel(val, index) {
       this.sprayCtr[index].value = val
       const command = this.sprayObj.command
-      this.ctrlSpray(command[val].nameKey, command[val].params())
+      this.ctrlSpray(command[val].nameKey, command[val].params(), command[val].actions)
     },
 
     /**
@@ -470,7 +513,7 @@ export default {
         cancelButtonText: '取消',
         type: 'info'
       }).then(() => {
-        this.ctrlSpray(command.sprayPwm.nameKey, command.sprayPwm.params(val))
+        this.ctrlSpray(command.sprayPwm.nameKey, command.sprayPwm.params(val), command.sprayPwm.actions)
       }).catch(() => {
         this.rate = val
       })
@@ -554,11 +597,11 @@ export default {
   box-sizing: border-box;
 }
 .spray__name {
-    padding-top: 4px;
-    font-size: 14px;
-    text-align: center;
-    color: #333;
-  }
+  padding-top: 4px;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+}
 .spray__row {
     margin: 10px 0;
     & .spray__col__mb{
@@ -650,7 +693,9 @@ export default {
   & .colf{
     margin-right: 15px;
     font-size: 14px;
+    flex-shrink: 0;
     font-weight: 600;
+    color: #333
   }
 }
 </style>

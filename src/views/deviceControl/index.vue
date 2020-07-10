@@ -5,6 +5,7 @@
     <Spray />
     <Drops />
     <Sensor />
+    <Fertilizer />
     <Toolkit />
     <SprayPlan />
     <DataPanel />
@@ -17,6 +18,7 @@ import Gmps from '@/components/GMaps'
 import Spray from './components/spray'
 import Drops from './components/drops'
 import Sensor from './components/sensor'
+import Fertilizer from './components/fertilizer'
 import Toolkit from './components/toolkit'
 import SprayPlan from './components/sprayPlan'
 import Quick from './components/quick'
@@ -33,6 +35,7 @@ export default {
     Spray,
     Drops,
     Sensor,
+    Fertilizer,
     Toolkit,
     SprayPlan,
     Quick,
@@ -72,19 +75,6 @@ export default {
       // this.sprayValveState()
       this.mqttServer()
       this.loading = false
-
-      /* console.log(this.$store.state.device.drops)
-      console.log(this.$store.state.device.dropsCell)
-      console.log(this.$store.state.device.dropsValve)
-      console.log(this.$store.state.device.pump)
-      console.log(this.$store.state.device.fertilizer)
-      console.log(this.$store.state.device.soil)
-      console.log(this.$store.state.device.weather)
-      console.log(this.$store.state.device.spray)
-      console.log(this.$store.state.device.sprayValve)
-      console.log(this.$store.state.device.ndvi)
-      console.log(this.$store.state.device.height)
-      console.log(this.$store.state.device.canopy) */
     },
 
     /**
@@ -111,6 +101,9 @@ export default {
     mapRgTop() {
       mapFun.mapRgTop(this.map, '工具箱', require('@/icons/device/tool.png'), () => {
         this.$store.dispatch('control/toolShow', true)
+      })
+      mapFun.mapRgTop(this.map, '采集面板', require('@/icons/device/cgq1.png'), () => {
+        this.$store.dispatch('control/sensorShow', true)
       })
     },
 

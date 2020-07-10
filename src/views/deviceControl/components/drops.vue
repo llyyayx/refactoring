@@ -4,10 +4,10 @@
       <!-- 滴灌阀门部分go -->
       <el-row v-show="dropValve.length > 0" :gutter="6" align="middle" class="drops__pt">
         <el-col :span="4">
-          <div>灌区喷头</div>
+          <div>灌区阀门</div>
         </el-col>
       </el-row>
-      <div v-for="(dgValve, idx) in dropValve" :key="'dg'+idx" class="dgzzle">
+      <div v-for="(dgValve, idx) in screenValve(dropValve, dropDevice)" :key="'dg'+idx" class="dgzzle">
         <div class="dgzzle__heder">
           <div class="drops__title">{{ dgValve[0].pname }}</div>
           <transition name="el-fade-in">
@@ -86,6 +86,9 @@ export default {
     // 滴灌阀门
     dropValve() {
       return this.$store.state.device.dropsValve
+    },
+    dropDevice() {
+      return this.$store.state.control.dropDevice
     }
   },
   watch: {
@@ -123,6 +126,22 @@ export default {
     // 关闭面板的回调事件
     closeDrops() {
       this.$store.dispatch('control/dropShow', false)
+    },
+
+    /**
+     * 筛选出选择的滴灌项目下的阀门
+     * @param { Array } device 阀门集合
+     * @param { Object } condition 选择的滴灌
+     * @return { Array } 筛选结果
+     */
+    screenValve(device, condition) {
+      const array = []
+      device.forEach((el) => {
+        if (el[0].dSerialno === condition.serialno) {
+          array.push(el)
+        }
+      })
+      return array
     },
 
     /**

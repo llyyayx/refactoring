@@ -13,14 +13,14 @@ export function spray(item) {
     canvas = draw({ latitude, longitude, extension, cells })
   }
   // 地图标点
-  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/run/pg.png') })
+  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/pg.png') })
   clickEvent(mapSpot)
 
   // vuex管理
   store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, canvas,
-    mapSpot, attr: getAttr(deviceAttr, model || 'V1.0'), icon: require('@/icons/device/run/pg.png'), command: getCommand(deviceCommand, model || 'V1.0'),
+    mapSpot, attr: getAttr(deviceAttr, model || 'V1.0'), icon: require('@/icons/device/close/pg.png'), command: getCommand(deviceCommand, model || 'V1.0'),
     controlItem: getControlItem(controlItem, model || 'V1.0') })
-  if (portarrays) sprayValve(portarrays, { dname })
+  if (portarrays) sprayValve(portarrays, { dname, serialno })
 }
 
 // 绘制喷灌圈
@@ -323,6 +323,8 @@ const deviceCommand = {
       name: '行走速率',
       nameKey: '',
       param: '',
+      // 设置此项后，自动返回API中actions数组(用于适应actios中设置多个值)
+      actions: false,
       version: ['V1.0', 'V2.0']
     }
   ],
@@ -331,22 +333,42 @@ const deviceCommand = {
     {
       mark: 'openSpray',
       key: 'REG_CMD_PWR',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'openSpray',
+      key: 'Start_Pivot',
+      version: ['V1.0']
     },
     {
       mark: 'closeSpray',
       key: 'REG_CMD_PWR',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'closeSpray',
+      key: 'Stop_Pivot',
+      version: ['V1.0']
     },
     {
       mark: 'positive',
       key: 'REG_CMD_FWD',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'positive',
+      key: 'Forward_C',
+      version: ['V1.0']
     },
     {
       mark: 'reverse',
       key: 'REG_CMD_RWS',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'reverse',
+      key: 'Backward_C',
+      version: ['V1.0']
     },
     {
       mark: 'haveWater',
@@ -371,7 +393,12 @@ const deviceCommand = {
     {
       mark: 'sprayPwm',
       key: 'REG_CMD_PWM',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'sprayPwm',
+      key: ['Velocity_1', 'Velocity_2', 'Velocity_3', 'Velocity_4'],
+      version: ['V1.0']
     }
   ],
 
@@ -379,22 +406,42 @@ const deviceCommand = {
     {
       mark: 'openSpray',
       fun: () => { return 255 },
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'openSpray',
+      fun: () => { return true },
+      version: ['V1.0']
     },
     {
       mark: 'closeSpray',
       fun: () => { return 65280 },
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'closeSpray',
+      fun: () => { return true },
+      version: ['V1.0']
     },
     {
       mark: 'positive',
       fun: () => { return 255 },
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'positive',
+      fun: () => { return true },
+      version: ['V1.0']
     },
     {
       mark: 'reverse',
       fun: () => { return 255 },
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'reverse',
+      fun: () => { return true },
+      version: ['V1.0']
     },
     {
       mark: 'haveWater',
@@ -422,7 +469,30 @@ const deviceCommand = {
         val = parseInt(val)
         return parseInt('01' + val.toString(16), 16)
       },
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'sprayPwm',
+      fun: (val) => {
+        return val
+      },
+      version: ['V1.0']
+    }
+  ],
+  actions: [
+    {
+      mark: 'sprayPwm',
+      fun: (nameKey, val) => {
+        const actions = []
+        nameKey.forEach((el) => {
+          actions.push({
+            namekey: el,
+            params: val
+          })
+        })
+        return actions
+      },
+      version: ['V1.0']
     }
   ]
 }

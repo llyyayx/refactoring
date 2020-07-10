@@ -91,8 +91,7 @@ export default {
     // 添加图片
     var controlText = document.createElement('img')
     controlText.src = icon
-    controlText.style.width = '20px'
-    controlText.style.height = '20px'
+    controlText.style.width = '65%'
     controlText.style.display = 'block'
     controlText.style.position = 'absolute'
     controlText.style.left = '50%'

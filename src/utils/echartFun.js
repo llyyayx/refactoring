@@ -86,7 +86,7 @@ export default {
       series: [
         {
           name: config.name,
-          type: 'line',
+          type: config.type,
           smooth: true,
           showSymbol: true,
           symbol: 'none',

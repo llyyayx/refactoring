@@ -1,69 +1,82 @@
 <template>
   <panel :sub-class="'sensor-container'" :child-class="'sensor-box'" :show="show" @close="closeSensor" @full="full">
     <div slot="main">
-      <div v-show="soil.length > 0" class="sensor__title">墒情站</div>
-      <el-row :gutter="20" type="flex" class="sensor__list">
-        <el-col v-for="(item, index) in soil" :key="index" :span="column" class="sensor__block">
-          <div class="sensor__block--img">
-            <img :src="item.icon">
-            <div class="sensor__block--name">{{ item.dname }}</div>
-          </div>
-          <div class="sensor__block--item">
-            <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
-              <div class="sensor__block--namekey">{{ item2.name }}：</div>
-              <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+      <div v-show="soil.length > 0" class="mian-list">
+        <div v-show="soil.length > 0" class="sensor__title">墒情站</div>
+        <el-row :gutter="20" type="flex" class="sensor__list">
+          <el-col v-for="(item, index) in soil" :key="index" :span="column" class="sensor__block">
+            <div class="sensor__block--img">
+              <img :src="item.icon">
+              <div class="sensor__block--name">{{ item.dname }}</div>
             </div>
-          </div>
-        </el-col>
-      </el-row>
-      <el-divider class="sensor__divider" />
-      <div v-show="canopy.length > 0" class="sensor__title">NDVI</div>
-      <el-row :gutter="20" type="flex" class="sensor__list">
-        <el-col v-for="(item, index) in ndvi" :key="index" :span="column" class="sensor__block">
-          <div class="sensor__block--img">
-            <img :src="item.icon">
-            <div class="sensor__block--name">{{ item.dname }}</div>
-          </div>
-          <div class="sensor__block--item">
-            <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
-              <div class="sensor__block--namekey minlimit">{{ item2.name }}：</div>
-              <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+            <div class="sensor__block--item">
+              <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
+                <div class="sensor__block--namekey">{{ item2.name }}：</div>
+                <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+              </div>
             </div>
-          </div>
-        </el-col>
-      </el-row>
-      <el-divider class="sensor__divider" />
-      <div v-show="canopy.length > 0" class="sensor__title">冠层站</div>
-      <el-row :gutter="20" type="flex" class="sensor__list">
-        <el-col v-for="(item, index) in canopy" :key="index" :span="column" class="sensor__block">
-          <div class="sensor__block--img">
-            <img :src="item.icon">
-            <div class="sensor__block--name">{{ item.dname }}</div>
-          </div>
-          <div class="sensor__block--item">
-            <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
-              <div class="sensor__block--namekey">{{ item2.name }}：</div>
-              <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+          </el-col>
+        </el-row>
+        <el-divider class="sensor__divider" />
+      </div>
+
+      <div v-show="ndvi.length > 0" class="mian-list">
+        <div class="sensor__title">NDVI</div>
+        <el-row :gutter="20" type="flex" class="sensor__list">
+          <el-col v-for="(item, index) in ndvi" :key="index" :span="column" class="sensor__block">
+            <div class="sensor__block--img">
+              <img :src="item.icon">
+              <div class="sensor__block--name">{{ item.dname }}</div>
             </div>
-          </div>
-        </el-col>
-      </el-row>
-      <el-divider class="sensor__divider" />
-      <div v-show="canopy.length > 0" class="sensor__title">高度</div>
-      <el-row :gutter="20" type="flex" class="sensor__list">
-        <el-col v-for="(item, index) in height" :key="index" :span="column" class="sensor__block">
-          <div class="sensor__block--img">
-            <img :src="item.icon">
-            <div class="sensor__block--name">{{ item.dname }}</div>
-          </div>
-          <div class="sensor__block--item">
-            <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
-              <div class="sensor__block--namekey">{{ item2.name }}：</div>
-              <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+            <div class="sensor__block--item">
+              <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
+                <div class="sensor__block--namekey minlimit">{{ item2.name }}：</div>
+                <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+              </div>
             </div>
-          </div>
-        </el-col>
-      </el-row>
+          </el-col>
+        </el-row>
+        <el-divider class="sensor__divider" />
+      </div>
+
+      <div v-show="canopy.length > 0" class="mian-list">
+        <div class="sensor__title">冠层站</div>
+        <el-row :gutter="20" type="flex" class="sensor__list">
+          <el-col v-for="(item, index) in canopy" :key="index" :span="column" class="sensor__block">
+            <div class="sensor__block--img">
+              <img :src="item.icon">
+              <div class="sensor__block--name">{{ item.dname }}</div>
+            </div>
+            <div class="sensor__block--item">
+              <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
+                <div class="sensor__block--namekey">{{ item2.name }}：</div>
+                <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+        <el-divider class="sensor__divider" />
+      </div>
+
+      <div v-show="height.length > 0" class="mian-list">
+        <div class="sensor__title">高度</div>
+        <el-row :gutter="20" type="flex" class="sensor__list">
+          <el-col v-for="(item, index) in height" :key="index" :span="column" class="sensor__block">
+            <div class="sensor__block--img">
+              <img :src="item.icon">
+              <div class="sensor__block--name">{{ item.dname }}</div>
+            </div>
+            <div class="sensor__block--item">
+              <div v-for="(item2, index2) in item.attr" :key="index2" class="sensor__block--attr">
+                <div class="sensor__block--namekey">{{ item2.name }}：</div>
+                <div class="sensor__block--val">{{ item2.val }}{{ item2.unit }}</div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+        <el-divider class="sensor__divider" />
+      </div>
+
     </div>
   </panel>
 </template>

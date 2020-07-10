@@ -54,6 +54,9 @@ export default {
     drops() {
       return this.$store.state.device.drops
     },
+    spray() {
+      return this.$store.state.device.spray
+    },
     weather() {
       return this.$store.state.device.weather
     },
@@ -63,17 +66,14 @@ export default {
     fertilizer() {
       return this.$store.state.device.fertilizer
     },
-    pump() {
-      return this.$store.state.device.pump
-    },
-    spray() {
-      return this.$store.state.device.spray
-    },
     canopy() {
       return this.$store.state.device.canopy
     },
     ndvi() {
       return this.$store.state.device.ndvi
+    },
+    pump() {
+      return this.$store.state.device.pump
     },
     height() {
       return this.$store.state.device.height
@@ -118,9 +118,21 @@ export default {
     touch(item) {
       const config = this.$config
       switch (item.dclass) {
+        case config.DROPS_CLASS:
+          this.$store.dispatch('control/dropDevice', item)
+          this.$store.dispatch('control/dropShow', true)
+          break
+        case config.SPRAY_CLASS:
+          this.$store.dispatch('control/sprayDevice', item)
+          this.$store.dispatch('control/sprayShow', true)
+          break
+        case config.FERTILIZER_CLASS:
+          this.$store.dispatch('control/ferDevice', item)
+          this.$store.dispatch('control/ferShow', true)
+          break
         case config.SOIL_CLASS:
-          this.$store.dispatch('control/dataPanelShow', true)
           this.$store.dispatch('control/dataPanelObj', item)
+          this.$store.dispatch('control/dataPanelShow', true)
           break
         default:
           // eslint-disable-next-line no-undef
