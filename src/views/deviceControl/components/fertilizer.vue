@@ -115,7 +115,7 @@ export default {
     }, 500, false),
 
     /**
-     * 喷灌机控制项-筛选对应
+     * 施肥机控制项-筛选对应
      * @param { String } 控制项的label
      * @param { Number } 选择的第几项
      * @param { Object } 所控制的施肥机对象
