@@ -13,6 +13,8 @@ const state = {
   dataPanelShow: false,
   // deviceControl-施肥机面板显隐
   ferShow: false,
+  // deviceControl-水泵面板显隐
+  pumpShow: false,
   // quick组件设置-数据面板采集对象(采集设备)
   dataPanelObj: {},
   // quick组件设置-喷灌机设备对象(控制设备)
@@ -44,6 +46,9 @@ const mutations = {
   },
   SET_DATAPANELSHOW: (state, show) => {
     state.dataPanelShow = show
+  },
+  SET_PUMPSHOW: (state, show) => {
+    state.pumpShow = show
   },
   SET_DATAPANELOBJ: (state, device) => {
     state.dataPanelObj = device
@@ -77,6 +82,9 @@ const actions = {
   },
   ferShow: ({ commit }, show) => {
     commit('SET_FERSHOW', show)
+  },
+  pumpShow: ({ commit }, show) => {
+    commit('SET_PUMPSHOW', show)
   },
   dataPanelShow: ({ commit }, show) => {
     commit('SET_DATAPANELSHOW', show)

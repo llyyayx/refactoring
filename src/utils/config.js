@@ -13,8 +13,8 @@ export default {
   CANOPY_CLASS: 15,
   HEIGHT_CLASS: 16,
   NDVI_CLASS: 18,
-
-  MQTT_TOPIC: 'D/0103.0007.1921000133/#',
+  // D/0103.0007.1921000133/#
+  MQTT_TOPIC: 'D/0103.0007.1919000125/#',
   MQTT_HOST: 'www.zesi.com.cn',
   MQTT_PORT: 443,
   MQTT_ADDR: '/mqtt',

@@ -40,7 +40,7 @@
       <!-- 阀门控制对话框go -->
       <el-dialog :visible.sync="dialog" class="dialog" width="570px">
         <el-tag v-for="(item, index) in ctrlDev" :key="item.idx" effect="dark" class="tag" closable @close="delValve(index)">
-          {{ '阀门0'+item.idx }}
+          {{ item.dname }}
         </el-tag>
         <span slot="footer" class="dialog-footer">
           <el-button @click="closeValve">关 阀</el-button>
@@ -63,11 +63,11 @@ export default {
   },
   data() {
     return {
-      // 全屏模式下：喷头lg列数
+      // 全屏模式下：阀门lg列数
       valveSpan: 4,
-      // 每个滴灌分区框选的喷头(二维)
+      // 每个滴灌分区框选的阀门(二维)
       subValve: [],
-      // 选择要进行操控的喷头
+      // 选择要进行操控的阀门
       ctrlDev: [],
       // 控制对话框显示隐藏
       dialog: false,
@@ -92,7 +92,7 @@ export default {
     }
   },
   watch: {
-    dropValve: function() {
+    dropDevice: function() {
       this.$nextTick(() => {
         drag('dgzzle', 'menux', (list, dom) => {
           const group = this.valveCtrGroup(this.dropValve[dom])
@@ -178,7 +178,7 @@ export default {
     },
 
     /**
-     * 喷头控制
+     * 阀门控制
      * @param { Array } device 需控制的设备列表
      */
     control(device) {
@@ -203,8 +203,8 @@ export default {
     },
 
     /**
-     * 去除已选喷头
-     * @param { Number } index 喷头序号
+     * 去除已选阀门
+     * @param { Number } index 阀门序号
      */
     delValve(index) {
       this.ctrlDev.splice(index, 1)
@@ -233,16 +233,17 @@ export default {
     }, 500, false),
 
     /**
-     * 喷头发送控制指令（单纯的提取一下）
-     * @param { Object } valve 喷头对象
-     * @param { String } mode 指令(打开或者关闭)
+     * 阀门发送控制指令（单纯的提取一下）
+     * @param { Object } valve 阀门对象
+     * @param { String } command 指令
+     * @param { String } params 指令参数
      */
-    ctrlValve(valve, mode) {
+    ctrlValve(valve, command, params) {
       action({
         serialno: valve.rtuSerialno,
         actions: [{
-          namekey: mode + valve.rtuPort,
-          params: true
+          namekey: command + valve.rtuPort,
+          params: params
         }]
       }).then((e) => {
         this.success()
@@ -252,23 +253,24 @@ export default {
     },
 
     /**
-     * 喷头关闭动作
+     * 阀门关闭动作
      */
     closeValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        // this.ctrlValve(el, command.closeValve)
+        this.ctrlValve(el, el.command.closeValve.nameKey, el.command.closeValve.params())
       })
       this.dialog = false
     },
 
     /**
-     * 喷头开启动作
+     * 阀门开启动作
      */
     openValve() {
+      debugger
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        // this.ctrlValve(el, command.openValve)
+        this.ctrlValve(el, el.command.openValve.nameKey, el.command.openValve.params())
       })
       this.dialog = false
     }

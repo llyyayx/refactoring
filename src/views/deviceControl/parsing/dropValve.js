@@ -1,6 +1,7 @@
 import store from '@/store'
 import config from '@/utils/config'
 import mapFun from '@/utils/mapFun'
+import { getAttr, getCommand } from '@/utils/setDevice'
 
 // 解析分区 => 解析滴灌阀门
 export function dropValve(cells, parent) {
@@ -15,7 +16,7 @@ export function dropValve(cells, parent) {
     valve.forEach((item2, index2) => {
       switch (item2.dclass) {
         case config.DROPS_VALVE_CLASS : {
-          const { dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort } = item2
+          const { dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort, model } = item2
           // 阀门标点
           const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/fm.png') })
           clickEvent(mapSpot)
@@ -23,7 +24,8 @@ export function dropValve(cells, parent) {
             dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort, mapSpot,
             areaName: item.name, areaId: id, icon: require('@/icons/device/close/fm.png'), pname: parent.dname,
             dSerialno: parent.serialno,
-            idx: drops.length === 0 ? 1 : drops.length + 1
+            attr: getAttr(deviceAttr, model || 'V1.0'),
+            command: getCommand(deviceCommand, model || 'V1.0')
           })
         } break
       }
@@ -52,4 +54,118 @@ function clickEvent(mapSpot, self) {
   mapFun.marKerClickEvent(mapSpot, () => {
     store.dispatch('control/dropShow', true)
   })
+}
+
+/* -----------------------属性装载-------------------------- */
+
+/**
+ * 属性值加载回调：设置阀门图标
+ * @param { String } el 阀门状态属性值
+ * @param { Object } vueX 阀门设备对象
+ */
+function stateIcon(el, vueX) {
+  let icon
+  if (el === 'offline') {
+    icon = require('@/icons/device/break/fm.png')
+  } else {
+    if (el) {
+      icon = require('@/icons/device/run/fm.png')
+    } else {
+      icon = require('@/icons/device/close/fm.png')
+    }
+  }
+  vueX.icon && (vueX.icon = icon)
+  vueX.mapSpot && vueX.mapSpot.setIcon(icon)
+}
+
+const deviceAttr = {
+  attr: [
+    {
+      mark: 'valveState',
+      name: '阀门状态',
+      type: 'boolean',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        return el
+      },
+      nameKey: '',
+      val: '启动',
+      unit: '',
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon],
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+  attrNameKey: [
+    {
+      mark: 'valveState',
+      key: 'DO',
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+  rules: [
+    {
+      mark: 'valveState',
+      fun: (el) => {
+        if (el.regs !== undefined) {
+          if (el.regs.DO) {
+            return true
+          } else {
+            return false
+          }
+        } else {
+          if (el.status === 'offline') {
+            return 'offline'
+          }
+        }
+      },
+      version: ['V1.0', 'V2.0']
+    }
+  ]
+}
+
+/* -----------------------控制指令装载-------------------------- */
+
+const deviceCommand = {
+  command: [
+    {
+      mark: 'openValve',
+      name: '打开阀门',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closeValve',
+      name: '关闭阀门',
+      nameKey: '',
+      param: '',
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+  commandNameKey: [
+    {
+      mark: 'openValve',
+      key: 'Open_PulseValve_',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closeValve',
+      key: 'Close_PulseValve_',
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+  params: [
+    {
+      mark: 'openValve',
+      fun: () => { return true },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'closeValve',
+      fun: () => { return true },
+      version: ['V1.0', 'V2.0']
+    }
+  ]
 }

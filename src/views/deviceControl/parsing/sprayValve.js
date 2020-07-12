@@ -29,15 +29,17 @@ export function sprayValve(portarrays, parent) {
  * @param { Object } vueX 喷头设备对象
  */
 function stateIcon(el, vueX) {
-  if (el) {
-    const run = require('@/icons/device/run/fm.png')
-    vueX.icon && (vueX.icon = run)
-    vueX.mapSpot && vueX.mapSpot.setIcon(run)
+  let icon
+  if (el === 'offline') {
+    icon = require('@/icons/device/break/fm.png')
   } else {
-    const close = require('@/icons/device/close/fm.png')
-    vueX.icon && (vueX.icon = close)
-    vueX.mapSpo && vueX.mapSpot.setIcon(close)
+    if (el) {
+      icon = require('@/icons/device/run/fm.png')
+    } else {
+      icon = require('@/icons/device/close/fm.png')
+    }
   }
+  vueX.icon && (vueX.icon = icon)
 }
 
 const deviceAttr = {
@@ -66,7 +68,25 @@ const deviceAttr = {
       version: ['V1.0', 'V2.0']
     }
   ],
-  rules: []
+  rules: [
+    {
+      mark: 'valveState',
+      fun: (el) => {
+        if (el.regs !== undefined) {
+          if (el.regs.DO) {
+            return true
+          } else {
+            return false
+          }
+        } else {
+          if (el.status === 'offline') {
+            return 'offline'
+          }
+        }
+      },
+      version: ['V1.0', 'V2.0']
+    }
+  ]
 }
 
 /* -----------------------控制指令装载-------------------------- */

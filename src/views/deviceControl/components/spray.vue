@@ -201,7 +201,7 @@ export default {
     }
   },
   watch: {
-    sprayValve: function() {
+    sprayDevice: function() {
       this.$nextTick(() => {
         drag('nozzle', 'menux', (list, dom) => {
           const group = this.valveCtrGroup(this.sprayValve[dom])

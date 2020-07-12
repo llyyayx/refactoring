@@ -116,8 +116,10 @@ function stateIcon(el, vueX) {
   let icon
   if (el === '运行') {
     icon = require('@/icons/device/run/pg.png')
-  } else {
+  } else if (el === '停止') {
     icon = require('@/icons/device/close/pg.png')
+  } else {
+    icon = require('@/icons/device/break/pg.png')
   }
   vueX.icon && (vueX.icon = icon)
   vueX.mapSpot && vueX.mapSpot.setIcon(icon)
@@ -125,9 +127,11 @@ function stateIcon(el, vueX) {
 
 function setAngle(el, vueX) {
   vueX.canvas.pgAngle = el
-  vueX.canvas.view.onRemove()
-  vueX.canvas.view.onAdd()
-  vueX.canvas.view.draw()
+  if (vueX.canvas.view) {
+    vueX.canvas.view.onRemove()
+    vueX.canvas.view.onAdd()
+    vueX.canvas.view.draw()
+  }
 }
 
 const deviceAttr = {
@@ -142,7 +146,7 @@ const deviceAttr = {
         return el ? '运行' : '停止'
       },
       nameKey: '',
-      val: '启动',
+      val: '停止',
       unit: '',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
@@ -183,7 +187,7 @@ const deviceAttr = {
         return Math.floor(el * 10) / 10
       },
       nameKey: '',
-      val: '100',
+      val: '0.0',
       unit: '°',
       rules: false,
       callback: [setAngle],
@@ -209,18 +213,33 @@ const deviceAttr = {
   attrNameKey: [
     {
       mark: 'sprayState',
+      key: 'System_Run',
+      version: ['V1.0']
+    },
+    {
+      mark: 'sprayState',
       key: 'REG_RUN_STS',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'sprayModel',
+      key: 'Pivot_LocationSel',
+      version: ['V1.0']
     },
     {
       mark: 'sprayModel',
       key: 'REMOTE_LOCAL',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'sprayPwm',
+      key: 'Pivot_Velocity',
+      version: ['V1.0']
     },
     {
       mark: 'sprayPwm',
       key: 'REG_HMI_PWM',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
     },
     {
       mark: 'sprayAngle',
@@ -234,26 +253,60 @@ const deviceAttr = {
     {
       mark: 'sprayState',
       fun: (el) => {
-        if (el.FWD_HMI || el.REV_HMI) {
+        if (el.regs !== undefined) {
+          if (el.regs.SafeCircuit_State === false) {
+            return '故障'
+          } else if (el.regs !== undefined) {
+            if (el.regs.System_Run) {
+              return '运行'
+            } else {
+              return '停止'
+            }
+          }
+        } else {
+          if (el.status === 'offline') {
+            return '掉线'
+          }
+        }
+      },
+      version: ['V1.0']
+    },
+    {
+      mark: 'sprayState',
+      fun: (el) => {
+        if (el.regs.FWD_HMI || el.regs.REV_HMI) {
           return '运行'
         } else {
           return '停止'
         }
       },
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
     },
     {
       mark: 'direction',
       fun: (el) => {
-        if (el.FWD_HMI) {
+        if (el.regs.Forward_HMI) {
           return '正向'
-        } else if (el.REV_HMI) {
+        } else if (el.regs.Backward_HMI) {
           return '反向'
         } else {
           return '未运行'
         }
       },
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0']
+    },
+    {
+      mark: 'direction',
+      fun: (el) => {
+        if (el.regs.FWD_HMI) {
+          return '正向'
+        } else if (el.regs.REV_HMI) {
+          return '反向'
+        } else {
+          return '未运行'
+        }
+      },
+      version: ['V2.0']
     }
   ]
 }
@@ -332,16 +385,11 @@ const deviceCommand = {
   commandNameKey: [
     {
       mark: 'openSpray',
-      key: 'REG_CMD_PWR',
-      version: ['V2.0']
-    },
-    {
-      mark: 'openSpray',
       key: 'Start_Pivot',
       version: ['V1.0']
     },
     {
-      mark: 'closeSpray',
+      mark: 'openSpray',
       key: 'REG_CMD_PWR',
       version: ['V2.0']
     },
@@ -351,8 +399,8 @@ const deviceCommand = {
       version: ['V1.0']
     },
     {
-      mark: 'positive',
-      key: 'REG_CMD_FWD',
+      mark: 'closeSpray',
+      key: 'REG_CMD_PWR',
       version: ['V2.0']
     },
     {
@@ -361,14 +409,19 @@ const deviceCommand = {
       version: ['V1.0']
     },
     {
-      mark: 'reverse',
-      key: 'REG_CMD_RWS',
+      mark: 'positive',
+      key: 'REG_CMD_FWD',
       version: ['V2.0']
     },
     {
       mark: 'reverse',
       key: 'Backward_C',
       version: ['V1.0']
+    },
+    {
+      mark: 'reverse',
+      key: 'REG_CMD_RWS',
+      version: ['V2.0']
     },
     {
       mark: 'haveWater',
@@ -392,24 +445,29 @@ const deviceCommand = {
     },
     {
       mark: 'sprayPwm',
-      key: 'REG_CMD_PWM',
-      version: ['V2.0']
+      key: ['Velocity_1', 'Velocity_2', 'Velocity_3', 'Velocity_4'],
+      version: ['V1.0']
     },
     {
       mark: 'sprayPwm',
-      key: ['Velocity_1', 'Velocity_2', 'Velocity_3', 'Velocity_4'],
-      version: ['V1.0']
+      key: 'REG_CMD_PWM',
+      version: ['V2.0']
     }
   ],
 
   params: [
     {
       mark: 'openSpray',
+      fun: () => { return true },
+      version: ['V1.0']
+    },
+    {
+      mark: 'openSpray',
       fun: () => { return 255 },
       version: ['V2.0']
     },
     {
-      mark: 'openSpray',
+      mark: 'closeSpray',
       fun: () => { return true },
       version: ['V1.0']
     },
@@ -419,7 +477,7 @@ const deviceCommand = {
       version: ['V2.0']
     },
     {
-      mark: 'closeSpray',
+      mark: 'positive',
       fun: () => { return true },
       version: ['V1.0']
     },
@@ -429,7 +487,7 @@ const deviceCommand = {
       version: ['V2.0']
     },
     {
-      mark: 'positive',
+      mark: 'reverse',
       fun: () => { return true },
       version: ['V1.0']
     },
@@ -437,11 +495,6 @@ const deviceCommand = {
       mark: 'reverse',
       fun: () => { return 255 },
       version: ['V2.0']
-    },
-    {
-      mark: 'reverse',
-      fun: () => { return true },
-      version: ['V1.0']
     },
     {
       mark: 'haveWater',
@@ -466,17 +519,17 @@ const deviceCommand = {
     {
       mark: 'sprayPwm',
       fun: (val) => {
-        val = parseInt(val)
-        return parseInt('01' + val.toString(16), 16)
+        return val
       },
-      version: ['V2.0']
+      version: ['V1.0']
     },
     {
       mark: 'sprayPwm',
       fun: (val) => {
-        return val
+        val = parseInt(val)
+        return parseInt('01' + val.toString(16), 16)
       },
-      version: ['V1.0']
+      version: ['V2.0']
     }
   ],
   actions: [
