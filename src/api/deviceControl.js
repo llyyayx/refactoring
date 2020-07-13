@@ -51,10 +51,24 @@ export function real(serialno) {
 
 /**
  * 查询设备历史数据
+ * @param { String } serialno 设备标识
+ * @param { nameKey } serialno 设备属性标识
+ * @param { String } week 几周之内(后期可能改成'天'为周期)
  */
 export function hist(serialno, nameKey, week) {
   return request({
     url: `/hist/${serialno}?name=${nameKey}&week=${week}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 查询喷灌机分区
+ * @param { String } serialno 设备标识
+ */
+export function partition(serialno) {
+  return request({
+    url: `/cells/${serialno}`,
     method: 'get'
   })
 }

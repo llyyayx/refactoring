@@ -326,112 +326,112 @@ const deviceCommand = {
       mark: 'openPump',
       name: '开注肥泵',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closePump',
       name: '关注肥泵',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openInto1',
       name: '开进水阀1',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeInto1',
       name: '关进水阀1',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openInto2',
       name: '开进水阀2',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeInto2',
       name: '关进水阀2',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openOut1',
       name: '开出水阀1',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeOut1',
       name: '关出水阀1',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openOut2',
       name: '开出水阀2',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeOut2',
       name: '开出水阀2',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openStir1',
       name: '开搅拌器1',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeStir1',
       name: '关搅拌器1',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openStir2',
       name: '开搅拌器2',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeStir2',
       name: '关搅拌器2',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openFlush',
       name: '开清洗阀',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeFlush',
       name: '关清洗阀',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     }
   ],

@@ -235,16 +235,23 @@ export default {
     /**
      * 阀门发送控制指令（单纯的提取一下）
      * @param { Object } valve 阀门对象
-     * @param { String } command 指令
+     * @param { String } namekey 指令
      * @param { String } params 指令参数
+     * @param { Boolean || Function } actions 多指令控制
      */
-    ctrlValve(valve, command, params) {
-      action({
-        serialno: valve.rtuSerialno,
-        actions: [{
-          namekey: command + valve.rtuPort,
+    ctrlValve(valve, namekey, params, actions) {
+      let array
+      if (Object.prototype.toString.call(actions) === '[object Function]') {
+        array = actions(namekey, params)
+      } else {
+        array = [{
+          namekey: namekey + valve.rtuPort,
           params: params
         }]
+      }
+      action({
+        serialno: valve.rtuSerialno,
+        actions: array
       }).then((e) => {
         this.success()
       }).catch((e) => {
@@ -258,7 +265,7 @@ export default {
     closeValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, el.command.closeValve.nameKey, el.command.closeValve.params())
+        this.ctrlValve(el, el.command.closeValve.nameKey, el.command.closeValve.params(), el.command.closeValve.actions)
       })
       this.dialog = false
     },
@@ -267,10 +274,9 @@ export default {
      * 阀门开启动作
      */
     openValve() {
-      debugger
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, el.command.openValve.nameKey, el.command.openValve.params())
+        this.ctrlValve(el, el.command.openValve.nameKey, el.command.openValve.params(), el.command.openValve.actions)
       })
       this.dialog = false
     }

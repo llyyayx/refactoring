@@ -133,14 +133,14 @@ const deviceCommand = {
       mark: 'openValve',
       name: '打开阀门',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'closeValve',
       name: '关闭阀门',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     }
   ],

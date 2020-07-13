@@ -22,7 +22,9 @@ const state = {
   // quick组件设置-滴灌对象(控制设备)
   dropDevice: {},
   // quick组件设置-施肥机对象(控制设备)
-  ferDevice: {}
+  ferDevice: {},
+  // quick组件设置-水泵对象(控制设备)
+  pumpDevice: {}
 }
 
 const mutations = {
@@ -61,6 +63,9 @@ const mutations = {
   },
   SET_FERDEVICE: (state, device) => {
     state.ferDevice = device
+  },
+  SET_PUMPDEVICE: (state, device) => {
+    state.pumpDevice = device
   }
 }
 
@@ -100,6 +105,9 @@ const actions = {
   },
   ferDevice: ({ commit }, device) => {
     commit('SET_FERDEVICE', device)
+  },
+  pumpDevice: ({ commit }, device) => {
+    commit('SET_PUMPDEVICE', device)
   }
 }
 

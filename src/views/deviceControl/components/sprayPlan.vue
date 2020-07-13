@@ -58,7 +58,7 @@
     </el-drawer>
     <!-- 计划列表end -->
     <!-- 添加计划go -->
-    <el-dialog :visible.sync="dialog" :close-on-click-modal="false" class="dialog" width="630px">
+    <el-dialog :visible.sync="dialog" :close-on-click-modal="false" class="dialog" width="650px">
       <el-steps :active="active" :align-center="true" style="margin-bottom: 20px">
         <el-step title="喷灌机设置" />
         <el-step title="分区设置" />
@@ -81,7 +81,9 @@
               <el-input v-model="form.angale" placeholder="请输入停止角度" class="form__item" />
             </el-form-item>
             <el-form-item label="喷灌延时" prop="delaySec">
-              <el-input v-model="form.delaySec" placeholder="请输入喷灌延时" class="form__item" />
+              <el-input v-model="form.delaySec" placeholder="请输入喷灌延时" class="form__item">
+                <template slot="append">分钟</template>
+              </el-input>
             </el-form-item>
             <el-form-item label="行进方向" prop="direction">
               <el-select v-model="form.direction" placeholder="请选择">
@@ -112,10 +114,14 @@
               </el-select>
             </el-form-item>
             <el-form-item label="泵启动时长" prop="pumpTime">
-              <el-input v-model="form.pumpTime" placeholder="请输入启动时长" class="form__item" />
+              <el-input v-model="form.pumpTime" placeholder="请输入启动时长" class="form__item">
+                <template slot="append">分钟</template>
+              </el-input>
             </el-form-item>
             <el-form-item label="泵延时启动" prop="pumpDelaySec">
-              <el-input v-model="form.pumpDelaySec" placeholder="请输入延时时间" class="form__item" />
+              <el-input v-model="form.pumpDelaySec" placeholder="请输入延时时间" class="form__item">
+                <template slot="append">分钟</template>
+              </el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm('form')">下一步</el-button>
@@ -131,7 +137,7 @@
 </template>
 
 <script>
-import { plans } from '@/api/deviceControl'
+import { plans, partition } from '@/api/deviceControl'
 export default {
   data() {
     return {
@@ -151,13 +157,15 @@ export default {
         val: '',
         angale: '',
         delaySec: '',
-        pump: '',
-        pumpTime: '',
-        pumpDelaySec: '',
         direction: '',
         mode: '',
-        gun: ''
+        gun: '',
+        pump: '',
+        pumpTime: '',
+        pumpDelaySec: ''
       },
+      // 当前灌机分区
+      area: [],
       // 计划项验证
       rules: {
         name: [
@@ -182,6 +190,12 @@ export default {
         ],
         gun: [
           { required: true, message: '请设置尾枪', trigger: 'blur' }
+        ],
+        pumpTime: [
+          { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
+        ],
+        pumpDelaySec: [
+          { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
         ]
       },
       // 当前步骤
@@ -227,8 +241,11 @@ export default {
           message: '计划拉取成功'
         })
       }).catch((e) => {
-        console.log(e)
         this.loading = false
+        this.$notify.error({
+          title: '失败',
+          message: '计划拉取失败'
+        })
       })
     },
 
@@ -243,13 +260,49 @@ export default {
       this.getPlan(this.serialno)
     },
 
-    // 新增计划
-    addPlan() {
-      this.close()
-      this.dialog = true
+    /**
+     * 查询喷灌机分区
+     * @param { Function } callback 查询成功的回调函数
+     */
+    getArea(callback) {
+      if (!this.serialno) {
+        this.$confirm('请先选择喷灌机', '提示', {
+          type: 'warning'
+        }).catch(() => { return })
+        return
+      } else {
+        // eslint-disable-next-line no-unused-vars
+        const loading = this.$loading({
+          lock: true,
+          text: '分区查询中'
+        })
+        partition(this.serialno).then((el) => {
+          loading.close()
+          this.$notify.success({
+            title: '成功',
+            message: '分区查询成功'
+          })
+          this.area = el.data
+          callback()
+        }).catch((el) => {
+          loading.close()
+          this.$notify.error({
+            title: '失败',
+            message: '分区未加载，请重试'
+          })
+        })
+      }
     },
 
-    // 提交
+    // 新增计划
+    addPlan() {
+      this.getArea(() => {
+        this.close()
+        this.dialog = true
+      })
+    },
+
+    // 第一步跳转到第二步
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -261,7 +314,7 @@ export default {
       })
     },
 
-    // 重置
+    // 计划输入重置
     resetForm(formName) {
       this.$refs[formName].resetFields()
     }
@@ -337,6 +390,12 @@ export default {
     }
     & .plan__mt{
         margin-bottom: 12px;
+    }
+    & .dialog{
+      & >>> .el-form-item__label{
+        min-width: 82px;
+        text-align: left;
+      }
     }
 }
 

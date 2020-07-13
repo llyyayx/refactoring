@@ -97,28 +97,28 @@ const deviceCommand = {
       mark: 'openValve',
       name: '打开喷头',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'closeValve',
       name: '关闭喷头',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'openPwm',
       name: '打开pwm模式',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'closePwm',
       name: '关闭pwm模式',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {

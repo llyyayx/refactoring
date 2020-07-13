@@ -6,6 +6,7 @@
     <Drops />
     <Sensor />
     <Fertilizer />
+    <Pump />
     <Toolkit />
     <SprayPlan />
     <DataPanel />
@@ -19,6 +20,7 @@ import Spray from './components/spray'
 import Drops from './components/drops'
 import Sensor from './components/sensor'
 import Fertilizer from './components/fertilizer'
+import Pump from './components/pump'
 import Toolkit from './components/toolkit'
 import SprayPlan from './components/sprayPlan'
 import Quick from './components/quick'
@@ -36,6 +38,7 @@ export default {
     Drops,
     Sensor,
     Fertilizer,
+    Pump,
     Toolkit,
     SprayPlan,
     Quick,

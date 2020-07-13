@@ -49,7 +49,7 @@ function draw(param) {
       partition.push(JSON.parse(JSON.stringify(big)))
     }
   })
-  var extension = JSON.parse(param.extension.replace(/"/g, ' ').replace(/'/g, '"'))
+  var extension = param.extension ? JSON.parse(param.extension.replace(/"/g, ' ').replace(/'/g, '"')) : {}
   var long = extension.arm || 150
   var lngC = 40030173
   var hu = param.latitude.split('.')[0] * Math.PI / 180
@@ -319,63 +319,63 @@ const deviceCommand = {
       mark: 'openSpray',
       name: '打开喷灌机',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'closeSpray',
       name: '关闭喷灌机',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'positive',
       name: '正向行进',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'reverse',
       name: '反向行进',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'haveWater',
       name: '有水行进',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'noWater',
       name: '无水行进',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'openGun',
       name: '打开尾枪',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'closeGun',
       name: '关闭尾枪',
       nameKey: '',
-      param: '',
+      params: '',
       version: ['V1.0']
     },
     {
       mark: 'sprayPwm',
       name: '行走速率',
       nameKey: '',
-      param: '',
+      params: '',
       // 设置此项后，自动返回API中actions数组(用于适应actios中设置多个值)
       actions: false,
       version: ['V1.0', 'V2.0']

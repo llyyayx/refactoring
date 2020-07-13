@@ -393,16 +393,22 @@ export default {
     /**
      * 喷头发送控制指令（单纯的提取一下）
      * @param { Object } valve 喷头对象
-     * @param { String } command 指令
+     * @param { String } namekey 指令
      * @param { String } params 指令参数
      */
-    ctrlValve(valve, command, params) {
-      action({
-        serialno: valve.rtuSerialno,
-        actions: [{
-          namekey: command + valve.port,
+    ctrlValve(valve, namekey, params, actions) {
+      let array
+      if (Object.prototype.toString.call(actions) === '[object Function]') {
+        array = actions(namekey, params)
+      } else {
+        array = [{
+          namekey: namekey + valve.port,
           params: params
         }]
+      }
+      action({
+        serialno: valve.rtuSerialno,
+        actions: array
       }).then((e) => {
         this.success()
       }).catch((e) => {
@@ -416,7 +422,7 @@ export default {
     closeValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, el.command.closeValve.nameKey, el.command.closeValve.params())
+        this.ctrlValve(el, el.command.closeValve.nameKey, el.command.closeValve.params(), el.command.closeValve.actions)
       })
       this.dialog = false
     },
@@ -427,7 +433,7 @@ export default {
     openValve() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, el.command.openValve.nameKey, el.command.openValve.params())
+        this.ctrlValve(el, el.command.openValve.nameKey, el.command.openValve.params(), el.command.openValve.actions)
       })
       this.dialog = false
     },
@@ -451,7 +457,7 @@ export default {
     setPwm() {
       const ctrlDev = this.ctrlDev
       ctrlDev.forEach((el) => {
-        this.ctrlValve(el, el.command.setPwm.nameKey, el.command.setPwm.params(this.cycle, this.ratio))
+        this.ctrlValve(el, el.command.setPwm.nameKey, el.command.setPwm.params(this.cycle, this.ratio), el.command.closeValve.actions)
       })
       this.dialog = false
     },

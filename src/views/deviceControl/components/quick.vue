@@ -130,6 +130,10 @@ export default {
           this.$store.dispatch('control/ferDevice', item)
           this.$store.dispatch('control/ferShow', true)
           break
+        case config.PUMP_CLASS:
+          this.$store.dispatch('control/pumpDevice', item)
+          this.$store.dispatch('control/pumpShow', true)
+          break
         case config.SOIL_CLASS:
           this.$store.dispatch('control/dataPanelObj', item)
           this.$store.dispatch('control/dataPanelShow', true)
