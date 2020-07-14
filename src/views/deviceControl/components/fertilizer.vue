@@ -44,14 +44,14 @@ export default {
       ferSpan: 4,
       // 喷灌机模式
       ferCtr: [
+        { name: '注肥水泵', value: '0', selete: [{ title: '启动', label: 'openPump' }, { title: '停止', label: 'closePump' }], mark: 'pump' },
+        { name: '清洗阀', value: '0', selete: [{ title: '打开', label: 'openFlush' }, { title: '关闭', label: 'closeFlush' }], mark: 'flush' },
         { name: '进水阀1#', value: '0', selete: [{ title: '打开', label: 'openInto1' }, { title: '关闭', label: 'closeInto1' }], mark: 'into' },
         { name: '进水阀2#', value: '0', selete: [{ title: '打开', label: 'openInto2' }, { title: '关闭', label: 'closeInto2' }], mark: 'into' },
         { name: '出口阀1#', value: '0', selete: [{ title: '打开', label: 'openOut1' }, { title: '关闭', label: 'closeOut1' }], mark: 'out' },
         { name: '出口阀2#', value: '0', selete: [{ title: '打开', label: 'openOut2' }, { title: '关闭', label: 'closeOut2' }], mark: 'out' },
         { name: '搅拌机1#', value: '0', selete: [{ title: '打开', label: 'openStir1' }, { title: '关闭', label: 'closeStir1' }], mark: 'stir' },
-        { name: '搅拌机2#', value: '0', selete: [{ title: '打开', label: 'openStir2' }, { title: '关闭', label: 'closeStir2' }], mark: 'stir' },
-        { name: '清洗阀', value: '0', selete: [{ title: '打开', label: 'openFlush' }, { title: '关闭', label: 'closeFlush' }], mark: 'flush' },
-        { name: '注肥水泵', value: '0', selete: [{ title: '启动', label: 'openPump' }, { title: '停止', label: 'closePump' }], mark: 'pump' }
+        { name: '搅拌机2#', value: '0', selete: [{ title: '打开', label: 'openStir2' }, { title: '关闭', label: 'closeStir2' }], mark: 'stir' }
       ],
       // 控制的施肥机
       ferObj: {},

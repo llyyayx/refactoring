@@ -177,3 +177,16 @@ export function clone(obj) {
 export function random(m, n) {
   return Math.floor(Math.random() * (n - m)) + m
 }
+
+/**
+ * 数组按照属性从小到大排序
+ * @param { Array } array 数组
+ * @param { String } attr 属性名称
+ */
+export function sortAttr(array, attr) {
+  array.sort(function(a, b) {
+    const v1 = parseInt(a[attr])
+    const v2 = parseInt(b[attr])
+    return v1 - v2
+  })
+}

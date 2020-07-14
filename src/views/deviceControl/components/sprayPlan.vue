@@ -63,7 +63,7 @@
         <el-step title="喷灌机设置" />
         <el-step title="分区设置" />
       </el-steps>
-      <el-carousel ref="carousel" indicator-position="none" :loop="false" :autoplay="false" arrow="never" height="360px">
+      <el-carousel ref="carousel" indicator-position="none" :loop="false" :autoplay="false" arrow="never" height="350px">
         <el-carousel-item>
           <el-form ref="form" :model="form" :rules="rules" :inline="true">
             <el-form-item label="计划名称" prop="name">
@@ -74,6 +74,7 @@
                 v-model="form.val"
                 type="datetime"
                 placeholder="选择日期时间"
+                value-format="yyyy-MM-dd HH:mm:ss"
                 class="form__item"
               />
             </el-form-item>
@@ -85,19 +86,19 @@
                 <template slot="append">分钟</template>
               </el-input>
             </el-form-item>
-            <el-form-item label="行进方向" prop="direction">
+            <el-form-item v-show="sprayDevice.controlItem ? sprayDevice.controlItem.includes('direction') : true" label="行进方向" prop="direction">
               <el-select v-model="form.direction" placeholder="请选择">
                 <el-option value="1" label="正向" />
                 <el-option value="2" label="反向" />
               </el-select>
             </el-form-item>
-            <el-form-item label="行进方式" prop="mode">
+            <el-form-item v-show="sprayDevice.controlItem ? sprayDevice.controlItem.includes('mode') : true" label="行进方式" prop="mode">
               <el-select v-model="form.mode" placeholder="请选择">
                 <el-option value="1" label="有水" />
                 <el-option value="2" label="无水" />
               </el-select>
             </el-form-item>
-            <el-form-item label="尾枪设置" prop="gun">
+            <el-form-item v-show="sprayDevice.controlItem ? sprayDevice.controlItem.includes('gunSetting') : true" label="尾枪设置" prop="gun">
               <el-select v-model="form.gun" placeholder="请选择">
                 <el-option value="1" label="打开" />
                 <el-option value="2" label="关闭" />
@@ -123,26 +124,112 @@
                 <template slot="append">分钟</template>
               </el-input>
             </el-form-item>
-            <el-form-item>
+            <div class="btn__group">
               <el-button type="primary" @click="submitForm('form')">下一步</el-button>
               <el-button @click="resetForm('form')">重置</el-button>
-            </el-form-item>
+            </div>
           </el-form>
         </el-carousel-item>
-        <el-carousel-item>121212</el-carousel-item>
+        <el-carousel-item>
+          <el-button type="primary" size="small" @click="zone=true">选择</el-button>
+          <el-table :data="tableData" style="width: 100%;" height="240" max-height="240">
+            <el-table-column
+              prop="bigArea"
+              label="大分区"
+            />
+            <el-table-column
+              prop="smallArea"
+              label="小分区"
+            />
+            <el-table-column
+              prop="cycle"
+              label="脉冲周期"
+            />
+            <el-table-column
+              prop="radio"
+              label="占空比"
+            />
+            <el-table-column
+              prop="speed"
+              label="行走速率"
+            />
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.$index, scope.row)"
+                >
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="btn__group">
+            <el-button type="primary" @click="goBack">上一步</el-button>
+            <el-button type="primary" @click="submitPlan">提交</el-button>
+          </div>
+        </el-carousel-item>
       </el-carousel>
     </el-dialog>
     <!-- 添加计划end -->
+    <!-- 添加分区弹框go -->
+    <el-dialog :visible.sync="zone" class="dialog" width="650px">
+      <el-form ref="form2" :model="seting" :rules="rules2" :inline="true" class="seting">
+        <el-form-item label="大分区" prop="bigArea">
+          <el-select v-model="seting.bigArea" placeholder="请选择" @change="selectBig($event)">
+            <el-option
+              v-for="item in bigArea"
+              :key="item.index"
+              :value="item.value"
+              :label="item.name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="小分区" prop="smallArea">
+          <el-select v-model="seting.smallArea" :disabled="smallIdx < 0" placeholder="请选择">
+            <el-option
+              v-for="(item, key) in smallArea[smallIdx]"
+              :key="key"
+              :value="item.value"
+              :label="item.name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="脉冲周期" prop="cycle">
+          <el-input v-model="seting.cycle" placeholder="请输入脉冲周期" class="form__item">
+            <template slot="append">秒</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="占空比" prop="radio">
+          <el-input v-model="seting.radio" placeholder="请输入占空比" class="form__item">
+            <template slot="append">%</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="行走速率" prop="speed">
+          <el-input v-model="seting.speed" placeholder="请输入行走速率" class="form__item">
+            <template slot="append">%</template>
+          </el-input>
+        </el-form-item>
+        <div class="btn__group">
+          <el-button type="primary" size="small" @click="addArea('form2')">添加</el-button>
+        </div>
+      </el-form>
+    </el-dialog>
+    <!-- 添加分区弹框end -->
   </div>
 </template>
 
 <script>
 import { plans, partition } from '@/api/deviceControl'
+import { sortAttr, clone } from '@/utils'
 export default {
   data() {
     return {
-      // 选择的喷灌机
+      // 选择的喷灌机--编号
       serialno: '',
+      // 选择的喷灌机--设备
+      sprayDevice: {},
       // 展示已经执行的计划
       complete: false,
       // 加载
@@ -151,7 +238,8 @@ export default {
       list: [],
       // 添加计划对话框
       dialog: false,
-      // 计划项
+      zone: false,
+      // 喷灌机计划项
       form: {
         name: '',
         val: '',
@@ -166,6 +254,22 @@ export default {
       },
       // 当前灌机分区
       area: [],
+      // 灌机分区-大区
+      bigArea: [],
+      // 灌机分区-小区
+      smallArea: [],
+      // 大区对应的小区序号
+      smallIdx: -1,
+      // 分区设置表格
+      tableData: [],
+      // 设置分区参数表格
+      seting: {
+        bigArea: '',
+        smallArea: '',
+        cycle: '',
+        radio: '',
+        speed: ''
+      },
       // 计划项验证
       rules: {
         name: [
@@ -182,19 +286,30 @@ export default {
           { required: true, message: '请输入喷灌延时', trigger: 'blur' },
           { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
         ],
-        direction: [
-          { required: true, message: '请选择行进方向', trigger: 'blur' }
-        ],
-        mode: [
-          { required: true, message: '请选择行进方式', trigger: 'blur' }
-        ],
-        gun: [
-          { required: true, message: '请设置尾枪', trigger: 'blur' }
-        ],
         pumpTime: [
           { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
         ],
         pumpDelaySec: [
+          { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
+        ]
+      },
+      rules2: {
+        bigArea: [
+          { required: true, message: '请选择大区', trigger: 'blur' }
+        ],
+        smallArea: [
+          { required: true, message: '请选择小区', trigger: 'blur' }
+        ],
+        cycle: [
+          { required: true, message: '请输入周期', trigger: 'blur' },
+          { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
+        ],
+        radio: [
+          { required: true, message: '请输入占空比', trigger: 'blur' },
+          { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
+        ],
+        speed: [
+          { required: true, message: '请输入行走速率', trigger: 'blur' },
           { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
         ]
       },
@@ -225,6 +340,7 @@ export default {
      */
     select(e) {
       this.getPlan(e)
+      this.sprayDevice = this.getSpray(this.spray, e)
     },
 
     /**
@@ -282,8 +398,7 @@ export default {
             title: '成功',
             message: '分区查询成功'
           })
-          this.area = el.data
-          callback()
+          callback(el)
         }).catch((el) => {
           loading.close()
           this.$notify.error({
@@ -294,10 +409,55 @@ export default {
       }
     },
 
+    /**
+     * 判断数组对象中某个属性是否包含某值
+     */
+    isValue(array, attr, value) {
+      let result = false
+      array.forEach((el) => {
+        if (el[attr] === value) {
+          result = true
+        }
+      })
+      return result
+    },
+
+    // 设置分区选项
+    option() {
+      const area = this.area
+      const bigArea = []
+      const smallArea = []
+      area.forEach((el) => {
+        if (!this.isValue(bigArea, 'value', el.id)) {
+          bigArea.push({
+            value: el.id,
+            name: el.id + '大区',
+            index: bigArea.length
+          })
+          smallArea.push([{
+            value: el.idx,
+            name: el.name + '小区',
+            index: 0
+          }])
+        } else {
+          const index = smallArea.length - 1
+          smallArea[index].push({
+            value: el.idx,
+            name: el.name + '小区',
+            index: index
+          })
+        }
+      })
+      this.bigArea = bigArea
+      this.smallArea = smallArea
+    },
+
     // 新增计划
     addPlan() {
-      this.getArea(() => {
-        this.close()
+      this.getArea((el) => {
+        sortAttr(el.data, 'idx')
+        this.area = el.data
+        this.option()
         this.dialog = true
       })
     },
@@ -314,10 +474,186 @@ export default {
       })
     },
 
+    // 放回第一步
+    goBack() {
+      this.$refs.carousel.prev()
+      this.active = 1
+    },
+
     // 计划输入重置
     resetForm(formName) {
       this.$refs[formName].resetFields()
+    },
+
+    // 选择大区时间
+    selectBig(enevt) {
+      const bigArea = this.bigArea
+      let index = 0
+      bigArea.forEach((el) => {
+        if (el.value === enevt) {
+          index = el.index
+        }
+      })
+      this.seting.smallArea = ''
+      this.smallIdx = index
+    },
+
+    // 防止添加重复分区，大区统一行走速率
+    prevent() {
+      const table = this.tableData
+      const seting = this.seting
+      let result = true
+      table.forEach((el) => {
+        if (el.bigArea === seting.bigArea) {
+          el.speed = seting.speed
+        }
+        if (el.bigArea === seting.bigArea && el.smallArea === seting.smallArea) {
+          result = false
+        }
+      })
+      return result
+    },
+
+    // 添加设置的分区
+    addArea(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.prevent()) {
+            this.tableData.push(clone(this.seting))
+            this.$message.success('设置成功')
+          } else {
+            this.$message.error('失败，分区设置重复')
+          }
+        } else {
+          return false
+        }
+      })
+    },
+
+    // 删除已添加分区
+    handleDelete(index, row) {
+      this.tableData.splice(index, 1)
+    },
+
+    /**
+     * 根据编号查找设备列表
+     * @param { String } 设备编号
+     * @return 对应的设备
+     */
+    getSpray(deviceList, serialno) {
+      let device
+      deviceList.forEach((el) => {
+        if (el.serialno === serialno) {
+          device = el
+        }
+      })
+      return device
+    },
+
+    // 提交计划
+    submitPlan() {
+      // 基本格式
+      const plans = {
+        name: '',
+        serialno: '',
+        val: '',
+        status: '1',
+        expression: '>',
+        namekey: 'sys_cron',
+        devices: []
+      }
+      // step1：喷灌机设定
+      debugger
+      const spray = this.sprayDevice
+      plans.name = this.form.name
+      plans.val = this.form.val
+      plans.serialno = this.serialno
+      // step2: 喷灌机设备
+      const sprayStart = []
+      const sprayStop = []
+      /** * 正反向设置 ***/
+      if (this.form.direction) {
+        if (this.form.direction === '1') {
+          sprayStart.push({
+            namekey: spray.command.positive.nameKey,
+            params: spray.command.positive.params()
+          })
+        } else if (this.form.direction === '2') {
+          sprayStart.push({
+            namekey: spray.command.reverse.nameKey,
+            params: spray.command.reverse.params()
+          })
+        }
+      }
+      /** * 行进方式设置 ***/
+      if (this.form.mode) {
+        if (this.form.mode === '1') {
+          sprayStart.push({
+            namekey: spray.command.haveWater.nameKey,
+            params: spray.command.haveWater.params()
+          })
+        } else if (this.form.mode === '2') {
+          sprayStart.push({
+            namekey: spray.command.noWater.nameKey,
+            params: spray.command.noWater.params()
+          })
+        }
+      }
+      /** * 尾枪设置 ***/
+      if (this.form.gun) {
+        if (this.form.gun === '1') {
+          sprayStart.push({
+            namekey: spray.command.openGun.nameKey,
+            params: spray.command.openGun.params()
+          })
+        } else if (this.form.gun === '2') {
+          sprayStart.push({
+            namekey: spray.command.closeGun.nameKey,
+            params: spray.command.closeGun.params()
+          })
+        }
+        sprayStop.push({
+          namekey: spray.command.closeGun.nameKey,
+          params: spray.command.closeGun.params()
+        })
+      }
+      /** * 喷灌机设置 ***/
+      sprayStart.push({
+        namekey: spray.command.openSpray.nameKey,
+        params: spray.command.openSpray.params()
+      })
+      sprayStop.push({
+        namekey: spray.command.closeSpray.nameKey,
+        params: spray.command.closeSpray.params()
+      })
+      /** * 分区设置 ***/
+      const sprayOptions = []
+      this.tableData.forEach((el) => {
+        sprayOptions.push({
+          v: el.speed,
+          p: el.cycle,
+          d: el.radio,
+          lc: el.bigArea,
+          sc: el.smallArea
+        })
+      })
+      /** * 集成指令 ***/
+      plans.devices.push({
+        dclass: this.$config.SPRAY_CLASS,
+        serialno: this.serialno,
+        ctlGroup: 0,
+        idx: 0,
+        namekey: 'Current_Angle',
+        expression: '>',
+        val: this.form.angale,
+        delaySec: this.form.delaySec,
+        actionStart: sprayStart,
+        actionStop: sprayStop,
+        options: sprayOptions
+      })
+      console.log(plans)
     }
+
   }
 }
 </script>
@@ -395,6 +731,15 @@ export default {
       & >>> .el-form-item__label{
         min-width: 82px;
         text-align: left;
+      }
+      & .seting{
+        & >>> .el-form-item__label{
+          min-width: 76px;
+          text-align: left;
+        }
+      }
+      & .btn__group{
+        margin-top: 22px;
       }
     }
 }

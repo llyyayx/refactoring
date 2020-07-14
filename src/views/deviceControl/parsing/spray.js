@@ -317,14 +317,14 @@ const deviceCommand = {
   command: [
     {
       mark: 'openSpray',
-      name: '打开喷灌机',
+      name: '启动喷灌机',
       nameKey: '',
       params: '',
       version: ['V1.0', 'V2.0']
     },
     {
       mark: 'closeSpray',
-      name: '关闭喷灌机',
+      name: '停止喷灌机',
       nameKey: '',
       params: '',
       version: ['V1.0', 'V2.0']
