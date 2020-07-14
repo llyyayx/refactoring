@@ -65,7 +65,7 @@
       </el-steps>
       <el-carousel ref="carousel" indicator-position="none" :loop="false" :autoplay="false" arrow="never" height="350px">
         <el-carousel-item>
-          <el-form ref="form" :model="form" :rules="rules" :inline="true">
+          <el-form ref="form" :model="form" :rules="rules" :inline="true" style="height:272px">
             <el-form-item label="计划名称" prop="name">
               <el-input v-model="form.name" placeholder="请输入计划名称" class="form__item" />
             </el-form-item>
@@ -124,11 +124,11 @@
                 <template slot="append">分钟</template>
               </el-input>
             </el-form-item>
-            <div class="btn__group">
-              <el-button type="primary" @click="submitForm('form')">下一步</el-button>
-              <el-button @click="resetForm('form')">重置</el-button>
-            </div>
           </el-form>
+          <div class="btn__group">
+            <el-button type="primary" @click="submitForm('form')">下一步</el-button>
+            <el-button @click="resetForm('form')">重置</el-button>
+          </div>
         </el-carousel-item>
         <el-carousel-item>
           <el-button type="primary" size="small" @click="zone=true">选择</el-button>
@@ -138,7 +138,7 @@
               label="大分区"
             />
             <el-table-column
-              prop="smallArea"
+              prop="smallName"
               label="小分区"
             />
             <el-table-column
@@ -187,7 +187,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="小分区" prop="smallArea">
-          <el-select v-model="seting.smallArea" :disabled="smallIdx < 0" placeholder="请选择">
+          <el-select v-model="seting.smallArea" :disabled="smallIdx < 0" placeholder="请选择" @change="selectSmall($event)">
             <el-option
               v-for="(item, key) in smallArea[smallIdx]"
               :key="key"
@@ -266,6 +266,7 @@ export default {
       seting: {
         bigArea: '',
         smallArea: '',
+        smallName: '',
         cycle: '',
         radio: '',
         speed: ''
@@ -297,7 +298,7 @@ export default {
         bigArea: [
           { required: true, message: '请选择大区', trigger: 'blur' }
         ],
-        smallArea: [
+        smallName: [
           { required: true, message: '请选择小区', trigger: 'blur' }
         ],
         cycle: [
@@ -496,6 +497,16 @@ export default {
       })
       this.seting.smallArea = ''
       this.smallIdx = index
+    },
+
+    // 选择小区
+    selectSmall(event) {
+      const small = this.smallArea[this.smallIdx]
+      small.forEach((el) => {
+        if (el.value === event) {
+          this.seting.smallName = el.name
+        }
+      })
     },
 
     // 防止添加重复分区，大区统一行走速率
