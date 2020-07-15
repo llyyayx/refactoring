@@ -72,3 +72,18 @@ export function partition(serialno) {
     method: 'get'
   })
 }
+
+/**
+ * 添加计划
+ * @param { Object } data 计划事件
+ */
+export function addPlan(data) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    url: '/plans/addPlan',
+    method: 'post',
+    data
+  })
+}

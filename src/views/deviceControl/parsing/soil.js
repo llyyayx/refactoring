@@ -77,7 +77,7 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
-      max: 100,
+      max: 50,
       min: 0,
       ecType: 'line',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
@@ -96,7 +96,7 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
-      max: 100,
+      max: 50,
       min: 0,
       ecType: 'line',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
@@ -115,7 +115,7 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
-      max: 100,
+      max: 50,
       min: 0,
       ecType: 'line',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
@@ -134,7 +134,7 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '%',
-      max: 100,
+      max: 50,
       min: 0,
       ecType: 'line',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效

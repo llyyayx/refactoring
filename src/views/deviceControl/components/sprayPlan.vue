@@ -1,5 +1,5 @@
 <template>
-  <div class="plan-container">
+  <div class="plan-container" @contextmenu.prevent="menu = false" @click="menu = false">
     <!-- 计划列表go -->
     <el-drawer
       :visible="show"
@@ -23,7 +23,7 @@
             </el-select>
           </el-col>
         </el-row>
-        <el-row :gutter="10" type="flex" align="middle">
+        <el-row :gutter="10" type="flex" align="middle" class="plan__mt">
           <el-col :xl="6" :lg="8" class="plan__title">显示已完成计划</el-col>
           <el-col :xl="17" :lg="15" :offset="1">
             <el-switch
@@ -33,7 +33,7 @@
           </el-col>
         </el-row>
         <div v-loading="loading" class="plan__box--list">
-          <div v-for="item in list" :key="item.id" class="block">
+          <div v-for="item in list" :key="item.id" class="block" @contextmenu.prevent.stop="rigthMenu($event,item)">
             <el-row type="flex" align="middle">
               <el-col :xl="3" :lg="4">
                 <div class="plan__img">
@@ -136,23 +136,27 @@
             <el-table-column
               prop="bigArea"
               label="大分区"
+              width="70"
             />
             <el-table-column
               prop="smallName"
               label="小分区"
             />
-            <el-table-column
-              prop="cycle"
-              label="脉冲周期"
-            />
-            <el-table-column
-              prop="radio"
-              label="占空比"
-            />
-            <el-table-column
-              prop="speed"
-              label="行走速率"
-            />
+            <el-table-column prop="cycle" label="脉冲周期(S)">
+              <template slot-scope="scope">
+                <el-input v-model.number="scope.row.cycle" placeholder="必填" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="radio" label="占空比(%)">
+              <template slot-scope="scope">
+                <el-input v-model.number="scope.row.radio" placeholder="必填" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="speed" label="行走速率(%)">
+              <template slot-scope="scope">
+                <el-input v-model.number="scope.row.speed" placeholder="必填" @input="putSpeed(scope)" />
+              </template>
+            </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button
@@ -217,11 +221,45 @@
       </el-form>
     </el-dialog>
     <!-- 添加分区弹框end -->
+    <!-- 右击自定义菜单go -->
+    <transition name="el-zoom-in-center">
+      <div v-show="menu" class="menu" :style="{left: menuLf, top:menuTp}">
+        <ul>
+          <li @click="details">
+            <img src="@/icons/device/menu/details.png">
+            <span>查看详情</span>
+          </li>
+          <li>
+            <img src="@/icons/device/menu/copy.png">
+            <span>复制计划</span>
+          </li>
+          <li>
+            <img src="@/icons/device/menu/cancel.png">
+            <span>取消计划</span>
+          </li>
+          <li>
+            <img src="@/icons/device/menu/del.png">
+            <span>删除计划</span>
+          </li>
+        </ul>
+      </div>
+    </transition>
+    <!-- 右击自定义菜单end -->
+    <!-- 计划详情go -->
+    <el-dialog :visible.sync="content" class="dialog" width="650px">
+      <el-row type="flex" align="center">
+        <el-col>
+          <span>计划名称</span>
+          <span>{{ parsingPlan.name }}</span>
+        </el-col>
+      </el-row>
+    </el-dialog>
+    <!-- 计划详情end -->
   </div>
 </template>
 
 <script>
-import { plans, partition } from '@/api/deviceControl'
+import { plans, partition, addPlan } from '@/api/deviceControl'
 import { sortAttr, clone } from '@/utils'
 export default {
   data() {
@@ -238,7 +276,20 @@ export default {
       list: [],
       // 添加计划对话框
       dialog: false,
+      // 分区设置弹框
       zone: false,
+      // 历史计划详情
+      content: false,
+      // 右击弹框菜单
+      menu: false,
+      // 右击菜单left
+      menuLf: 0,
+      // 右击菜单top
+      menuTp: 0,
+      // 选择的计划
+      selectPlan: {},
+      // 解析后的计划，用于展示计划详情
+      parsingPlan: {},
       // 喷灌机计划项
       form: {
         name: '',
@@ -277,7 +328,7 @@ export default {
           { required: true, message: '请输入计划名称', trigger: 'blur' }
         ],
         val: [
-          { required: true, message: '请输入时间', trigger: 'blur' }
+          { required: true, message: '请设置启动时间', trigger: 'blur' }
         ],
         angale: [
           { required: true, message: '请输入停止角度', trigger: 'blur' },
@@ -286,6 +337,9 @@ export default {
         delaySec: [
           { required: true, message: '请输入喷灌延时', trigger: 'blur' },
           { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
+        ],
+        direction: [
+          { required: true, message: '请设置行进方向', trigger: 'blur' }
         ],
         pumpTime: [
           { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
@@ -410,6 +464,59 @@ export default {
       }
     },
 
+    // 右击菜单
+    rigthMenu(event, item) {
+      this.menu = true
+      this.menuLf = event.clientX + 'px'
+      this.menuTp = event.clientY + 'px'
+      this.selectPlan = item
+    },
+
+    // 查看计划详情
+    details() {
+      const selectPlan = this.selectPlan
+      const plan = {
+        // 计划名称
+        name: '',
+        // 计划开始时间
+        val: '',
+        // 计划停止角度
+        angale: '',
+        // 计划中喷灌机动作
+        device: [],
+        // 分区设置
+        cell: []
+      }
+      plan.name = selectPlan.name
+      plan.val = selectPlan.val
+      /** 灌机设置项 **/
+      const spray = this.sprayDevice
+      const sprayItem = selectPlan.devices[0]
+      plan.angale = sprayItem.val
+      const actionStart = JSON.parse(sprayItem.actionStart)
+      debugger
+      actionStart.forEach((el) => {
+        if (spray.command.openGun && el.namekey === spray.command.openGun.nameKey) {
+          plan.device.push({ mark: 'gunSetting', name: '打开' })
+        } else if (spray.command.closeGun && el.namekey === spray.command.closeGun.nameKey) {
+          plan.device.push({ mark: 'gunSetting', name: '关闭' })
+        }
+        if (spray.command.positive && el.namekey === spray.command.positive.nameKey) {
+          plan.device.push({ mark: 'direction', name: '正向' })
+        } else if (spray.command.reverse && el.namekey === spray.command.reverse.nameKey) {
+          plan.device.push({ mark: 'direction', name: '反向' })
+        }
+        if (spray.command.haveWater && el.namekey === spray.command.haveWater.nameKey) {
+          plan.device.push({ mark: 'mode', name: '有水' })
+        } else if (spray.command.noWater && el.namekey === spray.command.noWater.nameKey) {
+          plan.device.push({ mark: 'mode', name: '无水' })
+        }
+      })
+      plan.cell = JSON.parse(sprayItem.options).cells
+      this.parsingPlan = plan
+      this.content = true
+    },
+
     /**
      * 判断数组对象中某个属性是否包含某值
      */
@@ -453,12 +560,33 @@ export default {
       this.smallArea = smallArea
     },
 
+    // 初始化分区表格信息
+    initTable() {
+      const bigArea = this.bigArea
+      const smallArea = this.smallArea
+      const tableData = []
+      bigArea.forEach((el, index) => {
+        smallArea[index].forEach((item) => {
+          tableData.push({
+            bigArea: el.value,
+            smallArea: item.value,
+            smallName: item.name,
+            cycle: 60,
+            radio: 50,
+            speed: 100
+          })
+        })
+      })
+      this.tableData = tableData
+    },
+
     // 新增计划
     addPlan() {
       this.getArea((el) => {
         sortAttr(el.data, 'idx')
         this.area = el.data
         this.option()
+        this.initTable()
         this.dialog = true
       })
     },
@@ -541,13 +669,23 @@ export default {
       })
     },
 
+    // 手动输入分区速率_统一大区速率
+    putSpeed(event) {
+      const row = event.row
+      this.tableData.forEach((el) => {
+        if (el.bigArea === row.bigArea) {
+          el.speed = row.speed
+        }
+      })
+    },
+
     // 删除已添加分区
     handleDelete(index, row) {
       this.tableData.splice(index, 1)
     },
 
     /**
-     * 根据编号查找设备列表
+     * 方法：根据编号查找设备列表
      * @param { String } 设备编号
      * @return 对应的设备
      */
@@ -574,7 +712,6 @@ export default {
         devices: []
       }
       // step1：喷灌机设定
-      debugger
       const spray = this.sprayDevice
       plans.name = this.form.name
       plans.val = this.form.val
@@ -638,9 +775,10 @@ export default {
         params: spray.command.closeSpray.params()
       })
       /** * 分区设置 ***/
-      const sprayOptions = []
+      const sprayOptions = {}
+      sprayOptions.cells = []
       this.tableData.forEach((el) => {
-        sprayOptions.push({
+        sprayOptions.cells.push({
           v: el.speed,
           p: el.cycle,
           d: el.radio,
@@ -658,11 +796,22 @@ export default {
         expression: '>',
         val: this.form.angale,
         delaySec: this.form.delaySec,
-        actionStart: sprayStart,
-        actionStop: sprayStop,
-        options: sprayOptions
+        actionStart: JSON.stringify(sprayStart),
+        actionStop: JSON.stringify(sprayStop),
+        options: JSON.stringify(sprayOptions)
       })
-      console.log(plans)
+      addPlan(JSON.stringify(plans)).then((e) => {
+        this.dialog = false
+        this.$notify.success({
+          title: '成功',
+          message: '计划添加成功'
+        })
+      }).catch((e) => {
+        this.$notify.error({
+          title: '失败',
+          message: '计划添加失败'
+        })
+      })
     }
 
   }
@@ -701,7 +850,6 @@ export default {
         cursor: pointer;
     }
     & .plan__box{
-        padding: 0 20px;
         box-sizing: border-box;
         height: 100vh;
         & .plan__title{
@@ -712,31 +860,39 @@ export default {
             overflow-x: hidden;
             overflow-y: auto;
             height: calc(100% - 230px);
-            & .plan__img{
-                width: 60px;
-                & img{
+            & .block{
+              padding: 0 20px;
+              box-sizing: border-box;
+              cursor: pointer;
+              & .plan__img{
+                  width: 60px;
+                  & img{
                     width: 100%;
                     display: block;
-                }
-            }
-            & .plan__name{
+                  }
+              }
+              & .plan__name{
                 font-size: 14px;
                 @include nowrap
-            }
-            & .plan__time{
+              }
+              & .plan__time{
                 font-size: 14px;
                 margin-top: 5px;
+              }
             }
         }
         & .plan__btn{
             width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
             & .plan__btn--child{
                 width: 50%;
             }
         }
     }
     & .plan__mt{
-        margin-bottom: 12px;
+      padding: 0 20px;
+      margin-bottom: 12px;
     }
     & .dialog{
       & >>> .el-form-item__label{
@@ -753,6 +909,48 @@ export default {
         margin-top: 22px;
       }
     }
+}
+
+.menu{
+  background:#fff;
+  box-shadow:0px 0px 10px #ddd;
+  width:200px;
+  position:fixed;
+  z-index: 9999;
+  border-radius: 6px;
+  overflow: hidden;
+  & ul{
+    list-style-type:none;
+    margin: unset;
+    padding: unset;
+    & li{
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      height:35px;
+      line-height:35px;
+      font-size:14px;
+      color:#666;
+      list-style-type:none;
+      border-bottom:1px solid #ddd;
+      text-indent:20px;
+      cursor: pointer;
+      & img{
+        display: block;
+      }
+      & span{
+        text-indent: 12px;
+        text-align: left;
+      }
+    }
+    & li:nth-last-child(1) {
+      border-bottom: none
+    }
+    & li:hover{
+      background:#647E7C;
+      color:#fff;
+    }
+  }
 }
 
 .form__item{
