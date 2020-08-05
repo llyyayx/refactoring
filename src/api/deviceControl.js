@@ -53,11 +53,11 @@ export function real(serialno) {
  * 查询设备历史数据
  * @param { String } serialno 设备标识
  * @param { nameKey } serialno 设备属性标识
- * @param { String } week 几周之内(后期可能改成'天'为周期)
+ * @param { String } week 几天之内
  */
-export function hist(serialno, nameKey, week) {
+export function hist(serialno, nameKey, day) {
   return request({
-    url: `/hist/${serialno}?name=${nameKey}&week=${week}`,
+    url: `/hist/${serialno}/${nameKey}/${day}`,
     method: 'get'
   })
 }

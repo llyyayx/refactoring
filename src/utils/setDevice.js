@@ -16,13 +16,13 @@ export function getAttr(deviceAttr, version) {
     if (el.version[0] === '*' || el.version.includes(version)) {
       el.nameKey = getAttrNameKey(attrNameKey, el.mark, version)
       el.rules = getAttrRules(rules, el.mark, version)
-    }
-    const idx = history.indexOf(el.mark)
-    if (idx >= 0) {
-      attribute[idx] = el
-    } else {
-      attribute.push(el)
-      history.push(el.mark)
+      const idx = history.indexOf(el.mark)
+      if (idx >= 0) {
+        attribute[idx] = el
+      } else {
+        attribute.push(el)
+        history.push(el.mark)
+      }
     }
   })
   return attribute

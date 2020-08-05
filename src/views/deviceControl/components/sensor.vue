@@ -134,6 +134,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.sensor-container {
+  & >>> .sensor-box {
+    width: 700px;
+  }
+}
 
 .sensor__title {
   font-size: 16px;
@@ -153,6 +158,7 @@ export default {
     align-items: flex-start;
     margin-bottom: 10px;
     & .sensor__block--img {
+      width: 80px;
       padding-right: 10px;
       & img{
         width: 36px;

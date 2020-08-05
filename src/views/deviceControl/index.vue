@@ -9,6 +9,7 @@
     <Pump />
     <Toolkit />
     <SprayPlan />
+    <Partition />
     <DataPanel />
     <canvas id="myCan" width="300" height="300" style="display:none;" />
   </div>
@@ -23,6 +24,7 @@ import Fertilizer from './components/fertilizer'
 import Pump from './components/pump'
 import Toolkit from './components/toolkit'
 import SprayPlan from './components/sprayPlan'
+import Partition from './components/partition'
 import Quick from './components/quick'
 import DataPanel from './components/dataPanel'
 import state from './mixins/state'
@@ -41,6 +43,7 @@ export default {
     Pump,
     Toolkit,
     SprayPlan,
+    Partition,
     Quick,
     DataPanel
   },

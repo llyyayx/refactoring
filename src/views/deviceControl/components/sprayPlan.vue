@@ -247,12 +247,50 @@
     <!-- 右击自定义菜单end -->
     <!-- 计划详情go -->
     <el-dialog :visible.sync="content" class="dialog" width="650px">
-      <el-row type="flex" align="center">
-        <el-col>
-          <span>计划名称</span>
-          <span>{{ parsingPlan.name }}</span>
+      <p class="seting">基本设置</p>
+      <el-row :gutter="10">
+        <el-col :span="7" class="detail">
+          <span class="detail__title">计划名称：</span>
+          <span class="detail__value">{{ parsingPlan.name }}</span>
+        </el-col>
+        <el-col :span="10" class="detail">
+          <span class="detail__title">执行时间：</span>
+          <span class="detail__value">{{ parsingPlan.val }}</span>
+        </el-col>
+        <el-col :span="7" class="detail">
+          <span class="detail__title">停止角度：</span>
+          <span class="detail__value">{{ parsingPlan.angale }}</span>
+        </el-col>
+        <el-col v-for="(item, index) in parsingPlan.device" :key="index" :span="8" class="detail">
+          <span class="detail__title">{{ item.mark }}：</span>
+          <span class="detail__value">{{ item.value }}</span>
         </el-col>
       </el-row>
+      <el-divider />
+      <p class="seting">分区设置</p>
+      <el-table :data="parsingPlan.cell" style="width: 100%;" max-height="240">
+        <el-table-column
+          prop="lc"
+          label="大分区"
+          width="70"
+        />
+        <el-table-column
+          prop="sc"
+          label="小分区"
+        />
+        <el-table-column
+          prop="v"
+          label="行走速度"
+        />
+        <el-table-column
+          prop="p"
+          label="脉冲周期"
+        />
+        <el-table-column
+          prop="d"
+          label="占空比"
+        />
+      </el-table>
     </el-dialog>
     <!-- 计划详情end -->
   </div>
@@ -494,22 +532,21 @@ export default {
       const sprayItem = selectPlan.devices[0]
       plan.angale = sprayItem.val
       const actionStart = JSON.parse(sprayItem.actionStart)
-      debugger
       actionStart.forEach((el) => {
         if (spray.command.openGun && el.namekey === spray.command.openGun.nameKey) {
-          plan.device.push({ mark: 'gunSetting', name: '打开' })
+          plan.device.push({ mark: '尾枪状态', value: '打开' })
         } else if (spray.command.closeGun && el.namekey === spray.command.closeGun.nameKey) {
-          plan.device.push({ mark: 'gunSetting', name: '关闭' })
+          plan.device.push({ mark: '尾枪状态', value: '关闭' })
         }
         if (spray.command.positive && el.namekey === spray.command.positive.nameKey) {
-          plan.device.push({ mark: 'direction', name: '正向' })
+          plan.device.push({ mark: '行进方向', value: '正向' })
         } else if (spray.command.reverse && el.namekey === spray.command.reverse.nameKey) {
-          plan.device.push({ mark: 'direction', name: '反向' })
+          plan.device.push({ mark: '行进方向', value: '反向' })
         }
         if (spray.command.haveWater && el.namekey === spray.command.haveWater.nameKey) {
-          plan.device.push({ mark: 'mode', name: '有水' })
+          plan.device.push({ mark: '运行模式', value: '有水' })
         } else if (spray.command.noWater && el.namekey === spray.command.noWater.nameKey) {
-          plan.device.push({ mark: 'mode', name: '无水' })
+          plan.device.push({ mark: '运行模式', value: '无水' })
         }
       })
       plan.cell = JSON.parse(sprayItem.options).cells
@@ -699,6 +736,17 @@ export default {
       return device
     },
 
+    // 根据mark查找设备属性
+    getAttr(device, mark) {
+      let nameKey
+      device.attr.forEach((el) => {
+        if (el.mark === mark) {
+          nameKey = el.nameKey
+        }
+      })
+      return nameKey
+    },
+
     // 提交计划
     submitPlan() {
       // 基本格式
@@ -724,12 +772,12 @@ export default {
         if (this.form.direction === '1') {
           sprayStart.push({
             namekey: spray.command.positive.nameKey,
-            params: spray.command.positive.params()
+            params: spray.command.positive.params().toString()
           })
         } else if (this.form.direction === '2') {
           sprayStart.push({
             namekey: spray.command.reverse.nameKey,
-            params: spray.command.reverse.params()
+            params: spray.command.reverse.params().toString()
           })
         }
       }
@@ -738,12 +786,12 @@ export default {
         if (this.form.mode === '1') {
           sprayStart.push({
             namekey: spray.command.haveWater.nameKey,
-            params: spray.command.haveWater.params()
+            params: spray.command.haveWater.params().toString()
           })
         } else if (this.form.mode === '2') {
           sprayStart.push({
             namekey: spray.command.noWater.nameKey,
-            params: spray.command.noWater.params()
+            params: spray.command.noWater.params().toString()
           })
         }
       }
@@ -752,27 +800,27 @@ export default {
         if (this.form.gun === '1') {
           sprayStart.push({
             namekey: spray.command.openGun.nameKey,
-            params: spray.command.openGun.params()
+            params: spray.command.openGun.params().toString()
           })
         } else if (this.form.gun === '2') {
           sprayStart.push({
             namekey: spray.command.closeGun.nameKey,
-            params: spray.command.closeGun.params()
+            params: spray.command.closeGun.params().toString()
           })
         }
         sprayStop.push({
           namekey: spray.command.closeGun.nameKey,
-          params: spray.command.closeGun.params()
+          params: spray.command.closeGun.params().toString()
         })
       }
       /** * 喷灌机设置 ***/
       sprayStart.push({
         namekey: spray.command.openSpray.nameKey,
-        params: spray.command.openSpray.params()
+        params: spray.command.openSpray.params().toString()
       })
       sprayStop.push({
         namekey: spray.command.closeSpray.nameKey,
-        params: spray.command.closeSpray.params()
+        params: spray.command.closeSpray.params().toString()
       })
       /** * 分区设置 ***/
       const sprayOptions = {}
@@ -792,7 +840,7 @@ export default {
         serialno: this.serialno,
         ctlGroup: 0,
         idx: 0,
-        namekey: 'Current_Angle',
+        namekey: this.getAttr(spray, 'sprayAngle'),
         expression: '>',
         val: this.form.angale,
         delaySec: this.form.delaySec,
@@ -954,7 +1002,29 @@ export default {
 }
 
 .form__item{
-    width: 200px;
+  width: 200px;
+}
+
+.seting{
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.detail{
+  display: flex;
+  margin-bottom: 10px;
+  & .detail__title{
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 80px;
+  }
+  & .detail__value{
+    display: inline-block;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
 }
 
 /* 重置滚动条 */

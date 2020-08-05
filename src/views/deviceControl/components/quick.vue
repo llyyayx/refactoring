@@ -138,6 +138,10 @@ export default {
           this.$store.dispatch('control/dataPanelObj', item)
           this.$store.dispatch('control/dataPanelShow', true)
           break
+        case config.CANOPY_CLASS:
+          this.$store.dispatch('control/dataPanelObj', item)
+          this.$store.dispatch('control/dataPanelShow', true)
+          break
         default:
           // eslint-disable-next-line no-undef
           google.maps.event.trigger(item.mapSpot, 'click')

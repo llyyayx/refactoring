@@ -9,6 +9,8 @@ const state = {
   toolShow: false,
   // deviceControl-喷灌计划显隐
   pgPlanShow: false,
+  // deviceControl-分区显隐
+  partitionShow: false,
   // deviceControl-数据面板显隐
   dataPanelShow: false,
   // deviceControl-施肥机面板显隐
@@ -36,6 +38,9 @@ const mutations = {
   },
   SET_PGPLANSHOW: (state, show) => {
     state.pgPlanShow = show
+  },
+  SET_PARTITIONSHOW: (state, show) => {
+    state.partitionShow = show
   },
   SET_DROPSHOW: (state, show) => {
     state.dropShow = show
@@ -78,6 +83,9 @@ const actions = {
   },
   pgPlanShow: ({ commit }, show) => {
     commit('SET_PGPLANSHOW', show)
+  },
+  partitionShow: ({ commit }, show) => {
+    commit('SET_PARTITIONSHOW', show)
   },
   dropShow: ({ commit }, show) => {
     commit('SET_DROPSHOW', show)

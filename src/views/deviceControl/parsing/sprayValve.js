@@ -151,7 +151,7 @@ const deviceCommand = {
     },
     {
       mark: 'setPwm',
-      key: 'PWM_',
+      key: 'SetPulse_',
       version: ['V1.0', 'V2.0']
     }
   ],

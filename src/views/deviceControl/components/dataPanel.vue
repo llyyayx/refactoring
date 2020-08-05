@@ -28,7 +28,7 @@
         </el-col>
         <el-col :span="4" class="screening__item">
           <div class="screening__item--title">数据周期</div>
-          <el-select v-model="cycleValue" class="screening__item--options" placeholder="请选择">
+          <el-select v-model="cycleValue" change="mat" class="screening__item--options" placeholder="请选择">
             <el-option
               v-for="item in cycle"
               :key="item.value"
@@ -80,10 +80,13 @@ export default {
       deviceValue: 2,
       // 周期
       cycle: [
-        { value: 1, label: '一周内' },
-        { value: 2, label: '两周内' },
-        { value: 3, label: '三周内' },
-        { value: 4, label: '一个月内' }
+        { value: 1, label: '一天内' },
+        { value: 2, label: '两天内' },
+        { value: 3, label: '三天内' },
+        { value: 4, label: '四天内' },
+        { value: 5, label: '五天内' },
+        { value: 6, label: '六天内' },
+        { value: 7, label: '七天内' }
       ],
       // 周期选择值
       cycleValue: 1,
@@ -112,18 +115,21 @@ export default {
     deviceValue(e) {
       if (e === 1) {
         this.cycle = [
-          { value: 4, label: '一个月内' },
-          { value: 12, label: '三个月内' },
-          { value: 24, label: '六个月内' },
-          { value: 48, label: '一年内' }
+          { value: 30, label: '一个月内' },
+          { value: 90, label: '三个月内' },
+          { value: 180, label: '六个月内' },
+          { value: 365, label: '一年内' }
         ]
-        this.cycleValue = 4
+        this.cycleValue = 30
       } else if (e === 2) {
         this.cycle = [
-          { value: 1, label: '一周内' },
-          { value: 2, label: '两周内' },
-          { value: 3, label: '三周内' },
-          { value: 4, label: '一个月内' }
+          { value: 1, label: '一天内' },
+          { value: 2, label: '两天内' },
+          { value: 3, label: '三天内' },
+          { value: 4, label: '四天内' },
+          { value: 5, label: '五天内' },
+          { value: 6, label: '六天内' },
+          { value: 7, label: '七天内' }
         ]
         this.cycleValue = 1
       }
@@ -144,7 +150,9 @@ export default {
     }
   },
   methods: {
-
+    mat() {
+      alert(1212)
+    },
     /**
      * 关闭面板
      */
@@ -173,9 +181,9 @@ export default {
           date: [],
           value: [],
           unit: el.unit,
-          max: el.max,
-          min: el.min,
-          type: el.ecType
+          max: el.max || 100,
+          min: el.min || 0,
+          type: el.ecType || 'line'
         })
         self.AnEcObj[el.nameKey] = newObj
         newObj.showLoading()

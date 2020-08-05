@@ -13,6 +13,12 @@
             </div>
             <div class="tool__title">喷灌计划</div>
           </div>
+          <!-- <div class="too_content--item" @click="partition">
+            <div class="tool__img">
+              <svg-icon icon-class="zoon" class="icon--zoon" />
+            </div>
+            <div class="tool__title">喷灌分区</div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -42,69 +48,80 @@ export default {
     sprayPlan() {
       this.closeTool()
       this.$store.dispatch('control/pgPlanShow', true)
+    },
+
+    // 自定义分区
+    partition() {
+      this.closeTool()
+      this.$store.dispatch('control/partitionShow', true)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-    .tool-container{
+  .tool-container{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, .3);
+  }
+  .tool-box{
+    width: 600px;
+    background-color: #FFFFFF;
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    border-radius: 5px;
+    overflow: hidden;
+    & .tool__header{
+      background-color: #DCDFE6;
+      padding: 10px 20px;
+      position: relative;
+      & .tool__header--text{
+        font-size: 16px;
+        color: #333;
+      }
+      & .icon--close{
+        color: #666;
+        font-size:23px;
+        margin-left: 10px;
+        cursor: pointer;
         position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: rgba(0, 0, 0, .3);
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
     }
-    .tool-box{
-        width: 600px;
-        background-color: #FFFFFF;
-        position: absolute;
-        left: 50%;
-        top: 40%;
-        transform: translate(-50%, -50%);
-        border-radius: 5px;
-        overflow: hidden;
-        & .tool__header{
-          background-color: #DCDFE6;
-          padding: 10px 20px;
-          position: relative;
-          & .tool__header--text{
-              font-size: 16px;
-              color: #333;
+    & .tool__content{
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+      & .too_content--item{
+        width: 10%;
+        margin: 0 10px 10px 10px;
+        & .tool__img{
+          margin: 0 auto 4px;
+          cursor: pointer;
+          text-align: center;
+          & img{
+            display: block;
+            width: 100%;
           }
-          & .icon--close{
-            color: #666;
-            font-size:23px;
-            margin-left: 10px;
-            cursor: pointer;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+          & .icon--plan{
+            font-size: 56px;
+          }
+          & .icon--zoon{
+            font-size: 56px;
           }
         }
-        & .tool__content{
-            padding: 20px;
-            box-sizing: border-box;
-            & .too_content--item{
-                width: 10%;
-                margin: 0 10px 10px 10px;
-                & .tool__img{
-                    margin: 0 auto 4px;
-                    cursor: pointer;
-                    text-align: center;
-                    & img{
-                        display: block;
-                        width: 100%;
-                    }
-                    & .icon--plan{
-                        font-size: 56px;
-                    }
-                }
-                & .tool__title{
-                    font-size: 14px;
-                }
-            }
+        & .tool__title{
+          font-size: 14px;
         }
+      }
     }
+  }
 </style>

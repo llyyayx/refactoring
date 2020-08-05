@@ -41,10 +41,89 @@ const deviceAttr = {
       nameKey: '',
       val: '0.0',
       unit: '℃',
+      max: 50,
+      min: 0,
+      ecType: 'line',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon],
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'ch1',
+      name: '温度1',
+      type: 'Number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '℃',
+      max: 50,
+      min: 0,
+      ecType: 'line',
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon],
+      version: ['V1.0']
+    },
+    {
+      mark: 'ch2',
+      name: '温度2',
+      type: 'Number',
+      max: 50,
+      min: 0,
+      ecType: 'line',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '℃',
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon],
+      version: ['V1.0']
+    },
+    {
+      mark: 'ch3',
+      name: '温度3',
+      type: 'Number',
+      max: 50,
+      min: 0,
+      ecType: 'line',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '℃',
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon],
+      version: ['V1.0']
+    },
+    {
+      mark: 'ch4',
+      name: '温度4',
+      type: 'Number',
+      max: 50,
+      min: 0,
+      ecType: 'line',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '℃',
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon],
+      version: ['V1.0']
     }
   ],
 
@@ -52,7 +131,27 @@ const deviceAttr = {
     {
       mark: 'temp',
       key: 'Temp',
-      version: ['V1.0', 'V2.0']
+      version: ['V2.0']
+    },
+    {
+      mark: 'ch1',
+      key: 'CH1',
+      version: ['V1.0']
+    },
+    {
+      mark: 'ch2',
+      key: 'CH2',
+      version: ['V1.0']
+    },
+    {
+      mark: 'ch3',
+      key: 'CH3',
+      version: ['V1.0']
+    },
+    {
+      mark: 'ch4',
+      key: 'CH4',
+      version: ['V1.0']
     }
   ]
 

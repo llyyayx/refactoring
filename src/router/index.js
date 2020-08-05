@@ -62,7 +62,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/system/project',
     name: 'System',
-    meta: { title: 'System', icon: 'example', roles: ['editor', 'china'] },
+    meta: { title: 'System', icon: 'example', roles: ['editor'] },
     children: [
       {
         path: 'project',
@@ -109,7 +109,7 @@ export const asyncRoutes = [
     path: '/exit',
     component: Layout,
     name: 'Exit',
-    meta: { title: 'Exit', icon: 'nested', roles: ['editor'] }
+    meta: { title: 'Exit', icon: 'nested', roles: ['editor', 'china'] }
   },
 
   // 404 page must be placed at the end !!!
