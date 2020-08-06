@@ -33,7 +33,7 @@
           </el-col>
         </el-row>
         <div v-loading="loading" class="plan__box--list">
-          <div v-for="item in list" :key="item.id" class="block" @contextmenu.prevent.stop="rigthMenu($event,item)">
+          <div v-for="item in list" v-show="item.status===3 ? complete : true" :key="item.id" class="block" @contextmenu.prevent.stop="rigthMenu($event,item)">
             <el-row type="flex" align="middle">
               <el-col :xl="3" :lg="4">
                 <div class="plan__img">
@@ -229,15 +229,15 @@
             <img src="@/icons/device/menu/details.png">
             <span>查看详情</span>
           </li>
-          <li>
+          <li @click="copy">
             <img src="@/icons/device/menu/copy.png">
             <span>复制计划</span>
           </li>
-          <li>
+          <li @click="cancel">
             <img src="@/icons/device/menu/cancel.png">
             <span>取消计划</span>
           </li>
-          <li>
+          <li @click="del">
             <img src="@/icons/device/menu/del.png">
             <span>删除计划</span>
           </li>
@@ -297,7 +297,7 @@
 </template>
 
 <script>
-import { plans, partition, addPlan } from '@/api/deviceControl'
+import { plans, partition, addPlan, cancelPlan, delPlan } from '@/api/deviceControl'
 import { sortAttr, clone } from '@/utils'
 export default {
   data() {
@@ -554,8 +554,125 @@ export default {
       this.content = true
     },
 
+    // 复制计划
+    copy() {
+      // 1、灌机
+      const selectPlan = this.selectPlan
+      const sprayItem = selectPlan.devices[0]
+      const spray = this.sprayDevice
+      this.form.name = selectPlan.name
+      this.form.val = selectPlan.val
+      this.form.angale = sprayItem.val
+      this.form.delaySec = sprayItem.delay
+      const self = this
+      const actionStart = JSON.parse(sprayItem.actionStart)
+      actionStart.forEach((el) => {
+        if (spray.command.openGun && el.namekey === spray.command.openGun.nameKey) {
+          self.form.gun = '1'
+        } else if (spray.command.closeGun && el.namekey === spray.command.closeGun.nameKey) {
+          self.form.gun = '2'
+        }
+        if (spray.command.positive && el.namekey === spray.command.positive.nameKey) {
+          self.form.direction = '1'
+        } else if (spray.command.reverse && el.namekey === spray.command.reverse.nameKey) {
+          self.form.direction = '2'
+        }
+        if (spray.command.haveWater && el.namekey === spray.command.haveWater.nameKey) {
+          self.form.mode = '1'
+        } else if (spray.command.noWater && el.namekey === spray.command.noWater.nameKey) {
+          self.form.mode = '2'
+        }
+      })
+      // 2、分区
+      const cells = JSON.parse(sprayItem.options).cells
+      const tableData = []
+      cells.forEach((el) => {
+        tableData.push({
+          bigArea: el.lc,
+          smallName: el.sc,
+          cycle: el.p,
+          radio: el.d,
+          speed: el.v
+        })
+      })
+      this.tableData = tableData
+      this.dialog = true
+    },
+
+    // 取消计划
+    cancel() {
+      if (this.selectPlan.status !== 2) {
+        this.$alert('只能取消正在执行的计划', '提示', {
+          confirmButtonText: '确定',
+          type: 'warning',
+          showClose: false
+        })
+        return
+      }
+      this.$confirm('您确定取消该计划么?', '提示', {
+        type: 'warning',
+        showClose: false
+      }).then(() => {
+        cancelPlan(parseInt(this.selectPlan.id)).then((e) => {
+          if (e.code === 0) {
+            this.refresh()
+            this.$notify.success({
+              title: '成功',
+              message: '取消计划成功'
+            })
+          } else {
+            this.$notify.error({
+              title: '失败',
+              message: '取消计划失败'
+            })
+          }
+        })
+      }).catch(() => {
+        this.menu = false
+        return
+      })
+    },
+
+    // 删除计划
+    del() {
+      if (this.selectPlan.status === 2) {
+        this.$alert('正在执行的计划不能删除', '提示', {
+          confirmButtonText: '确定',
+          type: 'warning',
+          showClose: false
+        })
+        return
+      }
+      this.$confirm('您确定删除该计划么?', '提示', {
+        type: 'warning',
+        showClose: false
+      }).then(() => {
+        delPlan(parseInt(this.selectPlan.id)).then((e) => {
+          if (e.code === 0) {
+            this.refresh()
+            this.$notify.success({
+              title: '成功',
+              message: '删除计划成功'
+            })
+          } else {
+            this.$notify.error({
+              title: '失败',
+              message: '删除计划失败'
+            })
+          }
+        })
+      }).catch(() => {
+        this.menu = false
+        return
+      })
+    },
+
     /**
-     * 判断数组对象中某个属性是否包含某值
+     * 方法：判断数组对象中某个属性是否包含某值
+     * @param { Array } array 数组
+     * @param { String } attr 数组item中的属性名称
+     * @param { Number } value 确认含有的数值
+     * @return { Boolean } 返回有无
      */
     isValue(array, attr, value) {
       let result = false
@@ -841,7 +958,7 @@ export default {
         ctlGroup: 0,
         idx: 0,
         namekey: this.getAttr(spray, 'sprayAngle'),
-        expression: '>',
+        expression: '=',
         val: this.form.angale,
         delaySec: this.form.delaySec,
         actionStart: JSON.stringify(sprayStart),
@@ -849,6 +966,7 @@ export default {
         options: JSON.stringify(sprayOptions)
       })
       addPlan(JSON.stringify(plans)).then((e) => {
+        this.refresh()
         this.dialog = false
         this.$notify.success({
           title: '成功',

@@ -6,7 +6,7 @@ const state = {
   // deviceControl-传感器面板显隐
   sensorShow: false,
   // deviceControl-工具箱显隐
-  toolShow: false,
+  toolShow: true,
   // deviceControl-喷灌计划显隐
   pgPlanShow: false,
   // deviceControl-分区显隐

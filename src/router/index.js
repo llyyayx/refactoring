@@ -108,8 +108,15 @@ export const asyncRoutes = [
   {
     path: '/exit',
     component: Layout,
-    name: 'Exit',
-    meta: { title: 'Exit', icon: 'nested', roles: ['editor', 'china'] }
+    meta: { roles: ['editor', 'china'] },
+    children: [
+      {
+        path: 'index',
+        name: 'Exit',
+        component: () => import('@/views/exit/index'),
+        meta: { icon: 'nested', title: 'Exit' }
+      }
+    ]
   },
 
   // 404 page must be placed at the end !!!

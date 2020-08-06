@@ -87,3 +87,25 @@ export function addPlan(data) {
     data
   })
 }
+
+/**
+ * 取消计划
+ * @param {Number} planId 计划id
+ */
+export function cancelPlan(id) {
+  return request({
+    url: `/plans/${id}/cancel?forceDelete=0`,
+    method: 'put'
+  })
+}
+
+/**
+ * 删除计划
+ * @param {Number} planId 计划id
+ */
+export function delPlan(id) {
+  return request({
+    url: `/plans/${id}/cancel?forceDelete=1`,
+    method: 'put'
+  })
+}
