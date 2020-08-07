@@ -1,6 +1,6 @@
 <template>
   <div v-loading="loading" class="device-container">
-    <Gmps ref="gmps" @load="load" />
+    <LMaps @load="load" />
     <Quick />
     <Spray />
     <Drops />
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import Gmps from '@/components/GMaps'
+import LMaps from '@/components/LMaps'
 import Spray from './components/spray'
 import Drops from './components/drops'
 import Sensor from './components/sensor'
@@ -28,14 +28,14 @@ import Partition from './components/partition'
 import Quick from './components/quick'
 import DataPanel from './components/dataPanel'
 import state from './mixins/state'
-import mapFun from '@/utils/mapFun'
+import mapFun from '@/utils/lmapFun'
 import Paho from './mqttws31'
 import { getDevice } from '@/api/deviceControl'
 import { drops, pump, fertilizer, soil, weather, spray, ndvi, height, canopy } from './parsing'
 export default {
   name: 'DeviceControl',
   components: {
-    Gmps,
+    LMaps,
     Spray,
     Drops,
     Sensor,
@@ -88,6 +88,7 @@ export default {
      * @param { Object } map 地图实例化对象
      */
     load(map) {
+      this.loading = false
       this.map = map
       this.$store.dispatch('map/setMap', map)
       this.getContent()
@@ -100,7 +101,7 @@ export default {
      * @param { String } lng 经度
      */
     setMap(lat, lng) {
-      this.$refs.gmps.setCenter(lat, lng)
+      mapFun.setCenter(this.map, lat, lng)
     },
 
     // 地图右上栏
