@@ -1,13 +1,13 @@
 import store from '@/store'
 import { dropValve } from './dropValve'
-import mapFun from '@/utils/mapFun'
+import mapFun from '@/utils/lmapFun'
 
 // 解析滴灌
 export function drops(item) {
   const { dname, latitude, longitude, dclass, serialno, cells } = item
-  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/dg.png') })
+  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/run/dg.png') })
   clickEvent(mapSpot)
-  store.dispatch('device/setDrops', { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/dg.png'), mapSpot })
+  store.dispatch('device/setDrops', { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/run/dg.png'), mapSpot })
   if (cells) dropValve(cells, { dname, serialno })
 }
 

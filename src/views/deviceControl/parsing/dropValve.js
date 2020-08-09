@@ -1,6 +1,6 @@
 import store from '@/store'
 import config from '@/utils/config'
-import mapFun from '@/utils/mapFun'
+import mapFun from '@/utils/lmapFun'
 import { getAttr, getCommand } from '@/utils/setDevice'
 
 // 解析分区 => 解析滴灌阀门
@@ -75,7 +75,7 @@ function stateIcon(el, vueX) {
     }
   }
   vueX.icon && (vueX.icon = icon)
-  vueX.mapSpot && vueX.mapSpot.setIcon(icon)
+  vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(icon))
 }
 
 const deviceAttr = {

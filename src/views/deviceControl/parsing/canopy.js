@@ -1,5 +1,6 @@
 import store from '@/store'
 import { getAttr } from '@/utils/setDevice'
+import mapFun from '@/utils/lmapFun'
 
 // 解析冠层温度传感器
 export function canopy(item) {
@@ -19,11 +20,11 @@ function stateIcon(el, vueX) {
   if (el) {
     const run = require('@/icons/device/run/sqz.png')
     vueX.icon && (vueX.icon = run)
-    vueX.mapSpot && vueX.mapSpot.setIcon(run)
+    vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(run))
   } else {
     const close = require('@/icons/device/close/sqz.png')
     vueX.icon && (vueX.icon = close)
-    vueX.mapSpot && vueX.mapSpot.setIcon(close)
+    vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(close))
   }
 }
 

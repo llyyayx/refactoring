@@ -30,7 +30,6 @@ export default {
   },
   methods: {
     ready(map) {
-      console.log(map)
       this.map = map
       this.$emit('load', map)
     }

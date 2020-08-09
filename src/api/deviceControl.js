@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-
 /**
  * 拉取设备
  * @param {Number} groupId 组id

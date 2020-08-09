@@ -93,6 +93,7 @@ export default {
       this.$store.dispatch('map/setMap', map)
       this.getContent()
       this.mapRgTop()
+      mapFun.lookAddr(map)
     },
 
     /**

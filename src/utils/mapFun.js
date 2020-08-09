@@ -48,6 +48,14 @@ export default {
   },
 
   /**
+   * 构造一个图标
+   * @param { String } url 图标链接
+   */
+  getIcon(url) {
+    return url
+  },
+
+  /**
    * 地图上绘制多边形
    * @param { Object } map 地图实例化对象
    * @param { Array } kml 区域经纬度数组-二维数组
@@ -117,6 +125,13 @@ export default {
     map.controls[google.maps.ControlPosition.RIGHT_TOP].push(centerControlDiv)
   },
 
+  /**
+   * 创建信息窗口
+   * @param { Object } map 地图对象
+   * @param { Object } mapSpot 坐标点对象
+   * @param { Array } attr 属性
+   * @param { String } serialno 设备标识
+   */
   infowindow(map, mapSpot, attr, serialno) {
     if (Object.prototype.toString.call(attr) === '[object Array]' && attr.length > 0) {
       let content = ''

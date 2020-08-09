@@ -13,12 +13,12 @@
             </div>
             <div class="tool__title">喷灌计划</div>
           </div>
-          <div class="too_content--item" @click="partition">
+          <!-- <div class="too_content--item" @click="partition">
             <div class="tool__img">
               <svg-icon icon-class="zoon" class="icon--zoon" />
             </div>
             <div class="tool__title">喷灌分区</div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

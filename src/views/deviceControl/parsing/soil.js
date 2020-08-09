@@ -1,5 +1,5 @@
 import store from '@/store'
-import mapFun from '@/utils/mapFun'
+import mapFun from '@/utils/lmapFun'
 import { getAttr } from '@/utils/setDevice'
 
 // 解析土壤墒情传感器
@@ -41,11 +41,11 @@ function stateIcon(el, vueX) {
   if (el) {
     const run = require('@/icons/device/run/sqz.png')
     vueX.icon && (vueX.icon = run)
-    vueX.mapSpot && vueX.mapSpot.setIcon(run)
+    vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(run))
   } else {
     const close = require('@/icons/device/close/sqz.png')
     vueX.icon && (vueX.icon = close)
-    vueX.mapSpot && vueX.mapSpot.setIcon(close)
+    vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(close))
   }
 }
 

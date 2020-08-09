@@ -1,7 +1,7 @@
 import store from '@/store'
-import area from '../area'
+import area from '../leafletArea'
 import { sprayValve } from './sprayValve'
-import mapFun from '@/utils/mapFun'
+import mapFun from '@/utils/lmapFun'
 import { getAttr, getCommand, getControlItem } from '@/utils/setDevice'
 
 // 解析喷灌
@@ -122,7 +122,7 @@ function stateIcon(el, vueX) {
     icon = require('@/icons/device/break/pg.png')
   }
   vueX.icon && (vueX.icon = icon)
-  vueX.mapSpot && vueX.mapSpot.setIcon(icon)
+  vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(icon))
 }
 
 function setAngle(el, vueX) {
