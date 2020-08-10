@@ -17,7 +17,7 @@ export function spray(item) {
   clickEvent(mapSpot)
 
   // vuex管理
-  store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, canvas,
+  store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, cells, canvas,
     mapSpot, attr: getAttr(deviceAttr, model || 'V1.0'), icon: require('@/icons/device/close/pg.png'), command: getCommand(deviceCommand, model || 'V1.0'),
     controlItem: getControlItem(controlItem, model || 'V1.0') })
   if (portarrays) sprayValve(portarrays, { dname, serialno })

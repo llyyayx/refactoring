@@ -108,3 +108,18 @@ export function delPlan(id) {
     method: 'put'
   })
 }
+
+/**
+ * 提交分区
+ * @param { Array } data 分区信息
+ */
+export function subArea(data) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    url: '/cells',
+    method: 'post',
+    data
+  })
+}

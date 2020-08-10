@@ -123,7 +123,7 @@ export default {
         ctx.arc(0, 0, 150, startAng, endAng, false)
         ctx.lineWidth = this.lineWidth
         ctx.strokeStyle = '#000'
-        ctx.fillStyle = colorRgba(this.allArea[i].bigColor, 0.5)
+        ctx.fillStyle = colorRgba(this.allArea[i].bigColor, 0.2)
         ctx.fill()
         ctx.closePath()
         ctx.stroke()
@@ -148,7 +148,7 @@ export default {
           ctx.arc(0, 0, rgrad, startAng, endAng)
           ctx.lineWidth = this.lineWidth
           ctx.strokeStyle = '#000'
-          ctx.fillStyle = colorRgba(small[j].smallColor, 0.5)
+          ctx.fillStyle = colorRgba(small[j].smallColor, 0.2)
           ctx.fill()
           ctx.closePath()
           ctx.stroke()
