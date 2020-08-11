@@ -80,6 +80,7 @@ export default {
       // this.dropValveState()
       // this.sprayValveState()
       this.mqttServer()
+      this.drawCanopy()
       this.loading = false
     },
 
@@ -113,6 +114,20 @@ export default {
       mapFun.mapRgTop(this.map, '采集面板', require('@/icons/device/cgq1.png'), () => {
         this.$store.dispatch('control/sensorShow', true)
       })
+    },
+
+    // 绘制喷灌臂上的冠层采集器
+    drawCanopy() {
+      const canopy = this.$store.state.device.canopy
+      const spray = this.$store.state.device.spray[0]
+      canopy.forEach((el) => {
+        if (el.mounted) {
+          spray.canvas.sensor.push(el)
+        }
+      })
+      spray.canvas.view.onRemove()
+      spray.canvas.view.onAdd()
+      spray.canvas.view.draw()
     },
 
     // MQTT全设备状态监听

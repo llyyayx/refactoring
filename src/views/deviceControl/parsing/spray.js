@@ -78,8 +78,7 @@ function draw(param) {
     displayDirection: true,
     direction: true,
     allArea: partition,
-    arm: long,
-    allNozzle: 40
+    arm: long
   })
   return view
 }

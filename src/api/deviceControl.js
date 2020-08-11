@@ -118,8 +118,8 @@ export function subArea(data) {
     headers: {
       'Content-Type': 'application/json'
     },
-    url: '/cells',
+    url: `/cells/${data.serialno}`,
     method: 'post',
-    data
+    data: data.cells
   })
 }

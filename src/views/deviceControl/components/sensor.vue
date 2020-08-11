@@ -108,6 +108,19 @@ export default {
     },
     height() {
       return this.$store.state.device.height
+    },
+    spray() {
+      return this.$store.state.device.spray[0]
+    }
+  },
+  watch: {
+    canopy: {
+      handler: function(e) {
+        this.spray.canvas.view.onRemove()
+        this.spray.canvas.view.onAdd()
+        this.spray.canvas.view.draw()
+      },
+      deep: true
     }
   },
   methods: {

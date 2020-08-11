@@ -35,7 +35,6 @@ export default {
     this.times = new Date().valueOf() // 当前时间戳，保证唯一id(地图插入图片时)
 
     this.sensor = obj.sensor || [] // 悬臂传感器
-    this.allNozzle = obj.allNozzle || 0 // 喷头总数
 
     this.swX = 0 // 西南点,X坐标值
     this.swY = 0 // 西南点,Y坐标值
@@ -56,31 +55,6 @@ export default {
       }
       this.mapObj = new google.maps.Map(vessel, mapOptions)
     }
-
-    var view = {}
-    // new地图叠加对象(OverlayView方法)
-    view.onAdd = function() {
-      var swBound = latLng(_this.swSpot)
-      var neBound = latLng(_this.neSpot)
-      var bounds = latLngBounds(swBound, neBound)
-      var view = imageOverlay('', bounds, { className: 'setimg' + _this.times })
-      view.addTo(_this.mapObj)
-      view.on('error', function() {
-        _this.build()
-      })
-    }
-    view.draw = function() {
-      var now = _this.mapObj.getZoom()
-      _this.mapObj.setZoom(now - 1)
-      _this.mapObj.setZoom(now)
-    }
-    view.onRemove = function() {
-      view.remove()
-    }
-    view.onAdd()
-    view.draw()
-    // 把设置好的OverlayView(自定义添加的div图层)添加到地图(map)上
-    this.view = view
 
     // 获取像素点
     function getXy() {
@@ -217,27 +191,54 @@ export default {
       // 绘制冠层采集站
       var sensor = this.sensor
       if (sensor.length > 0) {
-        var allNozzle = this.allNozzle
+        var interval = Math.floor(150 / sensor.length)
         var _this = this
-        sensor.forEach(function(e) {
-          var sprinkler = new Image()
-          sprinkler.src = e.icon
-          var r = e.nozzle / allNozzle * 140
+        sensor.forEach(function(e, index) {
+          var r = index * interval
           var point = coordinates(150, 150, r, _this.pgAngle - _this.gps)
-          var x = Math.floor(point.x) - Math.floor(e.size / 2)
-          var y = Math.floor(point.y) - Math.floor(e.size / 2)
-          ctx.drawImage(sprinkler, x, y, e.size, e.size)
-          drawBubble(ctx, x, y - e.size, 40, 20, 5, 8)
+          var x = Math.floor(point.x)
+          var y = Math.floor(point.y)
+          ctx.beginPath()
+          ctx.arc(x, y, 4, 0, Math.PI * 2)
+          ctx.fillStyle = '#ff4500'
+          ctx.fill()
+          ctx.closePath()
+          ctx.save()
+          ctx.translate(x - 8, y)
+          ctx.rotate(_this.pgAngle * Math.PI / 180)
+          ctx.beginPath()
+          ctx.font = '14px 900 微软雅黑'
+          ctx.textAlign = 'end'
+          ctx.fillStyle = '#333'
+          ctx.fillText(e.attr[0].val, 0, 0)
+          ctx.closePath()
+          ctx.restore()
         })
       }
 
-      // canvas保存到overlayView中的Image
-      var getImg = document.getElementsByClassName('setimg' + this.times)[0]
-      getImg.src = ''
-      getImg.src = btx.toDataURL('image/png')
-      getImg.style.display = 'block'
-      getImg.style.width = '100%'
+      this.url = btx.toDataURL('image/png')
     }
+
+    var view = {}
+    // new地图叠加对象(OverlayView方法)
+    view.onAdd = function() {
+      _this.build()
+      var swBound = latLng(_this.swSpot)
+      var neBound = latLng(_this.neSpot)
+      var bounds = latLngBounds(swBound, neBound)
+      var layer = imageOverlay(_this.url, bounds, { className: 'setimg' + _this.times })
+      layer.addTo(_this.mapObj)
+      view.layer = layer
+    }
+    view.draw = function() {
+      return
+    }
+    view.onRemove = function() {
+      view.layer.remove()
+    }
+    view.onAdd()
+    // 把设置好的OverlayView(自定义添加的div图层)添加到地图(map)上
+    this.view = view
 
     /* 方法:求数组N项和 */
     // eslint-disable-next-line no-unused-vars
@@ -285,38 +286,6 @@ export default {
     // 臂长转换(把小分区距离范围转化成150范围的)
     function arms(val, arm) {
       return 150 * (val / arm)
-    }
-
-    // 封装一个画对话气泡的函数
-    function drawBubble(ctx, x, y, minW, minH, r, e) {
-      ctx.beginPath()
-      ctx.moveTo(0, 0)
-      ctx.save()
-      ctx.strokeStyle = '#fff'
-      ctx.moveTo(x + r, y)
-      ctx.arcTo(x + minW, y, x + minW, y + minH, r)
-      ctx.arcTo(x + minW, y + minH, x, y + minH, r)
-
-      // 三角开始
-      ctx.lineTo(x + minW / 2 - e, y + minH)
-      ctx.lineTo(x + minW / 2, y + minH + e)
-      ctx.lineTo(x + minW / 2 + e, y + minH)
-      // 三角结束
-
-      ctx.arcTo(x, y + minH, x, y, r)
-      ctx.lineTo(x, y + r)
-      ctx.arcTo(x, y, x + minW, y, r)
-      ctx.clip()
-      ctx.fillStyle = '#FFF'
-      ctx.fillRect(0, 0, 300, 300)
-      ctx.closePath()
-      ctx.stroke()
-      ctx.restore()
-      // 开始设置值
-      ctx.fillStyle = '#000'
-      ctx.textBaseline = 'middle' // 垂直居中
-      ctx.font = _this.textSize + ' Arial'
-      ctx.fillText('14.1℃', x + 1, y + minH / 2)
     }
 
     // 使用时只需传入十六进制字符串，“n”表示透明度  16进制颜色转rgba

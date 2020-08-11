@@ -190,3 +190,33 @@ export function sortAttr(array, attr) {
     return v1 - v2
   })
 }
+
+/**
+ * 格式化喷灌分区 (格式化的数据格式对应canvans绘制方法)
+ */
+export function formatCell(cells) {
+  let id
+  const partition = []
+  const big = { smallArea: [] }
+  cells.forEach((el, index) => {
+    if (index !== 0 && id !== el.id) {
+      partition.push(JSON.parse(JSON.stringify(big)))
+      big.smallArea = []
+    }
+    id = el.id
+    big.lfAng = el.argstart
+    big.rgAng = el.argend
+    big.num = el.id
+    big.bigColor = el.color
+    const small = {}
+    small.lfrad = el.disstart
+    small.rgrad = el.disend
+    small.num = el.name
+    small.smallColor = el.color
+    big.smallArea.push(small)
+    if (index === cells.length - 1) {
+      partition.push(JSON.parse(JSON.stringify(big)))
+    }
+  })
+  return partition
+}

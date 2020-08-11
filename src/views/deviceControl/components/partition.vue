@@ -14,7 +14,7 @@
         <span style="font-size: 16px">检测到该喷灌机进行过分区?</span>
         <span slot="footer" class="dialog-footer">
           <el-button type="primary" size="small" @click="editor">去编辑</el-button>
-          <el-button type="primary" size="small" @click="penta">重分区</el-button>
+          <el-button type="primary" size="small" @click="reset">重分区</el-button>
         </span>
       </el-dialog>
       <el-dialog title="分区设置" :visible.sync="setShow" width="950px" :modal="false" class="marea">
@@ -110,7 +110,9 @@
   </transition>
 </template>
 <script>
-import { clone } from '@/utils/index'
+import { clone, formatCell } from '@/utils/index'
+import { subArea } from '@/api/deviceControl'
+import device from '@/store/modules/device'
 export default {
   data() {
     return {
@@ -201,7 +203,8 @@ export default {
       }
     },
 
-    penta() {
+    // 重置分区
+    reset() {
       this.$store.dispatch('control/partitionShow', false)
       this.dialog = false
       this.setShow = true
@@ -209,10 +212,45 @@ export default {
 
     // 编辑分区
     editor() {
-      // const cells = this.device.cells
-      /* cells.forEach((el) => {
-        if
-      }) */
+      // 1、解析数据
+      const cells = this.device.cells
+      const saveId = []
+      const saveData = []
+      cells.forEach((el) => {
+        const index = saveId.indexOf(el.id)
+        if (index >= 0) {
+          saveData[index].push(el)
+        } else {
+          saveId.push(el.id)
+          saveData.push([el])
+        }
+      })
+      // 2、还原分区
+      const area = []
+      saveData.forEach((el) => {
+        const obj = {}
+        obj.serialno = this.device.serialno
+        obj.id = el[0].id
+        obj.argstart = el[0].argstart
+        obj.argend = el[0].argend
+        obj.smallArea = []
+        el.forEach((item) => {
+          obj.smallArea.push({
+            idx: item.idx,
+            name: item.name,
+            color: item.color,
+            spstart: item.spstart,
+            spend: item.spend,
+            disstart: item.disstart,
+            disend: item.disend
+          })
+        })
+        area.push(obj)
+      })
+      this.area = area
+      this.$store.dispatch('control/partitionShow', false)
+      this.dialog = false
+      this.setShow = true
     },
 
     // 添加大区
@@ -352,6 +390,7 @@ export default {
       // 喷头间距
       const interval = Math.floor((this.arm / this.valve) * 100) / 100
       let result = true
+      // 整理为提交数据格式
       const cell = []
       area.forEach((el) => {
         const smallArea = el.smallArea
@@ -372,8 +411,29 @@ export default {
         })
       })
       if (result) {
-        console.log(cell)
+        // 提交到接口api
+        subArea({
+          serialno: this.device.serialno,
+          cells: cell
+        }).then((e) => {
+          this.$alert('分区提交成功', '提示', {
+            showClose: false,
+            type: 'success'
+          })
+          this.device.cells = cell
+          // 重绘地图层分区
+          this.device.canvas.allArea = formatCell(cell)
+          this.device.canvas.view.onRemove()
+          this.device.canvas.view.onAdd()
+          this.device.canvas.view.draw()
+        }).catch((e) => {
+          this.$alert('分区提交失败，请联系管理员', '警告', {
+            showClose: false,
+            type: 'error'
+          })
+        })
       } else {
+        // 信息不完善，禁止提交
         this.$alert('分区信息不完善', '警告', {
           showClose: false,
           type: 'warning'
