@@ -119,15 +119,28 @@ export default {
     // 绘制喷灌臂上的冠层采集器
     drawCanopy() {
       const canopy = this.$store.state.device.canopy
-      const spray = this.$store.state.device.spray[0]
+      const spray = this.$store.state.device.spray
+      const device = []
       canopy.forEach((el) => {
         if (el.mounted) {
-          spray.canvas.sensor.push(el)
+          if (el.pserialno) {
+            spray.forEach((item) => {
+              if (item.serialno === el.pserialno) {
+                item.canvas.sensor.push(el)
+                device.push(item)
+              }
+            })
+          } else {
+            spray[0].canvas.sensor.push(el)
+            device.push(spray[0])
+          }
         }
       })
-      spray.canvas.view.onRemove()
-      spray.canvas.view.onAdd()
-      spray.canvas.view.draw()
+      device.forEach((el) => {
+        el.canvas.view.onRemove()
+        el.canvas.view.onAdd()
+        el.canvas.view.draw()
+      })
     },
 
     // MQTT全设备状态监听

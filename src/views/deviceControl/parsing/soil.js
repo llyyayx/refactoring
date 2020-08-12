@@ -5,7 +5,7 @@ import { getAttr } from '@/utils/setDevice'
 // 解析土壤墒情传感器
 export function soil(item) {
   const { dclass, serialno, dname, latitude, longitude, model } = item
-  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/sqz.png') })
+  const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/sqz.png') })
   clickEvent(mapSpot)
   const attr = getAttr(deviceAttr, model || 'V1.0')
   const infowindow = mapFun.infowindow(store.state.map.map, mapSpot, attr, serialno)
@@ -26,7 +26,7 @@ function marKer(obj) {
  */
 function clickEvent(mapSpot) {
   mapFun.marKerClickEvent(mapSpot, () => {
-    alert(6)
+    return
   })
 }
 
@@ -60,7 +60,7 @@ function setInfoWindow(el, vueX) {
     content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
       ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
   })
-  vueX.infowindow.setContent(content)
+  vueX.infowindow && vueX.infowindow.setContent(content)
 }
 
 const deviceAttr = {

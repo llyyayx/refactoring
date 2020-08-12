@@ -13,8 +13,8 @@ export function spray(item) {
     canvas = draw({ latitude, longitude, extension, cells })
   }
   // 地图标点
-  const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/pg.png') })
-  clickEvent(mapSpot)
+  const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/pg.png') })
+  clickEvent(mapSpot, serialno)
 
   // vuex管理
   store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, cells, canvas,
@@ -97,9 +97,11 @@ function marKer(obj) {
 /**
  * 标点点击事件
  * @param { Object } mapSpot 地图标点实例化对象
+ * @param { String } serialno 喷灌机编号
  */
-function clickEvent(mapSpot) {
+function clickEvent(mapSpot, serialno) {
   mapFun.marKerClickEvent(mapSpot, () => {
+    store.dispatch('control/sprayDevice', { serialno })
     store.dispatch('control/sprayShow', true)
   })
 }

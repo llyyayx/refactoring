@@ -83,6 +83,7 @@
 
 <script>
 import panel from '@/components/Panel'
+import { sortAttr } from '@/utils/index'
 export default {
   components: {
     panel
@@ -104,23 +105,39 @@ export default {
       return this.$store.state.device.ndvi
     },
     canopy() {
-      return this.$store.state.device.canopy
+      return sortAttr(this.$store.state.device.canopy, 'rtuId')
     },
     height() {
       return this.$store.state.device.height
     },
     spray() {
-      return this.$store.state.device.spray[0]
+      return this.$store.state.device.spray
     }
   },
   watch: {
-    canopy: {
-      handler: function(e) {
-        this.spray.canvas.view.onRemove()
-        this.spray.canvas.view.onAdd()
-        this.spray.canvas.view.draw()
-      },
-      deep: true
+    canopy(e) {
+      // 刷新canvas臂上冠层采集器数据
+      let device = []
+      const self = this
+      e.forEach((el) => {
+        if (el.mounted) {
+          if (el.pserialno) {
+            self.spray.forEach((item) => {
+              if (item.serialno === el.pserialno) {
+                device.push(item)
+              }
+            })
+          } else {
+            device.push(self.spray[0])
+          }
+        }
+      })
+      device.forEach((el) => {
+        el.canvas.view.onRemove()
+        el.canvas.view.onAdd()
+        el.canvas.view.draw()
+      })
+      device = []
     }
   },
   methods: {

@@ -737,8 +737,7 @@ export default {
     // 新增计划
     addPlan() {
       this.getArea((el) => {
-        sortAttr(el.data, 'idx')
-        this.area = el.data
+        this.area = sortAttr(el.data, 'id')
         this.option()
         this.initTable()
         this.dialog = true

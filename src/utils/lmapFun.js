@@ -1,4 +1,4 @@
-import { Control, icon, marker, polygon } from 'leaflet'
+import { Control, icon, marker, popup, polygon } from 'leaflet'
 
 export default {
 
@@ -18,6 +18,7 @@ export default {
   * @param { Object } obj 点对象
   * @param { String } obj.lng 点经度
   * @param { String } obj.lat 点纬度
+  * @param { String } obj.dname 点名称
   * @param { String } obj.icon 点图标资源路径
   * @return { Object } 点对象
   */
@@ -27,7 +28,7 @@ export default {
       iconSize: [50, 50],
       iconAnchor: [25, 25]
     })
-    var point = marker({ lat: obj.lat, lng: obj.lng }, { icon: myIcon }).addTo(map)
+    var point = marker({ lat: obj.lat, lng: obj.lng }, { icon: myIcon, title: obj.dname }).addTo(map)
     return point
   },
 
@@ -115,9 +116,9 @@ export default {
         content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
         ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
       })
-      const window = mapSpot.bindPopup('<div class="' + serialno + '">' + content + '</div>')
-      window.openPopup()
-      return window
+      const layer = popup({ autoClose: false, closeOnClick: false }).setContent('<div class="' + serialno + '">' + content + '</div>')
+      mapSpot.bindPopup(layer)
+      return layer
     }
   },
 
@@ -149,7 +150,7 @@ export default {
    */
   lookAddr(map) {
     map.on('click', function(e) {
-      console.log(e)
+      console.log(e.latlng)
     })
   }
 

@@ -189,6 +189,7 @@ export function sortAttr(array, attr) {
     const v2 = parseInt(b[attr])
     return v1 - v2
   })
+  return array
 }
 
 /**

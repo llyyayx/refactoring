@@ -4,13 +4,35 @@ import mapFun from '@/utils/lmapFun'
 
 // 解析冠层温度传感器
 export function canopy(item) {
-  const { dclass, serialno, dname, latitude, longitude, model, extension } = item
+  const { dclass, serialno, dname, latitude, longitude, model, extension, rtu } = item
+  // 传感器在喷灌机臂上判断
   let mounted = false
+  let pserialno = ''
   if (extension) {
-    mounted = JSON.parse(extension).mounted
+    // 在喷灌机臂上，且设置归属喷灌机
+    const obj = JSON.parse(extension)
+    mounted = obj.mounted
+    pserialno = obj.pserialno
   }
-  store.dispatch('device/setCanopy', { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/sqz.png'),
-    attr: getAttr(deviceAttr, model || 'V1.0'), mounted })
+
+  const attr = getAttr(deviceAttr, model || 'V1.0')
+
+  const itemAttr = { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/sqz.png'),
+    attr, mounted, pserialno, rtuId: rtu ? rtu.rtuid : 0 }
+
+  // 不在喷灌机臂上的设置地图标点及信息窗口
+  if (!mounted) {
+    const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/sqz.png') })
+    const infowindow = mapFun.infowindow(store.state.map.map, mapSpot, attr, serialno)
+    itemAttr.mapSpot = mapSpot
+    itemAttr.infowindow = infowindow
+  }
+  store.dispatch('device/setCanopy', itemAttr)
+}
+
+// 创建地图标点
+function marKer(obj) {
+  return mapFun.setMarker(store.state.map.map, obj)
 }
 
 /* -----------------------属性装载-------------------------- */
@@ -32,6 +54,20 @@ function stateIcon(el, vueX) {
   }
 }
 
+/**
+ * 属性值加载回调：设置地图infowindow信息
+ * @param { String } el 喷头状态属性值
+ * @param { Object } vueX 喷头设备对象
+ */
+function setInfoWindow(el, vueX) {
+  let content = ''
+  vueX.attr.forEach((el) => {
+    content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
+      ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
+  })
+  vueX.infowindow && vueX.infowindow.setContent(content)
+}
+
 const deviceAttr = {
 
   attr: [
@@ -51,7 +87,7 @@ const deviceAttr = {
       ecType: 'line',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
-      callback: [stateIcon],
+      callback: [stateIcon, setInfoWindow],
       version: ['V1.0']
     },
     {
@@ -70,7 +106,7 @@ const deviceAttr = {
       ecType: 'line',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
-      callback: [stateIcon],
+      callback: [stateIcon, setInfoWindow],
       version: ['V2.0']
     },
     {
@@ -89,7 +125,7 @@ const deviceAttr = {
       unit: '℃',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
-      callback: [stateIcon],
+      callback: [stateIcon, setInfoWindow],
       version: ['V2.0']
     },
     {
@@ -108,7 +144,7 @@ const deviceAttr = {
       unit: '℃',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
-      callback: [stateIcon],
+      callback: [stateIcon, setInfoWindow],
       version: ['V2.0']
     },
     {
@@ -127,7 +163,7 @@ const deviceAttr = {
       unit: '℃',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
-      callback: [stateIcon],
+      callback: [stateIcon, setInfoWindow],
       version: ['V2.0']
     }
   ],

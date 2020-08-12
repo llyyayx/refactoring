@@ -1,10 +1,12 @@
 import store from '@/store'
+import mapFun from '@/utils/lmapFun'
 import { getAttr, getCommand, getControlItem } from '@/utils/setDevice'
 
 // 解析施肥机
 export function fertilizer(item) {
   const { dclass, serialno, dname, latitude, longitude, model } = item
-  store.dispatch('device/setFertilizer', { dname, latitude, longitude, dclass, serialno,
+  const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/sf.png') })
+  store.dispatch('device/setFertilizer', { dname, latitude, longitude, dclass, serialno, mapSpot,
     icon: require('@/icons/device/close/sf.png'),
     attr: getAttr(deviceAttr, model || 'V1.0'),
     command: getCommand(deviceCommand, model || 'V1.0'),
@@ -12,7 +14,29 @@ export function fertilizer(item) {
   })
 }
 
+// 创建地图标点
+function marKer(obj) {
+  return mapFun.setMarker(store.state.map.map, obj)
+}
+
 /* -----------------------属性装载-------------------------- */
+
+/**
+ * 属性值加载回调：设置喷头图标
+ * @param { String } el 喷头状态属性值
+ * @param { Object } vueX 喷头设备对象
+ */
+function stateIcon(el, vueX) {
+  if (el === '启动') {
+    const run = require('@/icons/device/run/sqz.png')
+    vueX.icon && (vueX.icon = run)
+    vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(run))
+  } else {
+    const close = require('@/icons/device/close/sqz.png')
+    vueX.icon && (vueX.icon = close)
+    vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(close))
+  }
+}
 
 const deviceAttr = {
 
@@ -142,7 +166,7 @@ const deviceAttr = {
       unit: '',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
-      callback: [],
+      callback: [stateIcon],
       version: ['V1.0']
     },
     {
