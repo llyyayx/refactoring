@@ -19,6 +19,12 @@
             </div>
             <div class="tool__title">喷灌分区</div>
           </div>
+          <div class="too_content--item" @click="natural">
+            <div class="tool__img">
+              <svg-icon icon-class="natural" class="icon--natural" />
+            </div>
+            <div class="tool__title">间断点计算</div>
+          </div>
         </div>
       </div>
     </div>
@@ -54,7 +60,14 @@ export default {
     partition() {
       this.closeTool()
       this.$store.dispatch('control/partitionShow', true)
+    },
+
+    // 自然间断点计算
+    natural() {
+      this.closeTool()
+      this.$store.dispatch('control/naturalShow', true)
     }
+
   }
 }
 </script>
@@ -97,12 +110,13 @@ export default {
     }
     & .tool__content{
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       padding: 20px;
       box-sizing: border-box;
       & .too_content--item{
-        width: 10%;
-        margin: 0 10px 10px 10px;
+        width: 25%;
+        margin: 0 0 10px 0;
         & .tool__img{
           margin: 0 auto 4px;
           cursor: pointer;
@@ -111,15 +125,13 @@ export default {
             display: block;
             width: 100%;
           }
-          & .icon--plan{
-            font-size: 56px;
-          }
-          & .icon--zoon{
+          & .icon--plan, .icon--zoon, .icon--natural{
             font-size: 56px;
           }
         }
         & .tool__title{
           font-size: 14px;
+          text-align: center;
         }
       }
     }

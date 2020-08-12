@@ -11,6 +11,7 @@
     <SprayPlan />
     <Partition />
     <DataPanel />
+    <Natural />
     <canvas id="myCan" width="300" height="300" style="display:none;" />
   </div>
 </template>
@@ -27,6 +28,7 @@ import SprayPlan from './components/sprayPlan'
 import Partition from './components/partition'
 import Quick from './components/quick'
 import DataPanel from './components/dataPanel'
+import Natural from './components/natural'
 import state from './mixins/state'
 import mapFun from '@/utils/lmapFun'
 import Paho from './mqttws31'
@@ -45,7 +47,8 @@ export default {
     SprayPlan,
     Partition,
     Quick,
-    DataPanel
+    DataPanel,
+    Natural
   },
   mixins: [state],
   data() {
