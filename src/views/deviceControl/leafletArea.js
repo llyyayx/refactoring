@@ -226,7 +226,7 @@ export default {
       var swBound = latLng(_this.swSpot)
       var neBound = latLng(_this.neSpot)
       var bounds = latLngBounds(swBound, neBound)
-      var layer = imageOverlay(_this.url, bounds, { className: 'setimg' + _this.times })
+      var layer = imageOverlay(_this.url, bounds, { className: 'setimg' + _this.times, zIndex: 2 })
       layer.addTo(_this.mapObj)
       view.layer = layer
     }

@@ -123,3 +123,39 @@ export function subArea(data) {
     data: data.cells
   })
 }
+
+/**
+ * 上传自然间断点文件
+ */
+export function subFile() {
+  let baseURL
+  // eslint-disable-next-line no-eval
+  if (eval(process.env.VUE_APP_CROSS_DOMAIN)) {
+    baseURL = process.env.VUE_APP_PROXY_API + process.env.VUE_APP_BASE_API
+  } else {
+    baseURL = process.env.VUE_APP_BASE_API
+  }
+  return baseURL + '/files/json'
+}
+
+/**
+ * 读取上传的ec文件
+ * @param { String } fileName 读取文件的名称
+ */
+export function readFile(fileName) {
+  return request({
+    url: `/files/json/${fileName}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 读取已上传文件列表
+ *
+ */
+export function fileList() {
+  return request({
+    url: '/files/json',
+    method: 'get'
+  })
+}

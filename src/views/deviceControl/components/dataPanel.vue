@@ -175,18 +175,21 @@ export default {
       const self = this
       const attr = this.device.attr
       attr.forEach((el) => {
-        const newObj = echartFun.brokenLine(this.$echarts, {
-          dom: document.getElementById(el.nameKey),
-          name: el.name,
-          date: [],
-          value: [],
-          unit: el.unit,
-          max: el.max || 100,
-          min: el.min || 0,
-          type: el.ecType || 'line'
-        })
-        self.AnEcObj[el.nameKey] = newObj
-        newObj.showLoading()
+        const history = el.history !== undefined ? el.history : true
+        if (history) {
+          const newObj = echartFun.brokenLine(this.$echarts, {
+            dom: document.getElementById(el.nameKey),
+            name: el.name,
+            date: [],
+            value: [],
+            unit: el.unit,
+            max: el.max || 100,
+            min: el.min || 0,
+            type: el.ecType || 'line'
+          })
+          self.AnEcObj[el.nameKey] = newObj
+          newObj.showLoading()
+        }
       })
     },
 
@@ -197,16 +200,19 @@ export default {
     anSetData() {
       const attr = this.device.attr
       attr.forEach((el) => {
-        const dataObj = this.fromatting(this.histData[el.nameKey])
-        this.AnEcObj[el.nameKey].setOption({
-          xAxis: {
-            data: dataObj.date
-          },
-          series: [{
-            data: dataObj.value
-          }]
-        })
-        this.AnEcObj[el.nameKey].hideLoading()
+        const history = el.history !== undefined ? el.history : true
+        if (history) {
+          const dataObj = this.fromatting(this.histData[el.nameKey])
+          this.AnEcObj[el.nameKey].setOption({
+            xAxis: {
+              data: dataObj.date
+            },
+            series: [{
+              data: dataObj.value
+            }]
+          })
+          this.AnEcObj[el.nameKey].hideLoading()
+        }
       })
     },
 
@@ -246,13 +252,16 @@ export default {
       const array = []
       const legend = []
       attr.forEach((el) => {
-        const dataObj = this.fromatting(this.histData[el.nameKey])
-        array.push({
-          name: el.name,
-          type: el.ecType,
-          data: dataObj.value
-        })
-        legend.push(el.name)
+        const history = el.history !== undefined ? el.history : true
+        if (history) {
+          const dataObj = this.fromatting(this.histData[el.nameKey])
+          array.push({
+            name: el.name,
+            type: el.ecType || 'line',
+            data: dataObj.value
+          })
+          legend.push(el.name)
+        }
       })
       this.AnEcObj.merge.setOption({
         legend: {
@@ -282,8 +291,13 @@ export default {
       attr.forEach((el, index) => {
         new Promise((resolve, reject) => {
           hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
-            self.histData[res.ch.namekey] = res.items
-            resolve(index)
+            if (res.items) {
+              self.histData[el.nameKey] = res.items
+              resolve(index)
+            } else {
+              self.histData[el.nameKey] = []
+              resolve(index)
+            }
           })
         }).then((e) => {
           // 必须等所有数据加载完在执行

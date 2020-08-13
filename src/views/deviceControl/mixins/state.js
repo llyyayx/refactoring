@@ -1,31 +1,7 @@
 import { real } from '@/api/deviceControl'
+import mapFun from '@/utils/lmapFun'
 export default {
   methods: {
-    /**
-     * http接口解析阀门状态(滴灌喷灌)
-     * @param { Object } res 状态接口返回值
-     * @param { Object } controller 阀控器下属阀门
-     */
-    httpJxValve(res, controller) {
-      controller.forEach((valve) => {
-        if (res.status === 2 || !res.regs) {
-          const breake = require('@/icons/device/break/fm.png')
-          valve.icon && (valve.icon = breake)
-          valve.mapSpot && valve.mapSpot.setIcon(breake)
-        } else {
-          const port = (valve.rtuPort || valve.port) - 1
-          if (res.regs['DO.' + port.toString()]) {
-            const run = require('@/icons/device/run/fm.png')
-            valve.icon && (valve.icon = run)
-            valve.mapSpot && valve.mapSpot.setIcon(run)
-          } else {
-            const close = require('@/icons/device/close/fm.png')
-            valve.icon && (valve.icon = close)
-            valve.mapSpot && valve.mapSpot.setIcon(close)
-          }
-        }
-      })
-    },
 
     /**
      * matt订阅解析全设备状态
@@ -55,6 +31,32 @@ export default {
       })
     },
 
+    /**
+     * http接口解析阀门状态(滴灌喷灌)
+     * @param { Object } res 状态接口返回值
+     * @param { Object } controller 阀控器下属阀门
+     */
+    httpJxValve(res, controller) {
+      controller.forEach((valve) => {
+        if (res.status === 2 || !res.regs) {
+          const breake = require('@/icons/device/break/fm.png')
+          valve.icon && (valve.icon = breake)
+          valve.mapSpot && valve.mapSpot.setIcon(breake)
+        } else {
+          const port = (valve.rtuPort || valve.port) - 1
+          if (res.regs['DO.' + port.toString()]) {
+            const run = require('@/icons/device/run/fm.png')
+            valve.icon && (valve.icon = run)
+            valve.mapSpot && valve.mapSpot.setIcon(run)
+          } else {
+            const close = require('@/icons/device/close/fm.png')
+            valve.icon && (valve.icon = close)
+            valve.mapSpot && valve.mapSpot.setIcon(close)
+          }
+        }
+      })
+    },
+
     // 查询滴灌阀门状态
     dropValveState() {
       const _this = this
@@ -79,6 +81,35 @@ export default {
           real(el[0].rtuSerialno).then((res) => { this.httpJxValve(res, el) })
         })
       })
+    },
+
+    /**
+     * 采集设备主动拉取状态函数封装
+     * @param { Object } device 设备列表
+     * @param { String } breakIcon 掉线图标
+     */
+    packaging(device, breakIcon) {
+      const _this = this
+      device.forEach((el) => {
+        real(el.serialno).then((res) => {
+          if (res.status === 2 || !res.regs) {
+            el.icon && (el.icon = breakIcon)
+            el.mapSpot && el.mapSpot.setIcon(mapFun.getIcon(breakIcon))
+          } else {
+            _this.mqttJxState(res, el)
+          }
+        })
+      })
+    },
+
+    // 查询墒情站状态
+    soilState() {
+      this.packaging(this.$store.state.device.soil, require('@/icons/device/break/sqz.png'))
+    },
+
+    // 查询冠层站状态
+    canopySate() {
+      this.packaging(this.$store.state.device.canopy, require('@/icons/device/break/sqz.png'))
     },
 
     /**

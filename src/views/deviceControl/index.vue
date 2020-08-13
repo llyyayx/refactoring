@@ -13,6 +13,7 @@
     <DataPanel />
     <Natural />
     <canvas id="myCan" width="300" height="300" style="display:none;" />
+    <canvas id="myCan2" width="300" height="300" style="display:none;" />
   </div>
 </template>
 
@@ -82,6 +83,8 @@ export default {
       })
       // this.dropValveState()
       // this.sprayValveState()
+      this.soilState()
+      this.canopySate()
       this.mqttServer()
       this.drawCanopy()
       this.loading = false

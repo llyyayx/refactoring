@@ -112,7 +112,6 @@
 <script>
 import { clone, formatCell } from '@/utils/index'
 import { subArea } from '@/api/deviceControl'
-import device from '@/store/modules/device'
 export default {
   data() {
     return {
@@ -371,8 +370,10 @@ export default {
             })
           } else if (smallArea.length > 1) {
             for (let j = 0; j < smallArea.length; j++) {
-              smallArea.splice(j, 1)
-              break
+              if (smallArea[j].idx === idx) {
+                smallArea.splice(j, 1)
+                break
+              }
             }
           }
           break
