@@ -83,7 +83,6 @@
 
 <script>
 import panel from '@/components/Panel'
-import { sortAttr } from '@/utils/index'
 export default {
   components: {
     panel
@@ -105,7 +104,7 @@ export default {
       return this.$store.state.device.ndvi
     },
     canopy() {
-      return sortAttr(this.$store.state.device.canopy, 'rtuId')
+      return this.$store.state.device.canopy
     },
     height() {
       return this.$store.state.device.height

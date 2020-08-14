@@ -27,7 +27,7 @@ export default {
       },
       title: {
         left: 'center',
-        text: config.name + '(' + config.unit + ')'
+        text: config.unit ? config.name + '(' + config.unit + ')' : config.name
       },
       toolbox: {
         feature: {

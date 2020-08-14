@@ -4,7 +4,7 @@ export default {
   methods: {
 
     /**
-     * matt订阅解析全设备状态
+     * 方法：matt订阅解析全设备状态
      * @param { Object } res mqtt返回值
      * @param { Object } device 设备对象
      */
@@ -32,7 +32,7 @@ export default {
     },
 
     /**
-     * http接口解析阀门状态(滴灌喷灌)
+     * 方法：http接口解析阀门状态(滴灌喷灌)
      * @param { Object } res 状态接口返回值
      * @param { Object } controller 阀控器下属阀门
      */
@@ -54,6 +54,25 @@ export default {
             valve.mapSpot && valve.mapSpot.setIcon(close)
           }
         }
+      })
+    },
+
+    /**
+     * 方法: 采集设备主动拉取状态函数封装
+     * @param { Object } device 设备列表
+     * @param { String } breakIcon 掉线图标
+     */
+    packaging(device, breakIcon) {
+      const _this = this
+      device.forEach((el) => {
+        real(el.serialno).then((res) => {
+          if (res.status === 2 || !res.regs) {
+            el.icon && (el.icon = breakIcon)
+            el.mapSpot && el.mapSpot.setIcon(mapFun.getIcon(breakIcon))
+          } else {
+            _this.mqttJxState(res, el)
+          }
+        })
       })
     },
 
@@ -83,33 +102,44 @@ export default {
       })
     },
 
-    /**
-     * 采集设备主动拉取状态函数封装
-     * @param { Object } device 设备列表
-     * @param { String } breakIcon 掉线图标
-     */
-    packaging(device, breakIcon) {
-      const _this = this
-      device.forEach((el) => {
-        real(el.serialno).then((res) => {
-          if (res.status === 2 || !res.regs) {
-            el.icon && (el.icon = breakIcon)
-            el.mapSpot && el.mapSpot.setIcon(mapFun.getIcon(breakIcon))
-          } else {
-            _this.mqttJxState(res, el)
-          }
-        })
-      })
-    },
-
     // 查询墒情站状态
     soilState() {
       this.packaging(this.$store.state.device.soil, require('@/icons/device/break/sqz.png'))
     },
 
     // 查询冠层站状态
-    canopySate() {
+    canopyState() {
       this.packaging(this.$store.state.device.canopy, require('@/icons/device/break/sqz.png'))
+    },
+
+    // 查询NDVI状态
+    ndviState() {
+      this.packaging(this.$store.state.device.ndvi, require('@/icons/device/break/sqz.png'))
+    },
+
+    // 查询高度状态
+    heightState() {
+      this.packaging(this.$store.state.device.height, require('@/icons/device/break/sqz.png'))
+    },
+
+    // 查询喷灌机状态
+    sprayState() {
+      this.packaging(this.$store.state.device.spray, require('@/icons/device/break/pg.png'))
+    },
+
+    // 查询水泵状态
+    pumpState() {
+      this.packaging(this.$store.state.device.pump, require('@/icons/device/break/sb.png'))
+    },
+
+    // 查询施肥机状态
+    sfState() {
+      this.packaging(this.$store.state.device.fertilizer, require('@/icons/device/break/sf.png'))
+    },
+
+    // 查询气象站状态
+    weatherState() {
+      this.packaging(this.$store.state.device.weather, require('@/icons/device/break/qxz.png'))
     },
 
     /**

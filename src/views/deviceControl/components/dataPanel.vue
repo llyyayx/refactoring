@@ -28,7 +28,7 @@
         </el-col>
         <el-col :span="4" class="screening__item">
           <div class="screening__item--title">数据周期</div>
-          <el-select v-model="cycleValue" change="mat" class="screening__item--options" placeholder="请选择">
+          <el-select v-model="cycleValue" class="screening__item--options" placeholder="请选择" @change="updateCycle">
             <el-option
               v-for="item in cycle"
               :key="item.value"
@@ -53,7 +53,7 @@
       <!-- 数据展示主体go -->
       <div class="dataMain">
         <div v-show="modeValue==='an'" class="an">
-          <div v-for="(item,index) in device.attr" :id="item.nameKey" :key="index" class="dataMain--list" />
+          <div v-for="(item,index) in device.attr" v-show="item.ecShow" :id="item.nameKey" :key="index" class="dataMain--list" />
         </div>
         <div v-show="modeValue==='merge'" class="merge">
           <div id="mergeEc" />
@@ -150,9 +150,19 @@ export default {
     }
   },
   methods: {
-    mat() {
-      alert(1212)
+
+    /**
+     * 更改周期重新请求数据
+     */
+    updateCycle() {
+      const keys = Object.keys(this.AnEcObj)
+      keys.forEach((el) => {
+        this.AnEcObj[el].showLoading()
+      })
+      // 切换数据周期
+      this.getData()
     },
+
     /**
      * 关闭面板
      */
@@ -175,8 +185,7 @@ export default {
       const self = this
       const attr = this.device.attr
       attr.forEach((el) => {
-        const history = el.history !== undefined ? el.history : true
-        if (history) {
+        if (el.ecShow) {
           const newObj = echartFun.brokenLine(this.$echarts, {
             dom: document.getElementById(el.nameKey),
             name: el.name,
@@ -200,8 +209,7 @@ export default {
     anSetData() {
       const attr = this.device.attr
       attr.forEach((el) => {
-        const history = el.history !== undefined ? el.history : true
-        if (history) {
+        if (el.ecShow) {
           const dataObj = this.fromatting(this.histData[el.nameKey])
           this.AnEcObj[el.nameKey].setOption({
             xAxis: {
@@ -252,8 +260,7 @@ export default {
       const array = []
       const legend = []
       attr.forEach((el) => {
-        const history = el.history !== undefined ? el.history : true
-        if (history) {
+        if (el.ecShow) {
           const dataObj = this.fromatting(this.histData[el.nameKey])
           array.push({
             name: el.name,
@@ -288,25 +295,34 @@ export default {
     getData() {
       const self = this
       const attr = this.device.attr
+      // 读取展示有效属性长度
+      let ecLen = 0
+      attr.forEach((el) => {
+        if (el.ecShow) {
+          ecLen += 1
+        }
+      })
       attr.forEach((el, index) => {
-        new Promise((resolve, reject) => {
-          hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
-            if (res.items) {
-              self.histData[el.nameKey] = res.items
-              resolve(index)
-            } else {
-              self.histData[el.nameKey] = []
-              resolve(index)
+        if (el.ecShow) {
+          new Promise((resolve, reject) => {
+            hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
+              if (res.items) {
+                self.histData[el.nameKey] = res.items
+                resolve(index)
+              } else {
+                self.histData[el.nameKey] = []
+                resolve(index)
+              }
+            })
+          }).then((e) => {
+            // 必须等所有数据加载完在执行
+            const len = Object.keys(self.histData).length
+            if (len === ecLen) {
+              this.load = true
+              self.selectMode()
             }
           })
-        }).then((e) => {
-          // 必须等所有数据加载完在执行
-          const len = Object.keys(self.histData).length
-          if (len === attr.length) {
-            this.load = true
-            self.selectMode()
-          }
-        })
+        }
       })
     },
 
@@ -333,7 +349,14 @@ export default {
       const keys = Object.keys(this.AnEcObj)
       if (mode === 'an') {
         const attr = this.device.attr
-        if (!keys.includes(attr[0].nameKey)) {
+        let nameKey
+        for (let i = 0; i < attr.length; i++) {
+          if (attr[i].ecShow) {
+            nameKey = attr[i].nameKey
+            break
+          }
+        }
+        if (!keys.includes(nameKey)) {
           this.an()
         }
       } else if (mode === 'merge') {

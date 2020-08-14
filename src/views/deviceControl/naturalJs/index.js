@@ -283,17 +283,7 @@ async function gMap(group,n,m,ys){
     ctx.save(); 
     group.forEach(function(e,index){
         var arry = e;
-        var color = '#FFC7CE';
-        switch(index){
-            case 0: color = ys[0];break;
-            case 1: color = ys[1];break;
-            case 2: color = ys[2];break;
-            case 3: color = ys[3];break;
-            case 4: color = ys[4];break;
-            case 5: color = ys[5];break;
-            case 6: color = ys[6];break;
-            case 7: color = ys[7];break;
-        };
+        var color =  ys[index];
         arry.forEach(function(t,index2){
             var pot = t.name.split('p')[1].split('_');
             var x = pot[0];

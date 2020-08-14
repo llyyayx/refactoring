@@ -172,16 +172,16 @@ export default {
         var centerAngle = 0
         var startAngle = 0
         if (this.direction) {
-          centerAngle = 50
-          startAngle = 0
+          centerAngle = 320
+          startAngle = 270
         } else {
-          centerAngle = 30
-          startAngle = 90
+          centerAngle = 300
+          startAngle = 0
         }
         ctx.beginPath()
-        ctx.arc(150, 150, 170, 30 * Math.PI / 180, 50 * Math.PI / 180, false)
+        ctx.arc(150, 150, 160, 300 * Math.PI / 180, 320 * Math.PI / 180, false)
         ctx.strokeStyle = this.directionColor
-        var sjCenter = coordinates(150, 150, 170, centerAngle)
+        var sjCenter = coordinates(150, 150, 160, centerAngle)
         var sjStart = coordinates(sjCenter.x, sjCenter.y, 20, startAngle)
         ctx.moveTo(sjCenter.x, sjCenter.y)
         ctx.lineTo(sjStart.x, sjStart.y)
@@ -199,7 +199,7 @@ export default {
           var x = Math.floor(point.x)
           var y = Math.floor(point.y)
           ctx.beginPath()
-          ctx.arc(x, y, 4, 0, Math.PI * 2)
+          ctx.arc(x, y, 2, 0, Math.PI * 2)
           ctx.fillStyle = '#ff4500'
           ctx.fill()
           ctx.closePath()
@@ -207,9 +207,9 @@ export default {
           ctx.translate(x - 8, y)
           ctx.rotate(_this.pgAngle * Math.PI / 180)
           ctx.beginPath()
-          ctx.font = '14px 900 微软雅黑'
+          ctx.font = '12px bold 微软雅黑'
           ctx.textAlign = 'end'
-          ctx.fillStyle = '#333'
+          ctx.fillStyle = '#FFF'
           ctx.fillText(e.attr[0].val, 0, 0)
           ctx.closePath()
           ctx.restore()

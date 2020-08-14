@@ -28,11 +28,11 @@ function marKer(obj) {
  */
 function stateIcon(el, vueX) {
   if (el === '启动') {
-    const run = require('@/icons/device/run/sqz.png')
+    const run = require('@/icons/device/run/sf.png')
     vueX.icon && (vueX.icon = run)
     vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(run))
   } else {
-    const close = require('@/icons/device/close/sqz.png')
+    const close = require('@/icons/device/close/sf.png')
     vueX.icon && (vueX.icon = close)
     vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(close))
   }

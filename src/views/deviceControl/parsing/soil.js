@@ -80,6 +80,7 @@ const deviceAttr = {
       max: 50,
       min: 0,
       ecType: 'line',
+      ecShow: true,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],
@@ -99,6 +100,7 @@ const deviceAttr = {
       max: 50,
       min: 0,
       ecType: 'line',
+      ecShow: true,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],
@@ -118,6 +120,7 @@ const deviceAttr = {
       max: 50,
       min: 0,
       ecType: 'line',
+      ecShow: true,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],
@@ -137,6 +140,7 @@ const deviceAttr = {
       max: 50,
       min: 0,
       ecType: 'line',
+      ecShow: true,
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon, setInfoWindow],

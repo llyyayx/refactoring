@@ -146,6 +146,10 @@ export default {
           this.$store.dispatch('control/dataPanelObj', item)
           this.$store.dispatch('control/dataPanelShow', true)
           break
+        case config.HEIGHT_CLASS:
+          this.$store.dispatch('control/dataPanelObj', item)
+          this.$store.dispatch('control/dataPanelShow', true)
+          break
         default:
           break
       }

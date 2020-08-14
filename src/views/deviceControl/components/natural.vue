@@ -118,7 +118,7 @@ export default {
       // 上传的文件
       fileList: [],
       // 上传返回的文件信息
-      info: { file: 'ec_zhuozhou.json' },
+      info: { file: '' },
 
       // 分组option选项
       groupOption: [6, 7, 8, 9, 10],
@@ -133,7 +133,9 @@ export default {
       // 上传地址
       action: subFile(),
       // 上传文件成功标识
-      subResult: false
+      subResult: false,
+      // 颜色集合
+      collection: ['#79AEAA', '#AFCA91', '#E4EC72', '#FCD151', '#FBC24B', '#F8742A', '#EC3819', '#9F0E0E', '#8B1919', '#0B0000']
     }
   },
   computed: {
@@ -146,7 +148,7 @@ export default {
       handler: function(e) {
         const color = []
         for (let i = 0; i < e; i++) {
-          color.push('')
+          color.push(this.collection[i])
         }
         this.color = color
       }
@@ -207,27 +209,34 @@ export default {
     // 计算数据
     calculate() {
       const self = this
-      const loading = this.$loading({ text: '数据处理中', lock: true })
-      readFile(this.info.file).then((e) => {
-        const promise = operation({
-          color: this.color,
-          latrt: this.enLat,
-          lngrt: this.enLng,
-          latlb: this.wsLat,
-          lnglb: this.wsLng,
-          grouping: this.grouping,
-          points: this.point,
-          cycle: this.cycle,
-          data: e.data
+      if (self.info.file.length > 0 && self.wsLng && self.wsLat && self.enLng && self.enLat) {
+        const loading = this.$loading({ text: '数据处理中', lock: true })
+        readFile(this.info.file).then((e) => {
+          const promise = operation({
+            color: this.color,
+            latrt: this.enLat,
+            lngrt: this.enLng,
+            latlb: this.wsLat,
+            lnglb: this.wsLng,
+            grouping: this.grouping,
+            points: this.point,
+            cycle: this.cycle,
+            data: e.data
+          })
+          loading.close()
+          self.imageOverlay(promise)
+        }).catch(() => {
+          this.$alert('文件读取失败，请检查网络', '警告', {
+            showClose: false,
+            type: 'error'
+          })
         })
-        loading.close()
-        self.imageOverlay(promise)
-      }).catch(() => {
-        this.$alert('文件读取失败，请检查网络', '警告', {
+      } else {
+        this.$alert('请补全信息', '警告', {
           showClose: false,
-          type: 'error'
+          type: 'waring'
         })
-      })
+      }
     },
 
     // imageOverlay
@@ -254,7 +263,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .natural-box {
-    max-height: 500px;
+    max-height: 520px;
     overflow-y: auto;
     & .title >>> .el-divider__text {
         font-size: 16px;

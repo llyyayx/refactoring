@@ -193,6 +193,19 @@ export function sortAttr(array, attr) {
 }
 
 /**
+ * 根据serialno排序
+ * @param { Array } array 数组
+ */
+export function serialno(array) {
+  array.sort(function(a, b) {
+    const v1 = a.serialno.split('.')[2]
+    const v2 = b.serialno.split('.')[2]
+    return parseInt(v1) - parseInt(v2)
+  })
+  return array
+}
+
+/**
  * 格式化喷灌分区 (格式化的数据格式对应canvans绘制方法)
  */
 export function formatCell(cells) {

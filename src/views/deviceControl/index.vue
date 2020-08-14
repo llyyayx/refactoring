@@ -35,6 +35,7 @@ import mapFun from '@/utils/lmapFun'
 import Paho from './mqttws31'
 import { getDevice } from '@/api/deviceControl'
 import { drops, pump, fertilizer, soil, weather, spray, ndvi, height, canopy } from './parsing'
+import { serialno } from '@/utils/index'
 export default {
   name: 'DeviceControl',
   components: {
@@ -81,12 +82,10 @@ export default {
           case config.CANOPY_CLASS: canopy(item); break
         }
       })
-      // this.dropValveState()
-      // this.sprayValveState()
-      this.soilState()
-      this.canopySate()
+      this.pullState()
       this.mqttServer()
       this.drawCanopy()
+      this.sort()
       this.loading = false
     },
 
@@ -100,7 +99,6 @@ export default {
       this.$store.dispatch('map/setMap', map)
       this.getContent()
       this.mapRgTop()
-      mapFun.lookAddr(map)
     },
 
     /**
@@ -119,6 +117,33 @@ export default {
       })
       mapFun.mapRgTop(this.map, '采集面板', require('@/icons/device/cgq1.png'), () => {
         this.$store.dispatch('control/sensorShow', true)
+      })
+    },
+
+    // 接口读取设备状态
+    pullState() {
+      this.dropValveState()
+      this.sprayValveState()
+      this.soilState()
+      this.canopyState()
+      this.ndviState()
+      this.heightState()
+      this.sprayState()
+      this.pumpState()
+      this.sfState()
+      this.weatherState()
+    },
+
+    // 设备排序
+    sort() {
+      const allDevice = this.$store.state.device
+      const keys = Object.keys(allDevice)
+      keys.forEach((el) => {
+        if (Object.prototype.toString.call(allDevice[el]) === '[object Array]') {
+          if (Object.prototype.toString.call(allDevice[el][0]) !== '[object Array]') {
+            serialno(allDevice[el])
+          }
+        }
       })
     },
 
