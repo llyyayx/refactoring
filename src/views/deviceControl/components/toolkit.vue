@@ -23,7 +23,7 @@
             <div class="tool__img">
               <svg-icon icon-class="natural" class="icon--natural" />
             </div>
-            <div class="tool__title">间断点计算</div>
+            <div class="tool__title">土质分布计算</div>
           </div>
         </div>
       </div>

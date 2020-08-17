@@ -1,7 +1,7 @@
 <template>
-  <el-dialog :visible.sync="show" :before-close="close" title="自然间断点计算参数设置" width="950px" class="natural-container">
+  <el-dialog :visible.sync="show" :before-close="close" title="参数设置" width="950px" class="natural-container">
     <div class="natural-box">
-      <el-divider content-position="left" class="title">地里位置</el-divider>
+      <el-divider content-position="left" class="title">地理位置</el-divider>
       <div class="location">
         <div class="locaItem">
           <div class="locaItem__title">西南角经度：</div>

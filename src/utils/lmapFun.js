@@ -1,4 +1,4 @@
-import { Control, icon, marker, popup, polygon } from 'leaflet'
+import { Control, icon, marker, popup, polygon, point } from 'leaflet'
 
 export default {
 
@@ -28,8 +28,9 @@ export default {
       iconSize: [50, 50],
       iconAnchor: [25, 25]
     })
-    var point = marker({ lat: obj.lat, lng: obj.lng }, { icon: myIcon, title: obj.dname }).addTo(map)
-    return point
+    var points = marker({ lat: obj.lat, lng: obj.lng }, { icon: myIcon, riseOnHover: true }).addTo(map)
+    points.bindTooltip(obj.dname, { permanent: true, direction: 'center', offset: point(0, -30) }).openTooltip()
+    return points
   },
 
   /**
@@ -64,30 +65,27 @@ export default {
    */
   mapRgTop(map, name, icon, callback) {
     var centerControlDiv = document.createElement('div')
+    centerControlDiv.style = 'width: 58px; background-color: #fff; padding: 5px; cursor: pointer'
+    centerControlDiv.style.boxShadow = 'rgba(0, 0, 0, 0.3) 0px 1px 4px -1px'
+    centerControlDiv.title = '打开' + name
+    centerControlDiv.style.borderRadius = '2px'
+
     var controlUI = document.createElement('div')
-    controlUI.style.width = '40px'
-    controlUI.style.height = '40px'
-    controlUI.style.margin = '10px'
-    controlUI.style.backgroundColor = '#fff'
-    controlUI.style.borderRadius = '2px'
-    controlUI.style.boxShadow = 'rgba(0, 0, 0, 0.3) 0px 1px 4px -1px'
-    controlUI.style.cursor = 'pointer'
-    controlUI.style.position = 'relative'
-    controlUI.title = '打开' + name
+    controlUI.style = 'width: 30px; margin: 0 auto'
     centerControlDiv.appendChild(controlUI)
     controlUI.classList.add('call')
     // 添加图片
     var controlText = document.createElement('img')
     controlText.src = icon
-    controlText.style.width = '65%'
-    controlText.style.display = 'block'
-    controlText.style.position = 'absolute'
-    controlText.style.left = '50%'
-    controlText.style.top = '50%'
-    controlText.style.transform = 'translate(-50%,-50%)'
+    controlText.style = 'width: 100%; display: block'
     controlUI.appendChild(controlText)
+    // 添加标题
+    var controlTitle = document.createElement('div')
+    controlTitle.innerText = name
+    controlTitle.style = 'text-align:center; margin-top: 2px; font-size: 12px'
+    centerControlDiv.appendChild(controlTitle)
     // 绑定事件
-    controlUI.addEventListener('click', function() {
+    centerControlDiv.addEventListener('click', function() {
       callback && callback()
     })
     // 实例化类

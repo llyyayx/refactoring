@@ -32,7 +32,7 @@
               </el-input>
             </div>
             <div class="sprayItem">
-              <div class="sprayItem__title">灌机臂长：</div>
+              <div class="sprayItem__title">整机长度：</div>
               <el-input v-model="arm" placeholder="请输入臂长" class="sprayItem__put">
                 <template slot="append">米</template>
               </el-input>

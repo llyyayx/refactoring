@@ -171,6 +171,7 @@ export default {
       if (this.displayDirection) {
         var centerAngle = 0
         var startAngle = 0
+        ctx.lineWidth = 4
         if (this.direction) {
           centerAngle = 320
           startAngle = 270

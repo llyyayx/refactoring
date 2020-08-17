@@ -126,7 +126,7 @@
             </el-form-item>
           </el-form>
           <div class="btn__group">
-            <el-button type="primary" @click="submitForm('form')">下一步</el-button>
+            <el-button type="primary" class="bml" @click="submitForm('form')">下一步</el-button>
             <el-button @click="resetForm('form')">重置</el-button>
           </div>
         </el-carousel-item>
@@ -170,7 +170,7 @@
             </el-table-column>
           </el-table>
           <div class="btn__group">
-            <el-button type="primary" @click="goBack">上一步</el-button>
+            <el-button type="primary" class="bml" @click="goBack">上一步</el-button>
             <el-button type="primary" @click="submitPlan">提交</el-button>
           </div>
         </el-carousel-item>
@@ -211,7 +211,7 @@
           </el-input>
         </el-form-item>
         <el-form-item label="行走速率" prop="speed">
-          <el-input v-model="seting.speed" placeholder="请输入行走速率" class="form__item">
+          <el-input :value="seting.speed" placeholder="请输入行走速率" class="form__item" @input="speedLimit">
             <template slot="append">%</template>
           </el-input>
         </el-form-item>
@@ -825,11 +825,24 @@ export default {
     // 手动输入分区速率_统一大区速率
     putSpeed(event) {
       const row = event.row
+      // 速率限制最大为100%
+      if (row.speed > 100) {
+        row.speed = 100
+      }
       this.tableData.forEach((el) => {
         if (el.bigArea === row.bigArea) {
           el.speed = row.speed
         }
       })
+    },
+
+    // 限速（弹框添加小区变量时使用）
+    speedLimit(e) {
+      if (e > 100) {
+        this.seting.speed = 100
+      } else {
+        this.seting.speed = e
+      }
     },
 
     // 删除已添加分区
@@ -1071,7 +1084,12 @@ export default {
         }
       }
       & .btn__group{
+        display: flex;
+        flex-direction: row-reverse;
         margin-top: 22px;
+        & .bml{
+          margin-left: 10px;
+        }
       }
     }
 }
