@@ -4,7 +4,7 @@ import { getAttr } from '@/utils/setDevice'
 // 解析ndvi传感器
 export function ndvi(item) {
   const { dclass, serialno, dname, latitude, longitude, model } = item
-  store.dispatch('device/setNdvi', { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/sqz.png'),
+  store.dispatch('device/setNdvi', { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/ndvi.png'),
     attr: getAttr(deviceAttr, model || 'V1.0') })
 }
 
@@ -17,11 +17,11 @@ export function ndvi(item) {
  */
 function stateIcon(el, vueX) {
   if (el) {
-    const run = require('@/icons/device/run/sqz.png')
+    const run = require('@/icons/device/run/ndvi.png')
     vueX.icon && (vueX.icon = run)
     vueX.mapSpot && vueX.mapSpot.setIcon(run)
   } else {
-    const close = require('@/icons/device/close/sqz.png')
+    const close = require('@/icons/device/close/ndvi.png')
     vueX.icon && (vueX.icon = close)
     vueX.mapSpot && vueX.mapSpot.setIcon(close)
   }

@@ -1,21 +1,19 @@
 <template>
-  <div v-loading="loading" class="maps-container">
+  <div class="maps-container">
     <div class="place">{{ tag }}</div>
     <div class="serach">
       <el-input v-model="input" placeholder="请输入详细地址" />
       <el-button type="primary" @click="serach">搜索</el-button>
     </div>
-    <LMaps ref="gmps" @load="load" />
+    <Gmps ref="gmps" @load="load" />
   </div>
 </template>
 
 <script>
-import { marker, icon, latLng } from 'leaflet'
-import LMaps from '@/components/LMaps'
-import { OpenStreetMapProvider } from 'leaflet-geosearch'
+import Gmps from '@/components/GMaps'
 export default {
   components: {
-    LMaps
+    Gmps
   },
   data: function() {
     return {
@@ -28,9 +26,7 @@ export default {
       // 位置提示文字
       tag: '当前位置: 0.0,0.0',
       // 输入地址转地理编码
-      input: '',
-      // 加载
-      loading: false
+      input: ''
     }
   },
   methods: {
@@ -41,63 +37,59 @@ export default {
     load(map) {
       this.maps = map
       const _this = this
-      map.on('click', function(event) {
-        _this.addMarker(event.latlng)
+      map.addListener('click', function(event) {
+        let markers = _this.markers
+        // 清空上一次的点
+        for (let i = 0; i < markers.length; i++) {
+          markers[i].setMap()
+        }
+        markers = []
+        const location = event.latLng
+        _this.location = {
+          lng: location.lng(),
+          lat: location.lat()
+        }
+        const text = '当前位置: [' + location.lng().toPrecision(9) + ',' + location.lat().toPrecision(9) + ']'
+        _this.tag = text
+        // eslint-disable-next-line no-undef
+        const marker = new google.maps.Marker({
+          position: location,
+          map: map
+        })
+        _this.markers.push(marker)
       })
     },
-
     /**
      * 地理编码：将地址转为经纬度坐标，并定位至此
      */
     serach() {
       const _this = this
       const address = this.input
-      const provider = new OpenStreetMapProvider()
-      this.loading = true
-      provider.search({ query: address }).then((e) => {
-        if (e.length > 0) {
-          const lat = e[0].y
-          const lng = e[0].x
-          _this.addMarker(latLng({ lat: lat, lng: lng }))
-          _this.maps.panTo({ lat: lat, lng: lng })
+      // eslint-disable-next-line no-undef
+      const geocoder = new google.maps.Geocoder()
+      geocoder.geocode({ 'address': address }, function(results, status) {
+        if (status === 'OK') {
+          _this.maps.setCenter(results[0].geometry.location)
+          // eslint-disable-next-line no-undef
+          const marker = new google.maps.Marker({
+            position: results[0].geometry.location,
+            map: _this.maps
+          })
+          _this.markers.push(marker)
+          _this.location = {
+            lng: results[0].geometry.location.lng(),
+            lat: results[0].geometry.location.lat()
+          }
+          const text = '当前位置: [' + _this.location.lng.toPrecision(9) + ',' + _this.location.lat.toPrecision(9) + ']'
+          _this.tag = text
         } else {
           _this.$message({
             type: 'error',
             message: '未查询到结果'
           })
         }
-        _this.loading = false
       })
     },
-
-    /**
-     * 添加地图点
-     * @param { Object } location
-     * location.lng: 点经度
-     * location.lat: 点纬度
-     */
-    addMarker(location) {
-      let markers = this.markers
-      // 清空上一次的点
-      for (let i = 0; i < markers.length; i++) {
-        markers[i].remove()
-      }
-      markers = []
-      this.location = {
-        lng: location.lng,
-        lat: location.lat
-      }
-      const text = '当前位置: [' + location.lng.toPrecision(9) + ',' + location.lat.toPrecision(9) + ']'
-      this.tag = text
-      const myIcon = icon({
-        iconUrl: require('@/icons/device/marker.png'),
-        iconSize: [25, 41],
-        iconAnchor: [12, 41]
-      })
-      const point = marker({ lat: location.lat, lng: location.lng }, { icon: myIcon }).addTo(this.maps)
-      this.markers.push(point)
-    },
-
     /**
      * 父组件通过该方法获得选定的经纬度
      */

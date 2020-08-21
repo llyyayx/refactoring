@@ -16,7 +16,9 @@ export default {
   methods: {
     async logout() {
       await this.$store.dispatch('user/logout')
+      this.$store.dispatch('device/logout')
       this.$router.push('/login')
+      // this.$store.dispatch('tagsView/DEL_ALL_CACHED_VIEWS')
     }
   }
 }

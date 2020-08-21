@@ -23,10 +23,6 @@ export function operation(obj){
     var m = Math.ceil(rty-lby);   //右上y-左下y(向上取整)
     var distance = []; //所有点及其最近12个点的距离
     var pvalue = [];  //组合点的data数据
-    //复制给canvas
-    var myCan2 = document.getElementById('myCan2')
-    myCan2.setAttribute('width', n)
-    myCan2.setAttribute('height', m)
     for(var i = 1; i <= m; i++){
         for(var y = 1; y <= n; y++){
             var point = y+'_'+i;
@@ -277,8 +273,12 @@ function kill(go,end){
 
 /*按照分组描绘到地图*/
 async function gMap(group,n,m,ys){
-    var btx = document.getElementById('myCan2');
-    var ctx = btx.getContext("2d");
+    var btx = document.createElement('canvas')
+    btx.width = n
+    btx.height = m
+    btx.style.display = 'none'
+    document.getElementsByClassName('device-container')[0].appendChild(btx)
+    var ctx = btx.getContext("2d")
     ctx.clearRect(0, 0, n, m);
     ctx.save(); 
     group.forEach(function(e,index){
@@ -308,7 +308,9 @@ async function gMap(group,n,m,ys){
         ctx.translate(-btx.height/2, -btx.width/2)
         ctx.drawImage(img, 0, 0)
     })
-    return btx.toDataURL("image/png")
+    var imgUrl = btx.toDataURL("image/png")
+    btx.parentNode.removeChild(btx)
+    return imgUrl
 };
 
 function newImage(url){

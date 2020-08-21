@@ -25,6 +25,12 @@
             </div>
             <div class="tool__title">土质分布计算</div>
           </div>
+          <div class="too_content--item" @click="natHistroy">
+            <div class="tool__img">
+              <svg-icon icon-class="histroy" class="icon--histroy" />
+            </div>
+            <div class="tool__title">土质计算历史</div>
+          </div>
         </div>
       </div>
     </div>
@@ -62,10 +68,16 @@ export default {
       this.$store.dispatch('control/partitionShow', true)
     },
 
-    // 自然间断点计算
+    // 土质分布计算
     natural() {
       this.closeTool()
       this.$store.dispatch('control/naturalShow', true)
+    },
+
+    // 土质计算历史
+    natHistroy() {
+      this.closeTool()
+      this.$store.dispatch('control/natHistroyShow', true)
     }
 
   }
@@ -125,7 +137,7 @@ export default {
             display: block;
             width: 100%;
           }
-          & .icon--plan, .icon--zoon, .icon--natural{
+          & .icon--plan, .icon--zoon, .icon--natural, .icon--histroy{
             font-size: 56px;
           }
         }

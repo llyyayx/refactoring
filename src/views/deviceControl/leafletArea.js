@@ -15,7 +15,7 @@ export default {
     this.mapHorizontalSpacing = obj.mapHorizontalSpacing || 0 // 地图与浏览器横向间隔(左)
     this.mapVerticalSpacing = obj.mapVerticalSpacing || 0 // 地图与浏览器纵向间隔(上)
 
-    this.canvasId = obj.canvasId // canvas画板(标签)的ID
+    this.parentClass = obj.parentClass // canvas画板(标签)的ID
     this.gps = obj.gps || 90 // gps起始方位与canvas起始方位的差度(逆时针正,顺时针负)
     this.allArea = obj.allArea || [] // 绘制喷灌区域的数据
     this.arm = obj.arm || 150 // 喷灌机臂长
@@ -35,6 +35,7 @@ export default {
     this.times = new Date().valueOf() // 当前时间戳，保证唯一id(地图插入图片时)
 
     this.sensor = obj.sensor || [] // 悬臂传感器
+    this.callback = obj.callback // 点击回调事件
 
     this.swX = 0 // 西南点,X坐标值
     this.swY = 0 // 西南点,Y坐标值
@@ -81,7 +82,11 @@ export default {
     /* 绘制canvas喷灌区域 */
     this.build = function() {
       // 初始化画布
-      var btx = document.getElementById(this.canvasId)
+      var btx = document.createElement('canvas')
+      btx.width = 300
+      btx.height = 300
+      btx.style.display = 'none'
+      document.getElementsByClassName(this.parentClass)[0].appendChild(btx)
       var ctx = btx.getContext('2d')
       ctx.clearRect(0, 0, 300, 300)
       ctx.save()
@@ -200,8 +205,8 @@ export default {
           var x = Math.floor(point.x)
           var y = Math.floor(point.y)
           ctx.beginPath()
-          ctx.arc(x, y, 2, 0, Math.PI * 2)
-          ctx.fillStyle = '#ff4500'
+          ctx.arc(x, y, 4, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(132,209,73,1)'
           ctx.fill()
           ctx.closePath()
           ctx.save()
@@ -211,31 +216,54 @@ export default {
           ctx.font = '12px bold 微软雅黑'
           ctx.textAlign = 'end'
           ctx.fillStyle = '#FFF'
-          ctx.fillText(e.attr[0].val, 0, 0)
+          // ctx.fillText(e.attr[0].val, 0, 0)
           ctx.closePath()
           ctx.restore()
         })
       }
 
       this.url = btx.toDataURL('image/png')
+      btx.parentNode.removeChild(btx)
     }
 
     var view = {}
     // new地图叠加对象(OverlayView方法)
     view.onAdd = function() {
+      if (document.getElementsByClassName(_this.parentClass).length === 0) return
       _this.build()
       var swBound = latLng(_this.swSpot)
       var neBound = latLng(_this.neSpot)
       var bounds = latLngBounds(swBound, neBound)
-      var layer = imageOverlay(_this.url, bounds, { className: 'setimg' + _this.times, zIndex: 2 })
+      var layer = imageOverlay(_this.url, bounds, { className: 'setimg' + _this.times, zIndex: 2, interactive: true })
       layer.addTo(_this.mapObj)
       view.layer = layer
+      layer.on('click', function(e) {
+        const center = _this.mapObj.latLngToContainerPoint(bounds.getCenter())
+        // 中心点坐标
+        const ctx = center.x
+        const cty = center.y
+        // 点击坐标
+        const dx = e.containerPoint.x
+        const dy = e.containerPoint.y
+        // 起点坐标（正北）
+        const neXy = _this.mapObj.latLngToContainerPoint(bounds.getNorthEast())
+        const wsXy = _this.mapObj.latLngToContainerPoint(bounds.getNorthWest())
+        const sx = (neXy.x - wsXy.x) / 2 + wsXy.x
+        const sy = neXy.y
+        const ang = angle(ctx, cty, sx, sy, dx, dy)
+        const value = ang - _this.pgAngle
+        if (value <= 1 && value >= -1) {
+          _this.callback()
+        }
+      })
     }
     view.draw = function() {
       return
     }
     view.onRemove = function() {
-      view.layer.remove()
+      if (view.layer) {
+        view.layer.remove()
+      }
     }
     view.onAdd()
     // 把设置好的OverlayView(自定义添加的div图层)添加到地图(map)上
@@ -249,6 +277,37 @@ export default {
         sum += arryName[j]
       }
       return sum
+    }
+
+    /* 方法:已知两点根据圆心计算角度 */
+    function angle(x0, y0, x1, y1, x2, y2) {
+      var dx1 = x1 - x0
+      var dy1 = y1 - y0
+
+      var dx2 = x2 - x0
+      var dy2 = y2 - y0
+
+      var r1 = Math.sqrt(dx1 * dx1 + dy1 * dy1)
+      var r2 = Math.sqrt(dx2 * dx2 + dy2 * dy2)
+
+      var a1 = Math.acos(dx1 / r1)
+      if (dy1 < 0) {
+        a1 = -a1
+      }
+      var a2 = Math.acos(dx2 / r2)
+      if (dy2 < 0) {
+        a2 = -a2
+      }
+
+      var da = a2 - a1
+
+      /* if(da > Math.PI){
+              da = 2 * Math.PI -da;
+            }; */
+      if (da < 0) {
+        da = 2 * Math.PI + da
+      }
+      return parseInt(da / (Math.PI / 180))
     }
 
     /* 方法：根据圆心坐标和半径以及圆上一点到圆心连线与x轴的夹角，求该点的坐标 */

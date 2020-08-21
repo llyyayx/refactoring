@@ -97,7 +97,7 @@
   </el-dialog>
 </template>
 <script>
-import { subFile, readFile, fileList } from '@/api/deviceControl'
+import { subFile, readFile, fileList, subResult } from '@/api/deviceControl'
 import { operation } from '../naturalJs/index'
 import { latLng, latLngBounds, imageOverlay } from 'leaflet'
 export default {
@@ -127,7 +127,7 @@ export default {
       // 迭代次数
       cycleOption: [2, 100, 1000, 5000, 10000, 15000, 20000, 25000, 30000, 50000],
       // 单选按钮
-      radio: '1',
+      radio: '2',
       // 历史上传数据
       dataList: [],
       // 上传地址
@@ -159,11 +159,7 @@ export default {
     fileList().then((e) => {
       self.dataList = e.data
     }).catch((e) => {
-      self.radio = '2'
-      this.$alert('读取数据列表失败', '警告', {
-        showClose: false,
-        type: 'error'
-      })
+      self.radio = '1'
     })
   },
   methods: {
@@ -230,6 +226,7 @@ export default {
             showClose: false,
             type: 'error'
           })
+          loading.close()
         })
       } else {
         this.$alert('请补全信息', '警告', {
@@ -255,6 +252,59 @@ export default {
         const layer = imageOverlay(url, bounds, { className: 'naturalImage' })
         layer.addTo(self.$store.state.map.map)
         self.close()
+        self.saveImage(url)
+      })
+    },
+
+    /**
+     * 保存图片
+     * @param { String } url 图片Base64数据
+     */
+    saveImage(url) {
+      this.$prompt('是否保存计算结果?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPlaceholder: '请输入保存文件名称',
+        type: 'info'
+      }).then(({ value }) => {
+        if (value.length === 0) {
+          this.$alert('请输入文件名称', '警告', {
+            showClose: false,
+            type: 'waring'
+          })
+          return
+        } else {
+          const arr = url.split(','); const mime = arr[0].match(/:(.*?);/)[1]
+          const bstr = atob(arr[1])
+          let n = bstr.length
+          const u8arr = new Uint8Array(n)
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n)
+          }
+          const obj = new Blob([u8arr], { type: mime })
+          var forms = new FormData()
+          forms.append('file', obj, value + '.png')
+          subResult(forms).then((e) => {
+            if (e.code === 0) {
+              this.$alert('结果保存成功', '提示', {
+                showClose: false,
+                type: 'success'
+              })
+            } else {
+              this.$alert('保存失败，请重试', '警告', {
+                showClose: false,
+                type: 'error'
+              })
+            }
+          }).catch(() => {
+            this.$alert('保存失败，请重试', '警告', {
+              showClose: false,
+              type: 'error'
+            })
+          })
+        }
+      }).catch(() => {
+        return
       })
     }
 

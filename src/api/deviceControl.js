@@ -125,7 +125,7 @@ export function subArea(data) {
 }
 
 /**
- * 上传自然间断点文件
+ * 上传土质分布文件
  */
 export function subFile() {
   let baseURL
@@ -139,7 +139,7 @@ export function subFile() {
 }
 
 /**
- * 读取上传的ec文件
+ * 读取上传的土质分布文件
  * @param { String } fileName 读取文件的名称
  */
 export function readFile(fileName) {
@@ -150,12 +150,48 @@ export function readFile(fileName) {
 }
 
 /**
- * 读取已上传文件列表
+ * 读取已上传土质分布文件列表
  *
  */
 export function fileList() {
   return request({
     url: '/files/json',
+    method: 'get'
+  })
+}
+
+/**
+ * 保存土质分布计算结果
+ * @param { String } file 计算结果（图片）
+ */
+export function subResult(data) {
+  return request({
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    url: '/files/result',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 读取土质分布计算结果列表
+ */
+export function resultList() {
+  return request({
+    url: '/files/result',
+    method: 'get'
+  })
+}
+
+/**
+ * 读取计算结果详情
+ * @param { String } fileName 读取文件的名称
+ */
+export function resultCtn(fileName) {
+  return request({
+    url: `/files/result/${fileName}`,
     method: 'get'
   })
 }

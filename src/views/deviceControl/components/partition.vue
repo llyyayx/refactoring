@@ -11,7 +11,7 @@
         </ul>
       </div>
       <el-dialog title="提示" :visible.sync="dialog" width="500px" :modal="false" class="dialog">
-        <span style="font-size: 16px">检测到该喷灌机进行过分区?</span>
+        <span style="font-size: 16px">检测到该喷灌机进行过分区</span>
         <span slot="footer" class="dialog-footer">
           <el-button type="primary" size="small" @click="editor">去编辑</el-button>
           <el-button type="primary" size="small" @click="reset">重分区</el-button>
@@ -37,14 +37,14 @@
                 <template slot="append">米</template>
               </el-input>
             </div>
-            <div class="sprayItem">
+            <!-- <div class="sprayItem">
               <div class="sprayItem__title">中心支轴经度：</div>
               <el-input class="sprayItem__put" disabled :value="device.longitude" />
             </div>
             <div class="sprayItem">
               <div class="sprayItem__title">中心支轴纬度：</div>
               <el-input class="sprayItem__put" disabled :value="device.latitude" />
-            </div>
+            </div> -->
           </div>
           <el-divider content-position="left" class="title">设置大分区</el-divider>
           <div class="bigArea">
@@ -207,6 +207,7 @@ export default {
       this.$store.dispatch('control/partitionShow', false)
       this.dialog = false
       this.setShow = true
+      this.area = []
     },
 
     // 编辑分区

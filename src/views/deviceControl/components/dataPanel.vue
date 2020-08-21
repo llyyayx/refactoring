@@ -15,7 +15,7 @@
           <div class="screening__item--title">设备名称:</div>
           <div class="screening__item--dname">{{ device.dname }}</div>
         </el-col>
-        <el-col :span="4" class="screening__item">
+        <!-- <el-col :span="4" class="screening__item">
           <div class="screening__item--title">采集密度:</div>
           <el-select v-model="deviceValue" class="screening__item--options" placeholder="请选择">
             <el-option
@@ -25,7 +25,7 @@
               :value="item.value"
             />
           </el-select>
-        </el-col>
+        </el-col> -->
         <el-col :span="4" class="screening__item">
           <div class="screening__item--title">数据周期</div>
           <el-select v-model="cycleValue" class="screening__item--options" placeholder="请选择" @change="updateCycle">
@@ -96,7 +96,7 @@ export default {
         { value: 'merge', label: '合并' }
       ],
       // 模式选择值
-      modeValue: 'an',
+      modeValue: 'merge',
       // 是否已经加载历史数据，不同设备改为false
       load: false,
       // 历史数据

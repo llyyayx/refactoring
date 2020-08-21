@@ -12,8 +12,7 @@
     <Partition />
     <DataPanel />
     <Natural />
-    <canvas id="myCan" width="300" height="300" style="display:none;" />
-    <canvas id="myCan2" width="300" height="300" style="display:none;" />
+    <NatHistroy />
   </div>
 </template>
 
@@ -30,6 +29,7 @@ import Partition from './components/partition'
 import Quick from './components/quick'
 import DataPanel from './components/dataPanel'
 import Natural from './components/natural'
+import NatHistroy from './components/natHistroy'
 import state from './mixins/state'
 import mapFun from '@/utils/lmapFun'
 import Paho from './mqttws31'
@@ -50,20 +50,42 @@ export default {
     Partition,
     Quick,
     DataPanel,
-    Natural
+    Natural,
+    NatHistroy
   },
   mixins: [state],
   data() {
     return {
       loading: true,
-      map: {}
+      // 地图对象
+      map: {},
+      // mqtt对象
+      client: {},
+      // 是否主动断开mqtt服务(false非主动断开，会自动重来)
+      initiative: false
     }
   },
-  watch: {
-
+  // 导航离开路由守卫：退出系统断开mqtt服务
+  beforeRouteLeave(to, form, next) {
+    try {
+      this.initiative = true
+      const config = this.$config
+      this.client.unsubscribe(config.MQTT_TOPIC, (e) => {
+        this.client.disconnect()
+      })
+      next()
+    } catch (error) {
+      next()
+    }
+  },
+  // keep-alive生命周期函数：进入页面时连接mqtt
+  activated(e) {
+    this.mqttServer()
   },
   methods: {
-
+    /**
+     * 获取设备信息及初始化
+     */
     async getContent() {
       const response = await getDevice(1)
       const { lat, lng, devices } = response[0]
@@ -82,10 +104,17 @@ export default {
           case config.CANOPY_CLASS: canopy(item); break
         }
       })
-      this.pullState()
-      this.mqttServer()
+      // 主动读取设备状态
+      this.stateAll()
+      // 机载冠层温度采集绘制
       this.drawCanopy()
+      // 设备排序(后台没排序-_-)
       this.sort()
+      // 刷新不出发activated事件，此处启动连接mqtt
+      if (Object.keys(this.client).length === 0) {
+        this.mqttServer()
+      }
+      // 关闭加载遮罩
       this.loading = false
     },
 
@@ -94,7 +123,6 @@ export default {
      * @param { Object } map 地图实例化对象
      */
     load(map) {
-      this.loading = false
       this.map = map
       this.$store.dispatch('map/setMap', map)
       this.getContent()
@@ -118,20 +146,6 @@ export default {
       mapFun.mapRgTop(this.map, '采集面板', require('@/icons/device/cgq1.png'), () => {
         this.$store.dispatch('control/sensorShow', true)
       })
-    },
-
-    // 接口读取设备状态
-    pullState() {
-      this.dropValveState()
-      this.sprayValveState()
-      this.soilState()
-      this.canopyState()
-      this.ndviState()
-      this.heightState()
-      this.sprayState()
-      this.pumpState()
-      this.sfState()
-      this.weatherState()
     },
 
     // 设备排序
@@ -177,8 +191,10 @@ export default {
     // MQTT全设备状态监听
     mqttServer() {
       const _this = this
+      this.initiative = false
       const config = this.$config
       const client = new Paho.MQTT.Client(config.MQTT_HOST, config.MQTT_PORT, config.MQTT_ADDR, new Date().getTime().toString())
+      this.client = client
       // 客户端连接
       client.connect({
         // 建立连接,马上发起订阅
@@ -208,7 +224,9 @@ export default {
       // 连接超时
       client.onConnectionLost = function() {
         const time = setTimeout(function() {
-          _this.mqttServer()
+          if (!_this.initiative) {
+            _this.mqttServer()
+          }
           clearTimeout(time)
         }, 1500)
       }
@@ -258,11 +276,6 @@ export default {
      */
     classify(data, device) {
       this.mqttJxState(data, device)
-      // const config = this.$config
-      /* switch (device.dclass) {
-        case config.DROPS_VALVE_CLASS: this.mqttJxSpray(data, device); break
-        // case config.SPRAY_CLASS: this.mqttJxSpray(data, device); break
-      } */
     }
 
   }

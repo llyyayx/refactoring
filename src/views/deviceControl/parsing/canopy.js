@@ -17,12 +17,12 @@ export function canopy(item) {
 
   const attr = getAttr(deviceAttr, model || 'V1.0')
 
-  const itemAttr = { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/sqz.png'),
+  const itemAttr = { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/canopy.png'),
     attr, mounted, pserialno, rtuId: rtu ? rtu.rtuid : 0 }
 
   // 不在喷灌机臂上的设置地图标点及信息窗口
   if (!mounted) {
-    const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/sqz.png') })
+    const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/canopy.png') })
     const infowindow = mapFun.infowindow(store.state.map.map, mapSpot, attr, serialno)
     itemAttr.mapSpot = mapSpot
     itemAttr.infowindow = infowindow
@@ -44,11 +44,11 @@ function marKer(obj) {
  */
 function stateIcon(el, vueX) {
   if (el) {
-    const run = require('@/icons/device/run/sqz.png')
+    const run = require('@/icons/device/run/canopy.png')
     vueX.icon && (vueX.icon = run)
     vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(run))
   } else {
-    const close = require('@/icons/device/close/sqz.png')
+    const close = require('@/icons/device/close/canopy.png')
     vueX.icon && (vueX.icon = close)
     vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(close))
   }

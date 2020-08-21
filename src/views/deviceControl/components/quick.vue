@@ -9,7 +9,7 @@
         <div class="quick__box--title">{{ item.title }}</div>
       </el-col>
     </el-row>
-    <el-divider class="divider2" />
+    <el-divider v-if="closeState" class="divider2" />
     <!-- 顶部列表end -->
     <!-- 设备展示栏go -->
     <el-row :class="['quick__content', state]">
@@ -20,7 +20,7 @@
         <div class="quick__device--name">{{ item.dname }}</div>
       </el-col>
     </el-row>
-    <div class="quick__close" @click="onOff">
+    <div v-show="closeState" class="quick__close" @click="onOff">
       <div class="img_box3">
         <img src="@/icons/device/sq.png">
       </div>
@@ -35,16 +35,18 @@ export default {
     return {
       // 设备列表显示隐藏
       state: 'off',
+      // 下拉箭头显示隐藏
+      closeState: false,
       quickList: [
         { title: '滴灌', icon: require('@/icons/device/run/dg.png'), obj: 'drops' },
         { title: '喷灌', icon: require('@/icons/device/run/pg.png'), obj: 'spray' },
         { title: '气象站', icon: require('@/icons/device/run/qxz.png'), obj: 'weather' },
         { title: '墒情站', icon: require('@/icons/device/run/sqz.png'), obj: 'soil' },
-        { title: '施肥机', icon: require('@/icons/device/run/sqz.png'), obj: 'fertilizer' },
-        { title: '冠层站', icon: require('@/icons/device/run/sqz.png'), obj: 'canopy' },
-        { title: 'NDVI', icon: require('@/icons/device/run/sqz.png'), obj: 'ndvi' },
+        { title: '施肥机', icon: require('@/icons/device/run/sf.png'), obj: 'fertilizer' },
+        { title: '冠层站', icon: require('@/icons/device/run/canopy.png'), obj: 'canopy' },
+        { title: 'NDVI', icon: require('@/icons/device/run/ndvi.png'), obj: 'ndvi' },
         { title: '水泵', icon: require('@/icons/device/run/sb.png'), obj: 'pump' },
-        { title: '高度', icon: require('@/icons/device/run/sqz.png'), obj: 'height' }
+        { title: '高度', icon: require('@/icons/device/run/height.png'), obj: 'height' }
       ],
       // 下拉设备列表
       deviceList: []
@@ -96,12 +98,18 @@ export default {
       if (this.state === 'off') {
         this.open()
       } else {
-        this.close(0)
+        this.close()
       }
     },
 
     // 返回对象长度>0的布尔值
     deviceLen(name) {
+      // 有设备显示下拉箭头
+      if (!this.closeState) {
+        if (this[name].length > 0) {
+          this.closeState = true
+        }
+      }
       return this[name].length > 0
     },
 

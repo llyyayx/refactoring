@@ -63,7 +63,6 @@ function draw(param) {
   const view = new area.region({
     swSpot: swSpot,
     neSpot: neSpot,
-    canvasId: 'myCan',
     lineWidth: 1,
     pgAngle: 0,
     pgWidth: 3,
@@ -78,7 +77,11 @@ function draw(param) {
     displayDirection: true,
     direction: true,
     allArea: partition,
-    arm: long
+    arm: long,
+    parentClass: 'device-container',
+    callback: () => {
+      store.dispatch('control/sensorShow', true)
+    }
   })
   return view
 }
@@ -129,9 +132,9 @@ function stateIcon(el, vueX) {
 function setAngle(el, vueX) {
   vueX.canvas.pgAngle = el
   if (vueX.canvas.view) {
-    vueX.canvas.view.onRemove()
+    /* vueX.canvas.view.onRemove()
     vueX.canvas.view.onAdd()
-    vueX.canvas.view.draw()
+    vueX.canvas.view.draw() */
   }
 }
 

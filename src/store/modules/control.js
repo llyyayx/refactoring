@@ -11,8 +11,10 @@ const state = {
   pgPlanShow: false,
   // deviceControl-分区显隐
   partitionShow: false,
-  // deviceControl-自然间断点计算
+  // deviceControl-土质分布计算
   naturalShow: false,
+  // deviceControl-土质计算历史
+  natHistroyShow: false,
   // deviceControl-数据面板显隐
   dataPanelShow: false,
   // deviceControl-施肥机面板显隐
@@ -46,6 +48,9 @@ const mutations = {
   },
   SET_NATURALSHOW: (state, show) => {
     state.naturalShow = show
+  },
+  SET_NATHISTROYSHOW: (state, show) => {
+    state.natHistroyShow = show
   },
   SET_DROPSHOW: (state, show) => {
     state.dropShow = show
@@ -94,6 +99,9 @@ const actions = {
   },
   naturalShow: ({ commit }, show) => {
     commit('SET_NATURALSHOW', show)
+  },
+  natHistroyShow: ({ commit }, show) => {
+    commit('SET_NATHISTROYSHOW', show)
   },
   dropShow: ({ commit }, show) => {
     commit('SET_DROPSHOW', show)

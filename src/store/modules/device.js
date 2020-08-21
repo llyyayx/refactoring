@@ -1,20 +1,29 @@
-const state = {
-  drops: [],
-  dropsCell: [],
-  dropsValve: [],
-  pump: [],
-  fertilizer: [],
-  soil: [],
-  weather: [],
-  spray: [],
-  // 格式: [ [{喷灌机1的喷头组},{.....}], [{喷灌机2的喷头组},{.....}] ]
-  sprayValve: [],
-  ndvi: [],
-  height: [],
-  canopy: []
+const getDefaultState = () => {
+  return {
+    drops: [],
+    dropsCell: [],
+    dropsValve: [],
+    pump: [],
+    fertilizer: [],
+    soil: [],
+    weather: [],
+    spray: [],
+    // 格式: [ [{喷灌机1的喷头组},{.....}], [{喷灌机2的喷头组},{.....}] ]
+    sprayValve: [],
+    ndvi: [],
+    height: [],
+    canopy: []
+  }
 }
 
+const state = getDefaultState()
+
 const mutations = {
+
+  RESET_STATE: (state) => {
+    Object.assign(state, getDefaultState())
+  },
+
   SET_DROPS: (state, drops) => {
     state.drops.push(drops)
   },
@@ -112,6 +121,10 @@ const actions = {
 
   setCanopy({ commit }, canopy) {
     commit('SET_CANOPY', canopy)
+  },
+
+  logout({ commit }) {
+    commit('RESET_STATE')
   }
 
 }

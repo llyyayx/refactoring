@@ -109,17 +109,17 @@ export default {
 
     // 查询冠层站状态
     canopyState() {
-      this.packaging(this.$store.state.device.canopy, require('@/icons/device/break/sqz.png'))
+      this.packaging(this.$store.state.device.canopy, require('@/icons/device/break/canopy.png'))
     },
 
     // 查询NDVI状态
     ndviState() {
-      this.packaging(this.$store.state.device.ndvi, require('@/icons/device/break/sqz.png'))
+      this.packaging(this.$store.state.device.ndvi, require('@/icons/device/break/ndvi.png'))
     },
 
     // 查询高度状态
     heightState() {
-      this.packaging(this.$store.state.device.height, require('@/icons/device/break/sqz.png'))
+      this.packaging(this.$store.state.device.height, require('@/icons/device/break/height.png'))
     },
 
     // 查询喷灌机状态
@@ -140,6 +140,20 @@ export default {
     // 查询气象站状态
     weatherState() {
       this.packaging(this.$store.state.device.weather, require('@/icons/device/break/qxz.png'))
+    },
+
+    // 查询全部设备状态
+    stateAll() {
+      this.dropValveState()
+      this.sprayValveState()
+      this.soilState()
+      this.canopyState()
+      this.ndviState()
+      this.heightState()
+      this.sprayState()
+      this.pumpState()
+      this.sfState()
+      this.weatherState()
     },
 
     /**
