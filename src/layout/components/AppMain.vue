@@ -14,7 +14,6 @@ export default {
   name: 'AppMain',
   data() {
     return {
-      pdtop: 50,
       paddingTop: 50
     }
   },
@@ -33,9 +32,9 @@ export default {
     tagsView: {
       handler(e) {
         if (e) {
-          this.paddingTop = this.pdtop + 30
+          this.paddingTop = parseInt(this.paddingTop) + 32
         } else {
-          this.paddingTop = this.pdtop
+          this.paddingTop = 50
         }
       },
       immediate: true

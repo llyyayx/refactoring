@@ -970,7 +970,7 @@ export default {
         ctlGroup: 0,
         idx: 0,
         namekey: this.getAttr(spray, 'sprayAngle'),
-        expression: '=',
+        expression: '>',
         val: this.form.angale,
         delaySec: this.form.delaySec,
         actionStart: JSON.stringify(sprayStart),

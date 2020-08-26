@@ -88,6 +88,10 @@ export default {
     transition: width 0.28s;
   }
 
+  .el-popup-parent--hidden .fixed-header {
+    padding-right: 0;
+  }
+
   .hideSidebar .fixed-header {
     width: calc(100% - 54px)
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="project-container">
+  <div v-loading="loading" class="project-container">
     <!-- 项目表单go -->
     <el-form ref="form" :model="form" :rules="rules" label-width="auto" class="project-form">
       <el-form-item label="项目名称：" prop="name">
@@ -46,6 +46,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       form: {
         name: '',
         location: '', // iput框展示的经纬度
@@ -68,6 +69,7 @@ export default {
   },
   mounted() {
     const _this = this
+    this.loading = true
     getDevice(1).then(function(e) {
       const data = e[0]
       _this.form.name = data.name
@@ -77,6 +79,13 @@ export default {
       _this.form.id = data.id
       // eslint-disable-next-line no-eval
       _this.form.js = eval(data.descri)
+      _this.loading = false
+    }).catch((e) => {
+      _this.loading = false
+      _this.$alert('获取信息失败', '提示', {
+        showClose: false,
+        type: 'error'
+      })
     })
   },
   methods: {

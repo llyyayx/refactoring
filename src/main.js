@@ -21,7 +21,7 @@ import '@/icons' // icon
 import '@/permission' // permission control
 import config from './utils/config'
 import echarts from 'echarts'
-
+import md5 from 'js-md5'
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -47,6 +47,7 @@ Vue.config.productionTip = false
 Vue.prototype.$Cookies = Cookies
 Vue.prototype.$config = config
 Vue.prototype.$echarts = echarts
+Vue.prototype.$md5 = md5
 
 new Vue({
   el: '#app',

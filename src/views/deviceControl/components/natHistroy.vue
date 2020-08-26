@@ -80,9 +80,11 @@ export default {
     // 读取每次结果的详情
     async eachImg() {
       const data = await this.readList()
-      for (let i = 0; i < data.length; i++) {
-        const result = await resultCtn(data[i])
-        this.result.push({ name: data[i], url: 'data:image/png;base64,' + this.getBase64(result) })
+      if (data) {
+        for (let i = 0; i < data.length; i++) {
+          const result = await resultCtn(data[i])
+          this.result.push({ name: data[i], url: 'data:image/png;base64,' + this.getBase64(result) })
+        }
       }
     }
 

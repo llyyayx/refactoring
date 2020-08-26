@@ -132,9 +132,9 @@ function stateIcon(el, vueX) {
 function setAngle(el, vueX) {
   vueX.canvas.pgAngle = el
   if (vueX.canvas.view) {
-    /* vueX.canvas.view.onRemove()
+    vueX.canvas.view.onRemove()
     vueX.canvas.view.onAdd()
-    vueX.canvas.view.draw() */
+    vueX.canvas.view.draw()
   }
 }
 
@@ -278,10 +278,14 @@ const deviceAttr = {
     {
       mark: 'sprayState',
       fun: (el) => {
-        if (el.regs.FWD_HMI || el.regs.REV_HMI) {
-          return '运行'
+        if (el.regs.TROUBLE_HMI) {
+          return '故障'
         } else {
-          return '停止'
+          if (el.regs.FWD_HMI || el.regs.REV_HMI) {
+            return '运行'
+          } else {
+            return '停止'
+          }
         }
       },
       version: ['V2.0']
