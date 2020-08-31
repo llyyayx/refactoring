@@ -18,7 +18,7 @@ export function canopy(item) {
   const attr = getAttr(deviceAttr, model || 'V1.0')
 
   const itemAttr = { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/canopy.png'),
-    attr, mounted, pserialno, rtuId: rtu ? rtu.rtuid : 0 }
+    attr, mounted, pserialno, rtuId: rtu ? rtu.rtuid : 0, rtu }
 
   // 不在喷灌机臂上的设置地图标点及信息窗口
   if (!mounted) {

@@ -4,12 +4,12 @@ import { getAttr } from '@/utils/setDevice'
 
 // 解析土壤墒情传感器
 export function soil(item) {
-  const { dclass, serialno, dname, latitude, longitude, model } = item
+  const { dclass, serialno, dname, latitude, longitude, model, rtu } = item
   const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/sqz.png') })
   clickEvent(mapSpot)
   const attr = getAttr(deviceAttr, model || 'V1.0')
   const infowindow = mapFun.infowindow(store.state.map.map, mapSpot, attr, serialno)
-  store.dispatch('device/setSoil', { dname, latitude, longitude, dclass, serialno,
+  store.dispatch('device/setSoil', { dname, latitude, longitude, dclass, serialno, rtu,
     icon: require('@/icons/device/close/sqz.png'), attr: attr, infowindow: infowindow,
     mapSpot: mapSpot
   })

@@ -3,8 +3,8 @@ import { getAttr } from '@/utils/setDevice'
 
 // 解析作物高度传感器
 export function height(item) {
-  const { dclass, serialno, dname, latitude, longitude, model } = item
-  store.dispatch('device/setHeight', { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/height.png'),
+  const { dclass, serialno, dname, latitude, longitude, model, rtu } = item
+  store.dispatch('device/setHeight', { dname, latitude, longitude, dclass, serialno, rtu, icon: require('@/icons/device/close/height.png'),
     attr: getAttr(deviceAttr, model || 'V1.0') })
 }
 

@@ -3,8 +3,8 @@ import { getAttr } from '@/utils/setDevice'
 
 // 解析ndvi传感器
 export function ndvi(item) {
-  const { dclass, serialno, dname, latitude, longitude, model } = item
-  store.dispatch('device/setNdvi', { dname, latitude, longitude, dclass, serialno, icon: require('@/icons/device/close/ndvi.png'),
+  const { dclass, serialno, dname, latitude, longitude, model, rtu } = item
+  store.dispatch('device/setNdvi', { dname, latitude, longitude, dclass, serialno, rtu, icon: require('@/icons/device/close/ndvi.png'),
     attr: getAttr(deviceAttr, model || 'V1.0') })
 }
 

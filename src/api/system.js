@@ -49,3 +49,16 @@ export function delUser(phone) {
     method: 'delete'
   })
 }
+
+/**
+ * 修改设备信息
+ * @param { Object } serialno 设备编号
+ * @param { Object } data 提交的信息
+ */
+export function deviceMsg(serialno, data) {
+  return request({
+    url: `devices/${serialno}`,
+    method: 'put',
+    data
+  })
+}

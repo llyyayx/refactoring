@@ -6,7 +6,7 @@ import { getAttr, getCommand, getControlItem } from '@/utils/setDevice'
 
 // 解析喷灌
 export function spray(item) {
-  const { dname, latitude, longitude, dclass, serialno, extension, portarrays, cells, model } = item
+  const { dname, latitude, longitude, dclass, serialno, extension, portarrays, cells, model, rtu } = item
   // 绘制喷灌圈
   let canvas = {}
   if (cells) {
@@ -17,7 +17,7 @@ export function spray(item) {
   clickEvent(mapSpot, serialno)
 
   // vuex管理
-  store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, cells, canvas,
+  store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, cells, canvas, rtu,
     mapSpot, attr: getAttr(deviceAttr, model || 'V1.0'), icon: require('@/icons/device/close/pg.png'), command: getCommand(deviceCommand, model || 'V1.0'),
     controlItem: getControlItem(controlItem, model || 'V1.0') })
   if (portarrays) sprayValve(portarrays, { dname, serialno })

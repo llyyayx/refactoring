@@ -3,8 +3,8 @@ import { getAttr, getCommand, getControlItem } from '@/utils/setDevice'
 
 // 解析水泵
 export function pump(item) {
-  const { dclass, serialno, dname, latitude, longitude, model } = item
-  store.dispatch('device/setPump', { dname, latitude, longitude, dclass, serialno,
+  const { dclass, serialno, dname, latitude, longitude, model, rtu } = item
+  store.dispatch('device/setPump', { dname, latitude, longitude, dclass, serialno, rtu,
     icon: require('@/icons/device/close/sb.png'),
     attr: getAttr(deviceAttr, model || 'V1.0'),
     command: getCommand(deviceCommand, model || 'V1.0'),

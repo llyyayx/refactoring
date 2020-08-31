@@ -4,9 +4,9 @@ import { getAttr, getCommand, getControlItem } from '@/utils/setDevice'
 
 // 解析施肥机
 export function fertilizer(item) {
-  const { dclass, serialno, dname, latitude, longitude, model } = item
+  const { dclass, serialno, dname, latitude, longitude, model, rtu } = item
   const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/sf.png') })
-  store.dispatch('device/setFertilizer', { dname, latitude, longitude, dclass, serialno, mapSpot,
+  store.dispatch('device/setFertilizer', { dname, latitude, longitude, dclass, serialno, mapSpot, rtu,
     icon: require('@/icons/device/close/sf.png'),
     attr: getAttr(deviceAttr, model || 'V1.0'),
     command: getCommand(deviceCommand, model || 'V1.0'),

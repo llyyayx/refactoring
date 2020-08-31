@@ -2,7 +2,7 @@
   <div v-loading="loading" class="user-container">
     <el-button size="mini" type="primary" class="addUser" @click="addShow = true">添加用户</el-button>
     <el-table
-      :data="user"
+      :data="currentUser"
       height="calc(100% - 102px)"
       style="width: 100%"
     >
@@ -57,15 +57,7 @@
       </el-table-column>
     </el-table>
     <!-- 分页 -->
-    <div style="margin-top: 30px;">
-      <el-pagination
-        background
-        layout="total, sizes, prev, pager, next"
-        :page-sizes="[20, 50, 100, 200]"
-        :page-size="50"
-        :total="user.length"
-      />
-    </div>
+    <Pagination :all-data="user" @currentChange="data => currentUser = data" />
     <!-- 编辑弹框 -->
     <el-dialog
       title="编辑信息"
@@ -157,10 +149,14 @@
 </template>
 
 <script>
+import Pagination from '@/components/Pagination'
 import { clone } from '@/utils'
 import { userList, userMsg, addUser, delUser } from '@/api/system'
 export default {
   name: 'User',
+  components: {
+    Pagination
+  },
   data() {
     // 手机号验证
     var validatePhone = (rule, value, callback) => {
@@ -179,6 +175,8 @@ export default {
       loading: false,
       // 用户信息列表
       user: [],
+      // 当前用户展示列表
+      currentUser: [],
       // 编辑行号
       editIndex: 0,
       // 编辑数据
