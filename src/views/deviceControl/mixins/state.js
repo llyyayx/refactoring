@@ -1,4 +1,4 @@
-import { real } from '@/api/deviceControl'
+import { real, action } from '@/api/deviceControl'
 import mapFun from '@/utils/lmapFun'
 export default {
   methods: {
@@ -102,6 +102,31 @@ export default {
       })
     },
 
+    // 召回喷灌机喷头pwm状态
+    sprayValvePwm() {
+      const _this = this
+      const sprayValve = this.$store.state.device.sprayValve
+      sprayValve.forEach((item) => {
+        // 将喷灌下边的喷头按照阀控器分组
+        const controller = _this.group(item, 'rtuSerialno')
+        controller.forEach((el) => {
+          const nameKey = el[0].command.refPwm.nameKey
+          const params = el[0].command.refPwm.params()
+          const data = []
+          nameKey.forEach((item) => {
+            data.push({
+              namekey: item,
+              params: params
+            })
+          })
+          action({
+            serialno: el[0].rtuSerialno,
+            actions: data
+          })
+        })
+      })
+    },
+
     // 查询墒情站状态
     soilState() {
       this.packaging(this.$store.state.device.soil, require('@/icons/device/break/sqz.png'))
@@ -146,6 +171,7 @@ export default {
     stateAll() {
       this.dropValveState()
       this.sprayValveState()
+      this.sprayValvePwm()
       this.soilState()
       this.canopyState()
       this.ndviState()

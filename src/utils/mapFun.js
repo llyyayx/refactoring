@@ -86,6 +86,17 @@ export default {
   },
 
   /**
+   * 地图折线
+   * @param { Object } map 地图实例化对象
+   * @param { Array } data 折线数据
+   * @param { String } color 折线颜色
+   * @param { Number } weight 折线宽度，默认为3
+   */
+  mapLine(map, data, color, weight = 3) {
+    polyline(data, { color: color, weight: weight }).addTo(map)
+  },
+
+  /**
    * 地图右上角添加选项按钮
    * @param { Object } map 地图对象
    * @param { String } name 按钮名称

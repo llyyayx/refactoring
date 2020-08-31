@@ -129,8 +129,27 @@ function stateIcon(el, vueX) {
   vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(icon))
 }
 
+/**
+ * 属性值加载回调：设置喷灌机角度
+ * @param { String } el 喷灌机状态属性值
+ * @param { Object } vueX 喷灌机设备对象
+ */
 function setAngle(el, vueX) {
   vueX.canvas.pgAngle = el
+  if (vueX.canvas.view) {
+    vueX.canvas.view.onRemove()
+    vueX.canvas.view.onAdd()
+    vueX.canvas.view.draw()
+  }
+}
+
+/**
+ * 属性值加载回调：设置喷灌机方向
+ * @param { String } el 喷灌机状态属性值
+ * @param { Object } vueX 喷灌机设备对象
+ */
+function direction(el, vueX) {
+  vueX.canvas.direction = (el === '正向')
   if (vueX.canvas.view) {
     vueX.canvas.view.onRemove()
     vueX.canvas.view.onAdd()
@@ -208,6 +227,7 @@ const deviceAttr = {
       val: '正向',
       unit: '',
       rules: false,
+      callback: [direction],
       version: ['V1.0', 'V2.0']
     }
 
@@ -281,10 +301,12 @@ const deviceAttr = {
         if (el.regs.TROUBLE_HMI) {
           return '故障'
         } else {
-          if (el.regs.FWD_HMI || el.regs.REV_HMI) {
-            return '运行'
-          } else {
-            return '停止'
+          if (el.regs.FWD_HMI !== undefined && el.regs.REV_HMI !== undefined) {
+            if (el.regs.FWD_HMI || el.regs.REV_HMI) {
+              return '运行'
+            } else {
+              return '停止'
+            }
           }
         }
       },
@@ -293,12 +315,14 @@ const deviceAttr = {
     {
       mark: 'direction',
       fun: (el) => {
-        if (el.regs.Forward_HMI) {
-          return '正向'
-        } else if (el.regs.Backward_HMI) {
-          return '反向'
-        } else {
-          return '未运行'
+        if (el.regs.Forward_HMI !== undefined && el.regs.Backward_HMI !== undefined) {
+          if (el.regs.Forward_HMI) {
+            return '正向'
+          } else if (el.regs.Backward_HMI) {
+            return '反向'
+          } else {
+            return '未运行'
+          }
         }
       },
       version: ['V1.0']
@@ -306,12 +330,14 @@ const deviceAttr = {
     {
       mark: 'direction',
       fun: (el) => {
-        if (el.regs.FWD_HMI) {
-          return '正向'
-        } else if (el.regs.REV_HMI) {
-          return '反向'
-        } else {
-          return '未运行'
+        if (el.regs.FWD_HMI !== undefined && el.regs.REV_HMI !== undefined) {
+          if (el.regs.FWD_HMI) {
+            return '正向'
+          } else if (el.regs.REV_HMI) {
+            return '反向'
+          } else {
+            return '未运行'
+          }
         }
       },
       version: ['V2.0']

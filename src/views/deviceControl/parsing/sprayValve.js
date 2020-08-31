@@ -8,6 +8,7 @@ export function sprayValve(portarrays, parent) {
   portarrays.forEach((item, index) => {
     const { spraySerialno, rtuSerialno, port, ctlGroup, descri, idx, model } = item
     spray.push({ spraySerialno, rtuSerialno, port, ctlGroup, descri, idx,
+      pwm: false,
       serialno: spraySerialno,
       dclass: config.SPRAY_VALVE_CLASS,
       icon: require('@/icons/device/close/fm.png'),
@@ -29,6 +30,10 @@ export function sprayValve(portarrays, parent) {
  * @param { Object } vueX 喷头设备对象
  */
 function stateIcon(el, vueX) {
+  if (vueX.pwm) {
+    // pwm打开终止此函数
+    return
+  }
   let icon
   if (el === 'offline') {
     icon = require('@/icons/device/break/fm.png')
@@ -42,6 +47,19 @@ function stateIcon(el, vueX) {
   vueX.icon && (vueX.icon = icon)
 }
 
+/**
+ * 属性值加载回调：设置PWM图标
+ * @param { String } el 喷头状态属性值
+ * @param { Object } vueX 喷头设备对象
+ */
+function pwmIcon(el, vueX) {
+  if (el === true) {
+    const icon = require('@/icons/device/pwm/fm.png')
+    vueX.icon && (vueX.icon = icon)
+  }
+  vueX.pwm = el
+}
+
 const deviceAttr = {
   attr: [
     {
@@ -53,11 +71,61 @@ const deviceAttr = {
         return el
       },
       nameKey: '',
-      val: '启动',
+      val: false,
       unit: '',
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon],
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'valvePwm',
+      name: '脉冲状态',
+      type: 'boolean',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        return el
+      },
+      nameKey: '',
+      val: false,
+      unit: '',
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [pwmIcon],
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'valveCycle',
+      name: '脉冲周期',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el.toString(16)
+        let cycle = el.substr(0, 2)
+        cycle = parseInt(cycle, 16)
+        return cycle
+      },
+      nameKey: '',
+      val: '0',
+      unit: 's',
+      rules: false,
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'valveRadio',
+      name: '占空比',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el.toString(16)
+        let radio = el.substr(2, 4)
+        radio = parseInt(radio, 16)
+        return radio
+      },
+      nameKey: '',
+      val: '0',
+      unit: '%',
+      rules: false,
       version: ['V1.0', 'V2.0']
     }
   ],
@@ -65,6 +133,21 @@ const deviceAttr = {
     {
       mark: 'valveState',
       key: 'DO',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'valvePwm',
+      key: 'PWM_EN',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'valveCycle',
+      key: 'PWM',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'valveRadio',
+      key: 'PWM',
       version: ['V1.0', 'V2.0']
     }
   ],
@@ -126,6 +209,13 @@ const deviceCommand = {
       name: '设置PWM值',
       nameKey: '',
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'refPwm',
+      name: '刷新PWM值',
+      nameKey: [],
+      params: '',
+      version: ['V1.0', 'V2. 0']
     }
   ],
   commandNameKey: [
@@ -152,6 +242,11 @@ const deviceCommand = {
     {
       mark: 'setPwm',
       key: 'SetPulse_',
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'refPwm',
+      key: ['READ_ALL_HOLDS', 'READ_ALL_DOS', 'READ_ALL_AIS'],
       version: ['V1.0', 'V2.0']
     }
   ],
@@ -184,6 +279,11 @@ const deviceCommand = {
         const v16 = cycle.toString(16) + ratio.toString(16)
         return parseInt(v16, 16)
       },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'refPwm',
+      fun: () => { return true },
       version: ['V1.0', 'V2.0']
     }
   ]

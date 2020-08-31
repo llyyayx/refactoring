@@ -78,16 +78,16 @@ export const asyncRoutes = [
         meta: { title: 'User', icon: 'tree' }
       },
       {
+        path: 'equipment',
+        name: 'Equipment',
+        component: () => import('@/views/system/equipment/index'),
+        meta: { title: 'Equipment', icon: 'tree' }
+      },
+      {
         path: 'alarm',
         name: 'Alarm',
         component: () => import('@/views/tree/index'),
         meta: { title: 'Alarm', icon: 'tree' }
-      },
-      {
-        path: 'equipment',
-        name: 'Equipment',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Equipment', icon: 'tree' }
       }
     ]
   },

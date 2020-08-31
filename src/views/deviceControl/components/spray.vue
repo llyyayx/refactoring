@@ -29,7 +29,7 @@
         <el-col :span="8">
           <el-switch
             v-model="value"
-            active-text="阵列划分"
+            active-text="阀控划分"
             inactive-text="按跨划分"
             inactive-color="#13ce66"
           />
@@ -43,6 +43,7 @@
             <el-button-group class="nozzle__heder--pwm">
               <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmSwitch(pgValve, true)">打开脉冲</el-button>
               <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmSwitch(pgValve, false)">关闭脉冲</el-button>
+              <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmState">刷新脉冲</el-button>
             </el-button-group>
             <transition name="el-fade-in">
               <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="nozzle__heder--btn nozzle__lf" round @click="multi(idx)">控制已选中</el-button>
@@ -63,6 +64,11 @@
                   <img :src="attr.icon" alt="喷头图标">
                 </div>
                 <div class="spray__attr spray__attr2 pointer">{{ '喷头0' + attr.idx }}</div>
+                <div class="spray__attr spray__attr2 pointer">
+                  <span v-for="vat in attr.attr" v-show="vat.mark==='valveCycle' || vat.mark==='valveRadio'" :key="vat.mark">
+                    {{ vat.val+vat.unit }}{{ vat.mark === 'valveCycle' ? ' | ' : '' }}
+                  </span>
+                </div>
               </el-col>
             </el-row>
             <el-divider class="spray__divider" />
@@ -138,10 +144,12 @@ import Panel from '@/components/Panel'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
 import { debounce } from '@/utils'
+import state from '../mixins/state'
 export default {
   components: {
     Panel
   },
+  mixins: [state],
   data() {
     return {
       // 用于判断分类模式：跨 || 阀控
@@ -571,6 +579,12 @@ export default {
           this.error()
         })
       })
+    },
+
+    // 刷新脉冲
+    pwmState() {
+      this.sprayValvePwm()
+      this.success('PWM状态刷新成功')
     }
 
   }

@@ -112,8 +112,9 @@ export default {
 
 <style lang="scss" scoped>
   .project-container {
-    padding: 20px;
+    padding: 30px;
     width: 100%;
+    box-sizing: border-box;
     & .project-form {
       width: 800px;
     }

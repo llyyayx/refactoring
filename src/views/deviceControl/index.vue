@@ -110,7 +110,7 @@ export default {
       this.drawCanopy()
       // 设备排序(后台没排序-_-)
       this.sort()
-      // 刷新不出发activated事件，此处启动连接mqtt
+      // F5刷新不触发activated事件，此处启动连接mqtt
       if (Object.keys(this.client).length === 0) {
         this.mqttServer()
       }
@@ -127,6 +127,7 @@ export default {
       this.$store.dispatch('map/setMap', map)
       this.getContent()
       this.mapRgTop()
+      mapFun.lookAddr(map)
     },
 
     /**
