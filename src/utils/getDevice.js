@@ -1,5 +1,6 @@
 import { getDevice } from '@/api/deviceControl'
 import { serialno } from '@/utils/index'
+// 获取rtu设备
 export async function getDevices() {
   const response = await getDevice(1)
   const { devices } = response[0]

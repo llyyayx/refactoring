@@ -25,7 +25,7 @@
       :visible.sync="dialogVisible"
       width="65%"
     >
-      <Location ref="mark" />
+      <Location ref="mark" :map-data="mapData" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="getGps">确 定</el-button>
@@ -46,7 +46,9 @@ export default {
   },
   data() {
     return {
+      // 加载弹框
       loading: false,
+      // 表单数据
       form: {
         name: '',
         location: '', // iput框展示的经纬度
@@ -55,6 +57,7 @@ export default {
         id: '', // id,上传时需要
         js: '' // 项目介绍
       },
+      // 验证柜子
       rules: {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' },
@@ -64,25 +67,35 @@ export default {
           { required: true, message: '请设置经纬度', trigger: 'blur' }
         ]
       },
+      // 地图初始化经纬度
+      mapData: {
+        center: [38.123456, 118.123456],
+        zoom: 20
+      },
+      // 地图显隐
       dialogVisible: false
     }
   },
   mounted() {
-    const _this = this
+    const self = this
     this.loading = true
     getDevice(1).then(function(e) {
       const data = e[0]
-      _this.form.name = data.name
-      _this.form.location = '经度：' + data.lng + '，' + '纬度：' + data.lat
-      _this.form.lat = data.lat
-      _this.form.lng = data.lng
-      _this.form.id = data.id
+      self.form.name = data.name
+      self.form.location = '经度：' + data.lng + '，' + '纬度：' + data.lat
+      self.form.lat = data.lat
+      self.form.lng = data.lng
+      self.form.id = data.id
       // eslint-disable-next-line no-eval
-      _this.form.js = eval(data.descri)
-      _this.loading = false
+      self.form.js = data.descri
+      self.mapData = {
+        center: [data.lat, data.lng],
+        zoom: 20
+      }
+      self.loading = false
     }).catch((e) => {
-      _this.loading = false
-      _this.$alert('获取信息失败', '提示', {
+      self.loading = false
+      self.$alert('获取信息失败', '提示', {
         showClose: false,
         type: 'error'
       })
@@ -92,6 +105,8 @@ export default {
     getGps() {
       const gps = this.$refs.mark.getLocation()
       this.form.location = '经度：' + gps.lng + '，' + '纬度：' + gps.lat
+      this.form.lat = gps.lat
+      this.form.lng = gps.lng
       this.dialogVisible = false
     },
     // 提交

@@ -127,7 +127,7 @@ export default {
       this.$store.dispatch('map/setMap', map)
       this.getContent()
       this.mapRgTop()
-      mapFun.lookAddr(map)
+      // mapFun.lookAddr(map)
     },
 
     /**
@@ -214,7 +214,7 @@ export default {
       // 消息到达回调函数
       client.onMessageArrived = function(msg) {
         const data = JSON.parse(msg.payloadString)
-        // console.log(data)
+        console.log(data)
         new Promise((resolve, reject) => {
           if (data.code) {
             const obj = _this.mqttScreen(data)

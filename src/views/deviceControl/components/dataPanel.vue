@@ -15,20 +15,20 @@
           <div class="screening__item--title">设备名称:</div>
           <div class="screening__item--dname">{{ device.dname }}</div>
         </el-col>
-        <!-- <el-col :span="4" class="screening__item">
-          <div class="screening__item--title">采集密度:</div>
-          <el-select v-model="deviceValue" class="screening__item--options" placeholder="请选择">
+        <el-col :span="4" class="screening__item">
+          <div class="screening__item--title">数据来源:</div>
+          <el-select v-model="sourceValue" class="screening__item--options" placeholder="请选择">
             <el-option
-              v-for="item in density"
+              v-for="item in source"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             />
           </el-select>
-        </el-col> -->
+        </el-col>
         <el-col :span="4" class="screening__item">
           <div class="screening__item--title">数据周期</div>
-          <el-select v-model="cycleValue" class="screening__item--options" placeholder="请选择" @change="updateCycle">
+          <el-select v-model="cycleValue" class="screening__item--options" placeholder="请选择" @change="reload">
             <el-option
               v-for="item in cycle"
               :key="item.value"
@@ -72,21 +72,19 @@ export default {
     return {
       device: {},
       // 数据密度
-      density: [
-        { value: 1, label: '稀疏' },
-        { value: 2, label: '密集' }
+      source: [
+        { value: 1, label: '远程' },
+        { value: 2, label: '本地' }
       ],
-      // 密度选择值
-      deviceValue: 2,
+      // 数据来源选择值
+      sourceValue: 1,
       // 周期
       cycle: [
         { value: 1, label: '一天内' },
-        { value: 2, label: '两天内' },
-        { value: 3, label: '三天内' },
-        { value: 4, label: '四天内' },
-        { value: 5, label: '五天内' },
-        { value: 6, label: '六天内' },
-        { value: 7, label: '七天内' }
+        { value: 30, label: '一个月内' },
+        { value: 90, label: '三个月内' },
+        { value: 180, label: '六个月内' },
+        { value: 365, label: '一年内' }
       ],
       // 周期选择值
       cycleValue: 1,
@@ -112,9 +110,10 @@ export default {
     }
   },
   watch: {
-    deviceValue(e) {
+    sourceValue(e) {
       if (e === 1) {
         this.cycle = [
+          { value: 1, label: '一天内' },
           { value: 30, label: '一个月内' },
           { value: 90, label: '三个月内' },
           { value: 180, label: '六个月内' },
@@ -133,6 +132,7 @@ export default {
         ]
         this.cycleValue = 1
       }
+      this.reload()
     },
     show(e) {
       this.device = this.$store.state.control.dataPanelObj
@@ -152,9 +152,9 @@ export default {
   methods: {
 
     /**
-     * 更改周期重新请求数据
-     */
-    updateCycle() {
+     * 重载数据
+    */
+    reload() {
       const keys = Object.keys(this.AnEcObj)
       keys.forEach((el) => {
         this.AnEcObj[el].showLoading()
@@ -305,9 +305,12 @@ export default {
       attr.forEach((el, index) => {
         if (el.ecShow) {
           new Promise((resolve, reject) => {
-            hist(self.device.serialno, el.nameKey, self.cycleValue).then((res) => {
+            hist(self.device.serialno, el.nameKey, self.cycleValue, self.sourceValue).then((res) => {
               if (res.items) {
                 self.histData[el.nameKey] = res.items
+                resolve(index)
+              } else if (res.data) {
+                self.histData[el.nameKey] = res.data
                 resolve(index)
               } else {
                 self.histData[el.nameKey] = []
@@ -332,13 +335,18 @@ export default {
      * @return { Object } 格式化好的对象
      */
     fromatting(data) {
-      const date = []
-      const value = []
-      if (data !== undefined && data.length > 0) {
-        data.forEach((el) => {
-          date.push(el.createdAt)
-          value.push(el.val)
-        })
+      let date = []
+      let value = []
+      if (this.sourceValue === 2) {
+        if (data !== undefined && data.length > 0) {
+          data.forEach((el) => {
+            date.push(el.createdAt)
+            value.push(el.val)
+          })
+        }
+      } else if (this.sourceValue === 1) {
+        date = data.categories
+        value = data.series[0].data
       }
       return { date, value }
     },
@@ -395,7 +403,7 @@ export default {
     left: 0;
     top: 0;
     bottom: 0;
-    background-color: rgba(255, 255, 255, .9);
+    background-color: rgba(255, 255, 255, 1);
     overflow-x: hidden;
     overflow-y: auto;
     & .dataPanel__top {

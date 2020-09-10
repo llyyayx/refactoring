@@ -69,7 +69,7 @@ const deviceAttr = {
     {
       mark: 'humidity1',
       name: '湿度1',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 10) / 10).toFixed(1)
@@ -89,7 +89,7 @@ const deviceAttr = {
     {
       mark: 'humidity2',
       name: '湿度2',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 10) / 10).toFixed(1)
@@ -109,7 +109,7 @@ const deviceAttr = {
     {
       mark: 'humidity3',
       name: '湿度3',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 10) / 10).toFixed(1)
@@ -129,7 +129,7 @@ const deviceAttr = {
     {
       mark: 'humidity4',
       name: '湿度4',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 10) / 10).toFixed(1)

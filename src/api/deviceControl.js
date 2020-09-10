@@ -53,12 +53,23 @@ export function real(serialno) {
  * @param { String } serialno 设备标识
  * @param { nameKey } serialno 设备属性标识
  * @param { String } week 几天之内
+ * @param { Number } mode 模式 (1远程2本地)
  */
-export function hist(serialno, nameKey, day) {
-  return request({
-    url: `/hist/${serialno}/${nameKey}/${day}`,
-    method: 'get'
-  })
+export function hist(serialno, nameKey, day, mode = 2) {
+  let message = {}
+  if (mode === 2) {
+    message = {
+      url: `/hist/${serialno}/${nameKey}/${day}`,
+      method: 'get'
+    }
+  } else {
+    message = {
+      baseURL: 'php',
+      url: `/api/statistics?serialno=${serialno}&namekey=${nameKey}&day=${day}`,
+      method: 'get'
+    }
+  }
+  return request(message)
 }
 
 /**

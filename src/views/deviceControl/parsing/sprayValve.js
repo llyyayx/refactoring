@@ -286,6 +286,22 @@ const deviceCommand = {
       fun: () => { return true },
       version: ['V1.0', 'V2.0']
     }
+  ],
+  actions: [
+    {
+      mark: 'refPwm',
+      fun: (nameKey, val) => {
+        const actions = []
+        nameKey.forEach((el) => {
+          actions.push({
+            namekey: el,
+            params: val
+          })
+        })
+        return actions
+      },
+      version: ['V1.0', 'V2.0']
+    }
   ]
 }
 

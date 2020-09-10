@@ -63,45 +63,45 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/system/project',
     name: 'System',
-    meta: { title: 'System', icon: 'example', roles: ['editor'] },
+    meta: { title: 'System', icon: 'example', roles: ['editor', 'china'] },
     children: [
       {
         path: 'project',
         name: 'Project',
         component: () => import('@/views/system/project/index'),
-        meta: { title: 'Project', icon: 'table', roles: ['editor'] }
+        meta: { title: 'Project', icon: 'table', noCache: true, roles: ['editor', 'china'] }
       },
       {
         path: 'user',
         name: 'User',
         component: () => import('@/views/system/user/index'),
-        meta: { title: 'User', icon: 'tree' }
+        meta: { title: 'User', icon: 'tree', noCache: true, roles: ['editor', 'china'] }
       },
       {
         path: 'equipment',
         name: 'Equipment',
         component: () => import('@/views/system/equipment/index'),
-        meta: { title: 'Equipment', icon: 'tree' }
+        meta: { title: 'Equipment', icon: 'tree', noCache: true, roles: ['editor', 'china'] }
       },
       {
         path: 'alarm',
         name: 'Alarm',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Alarm', icon: 'tree' }
+        component: () => import('@/views/system/alarm/index'),
+        meta: { title: 'Alarm', icon: 'tree', noCache: true, roles: ['editor'] }
       }
     ]
   },
 
   {
-    path: '/arm',
+    path: '/alarm',
     component: Layout,
     meta: { roles: ['editor'] },
     children: [
       {
-        path: 'list',
-        name: 'ArmList',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'ArmList', icon: 'form' }
+        path: 'event',
+        name: 'AlarmEvent',
+        component: () => import('@/views/alarmEvent/index'),
+        meta: { title: 'ArmList', icon: 'form', noCache: true, roles: ['editor'] }
       }
     ]
   },

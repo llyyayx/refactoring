@@ -74,7 +74,7 @@ const deviceAttr = {
     {
       mark: 'temp',
       name: '温度',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 10) / 10).toFixed(1)
@@ -94,7 +94,7 @@ const deviceAttr = {
     {
       mark: 'ch1',
       name: '温度1',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 10) / 10).toFixed(1)
@@ -114,7 +114,7 @@ const deviceAttr = {
     {
       mark: 'ch2',
       name: '温度2',
-      type: 'Number',
+      type: 'number',
       max: 50,
       min: 0,
       ecType: 'line',
@@ -134,7 +134,7 @@ const deviceAttr = {
     {
       mark: 'ch3',
       name: '温度3',
-      type: 'Number',
+      type: 'number',
       max: 50,
       min: 0,
       ecType: 'line',
@@ -154,7 +154,7 @@ const deviceAttr = {
     {
       mark: 'ch4',
       name: '温度4',
-      type: 'Number',
+      type: 'number',
       max: 50,
       min: 0,
       ecType: 'line',

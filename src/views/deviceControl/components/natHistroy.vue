@@ -49,8 +49,8 @@ export default {
     getBase64(File) {
       File = File.replace(/\s*/g, '')
       File = File.replace(/[\r\n]/g, '')
-      var blob = new Blob([File], { type: 'image/png' })
-      var binary = ''
+      const blob = new Blob([File], { type: 'image/png' })
+      let binary = ''
       blob.arrayBuffer().then((buffer) => {
         var bytes = buffer
         var len = bytes.byteLength
@@ -83,7 +83,7 @@ export default {
       if (data) {
         for (let i = 0; i < data.length; i++) {
           const result = await resultCtn(data[i])
-          this.result.push({ name: data[i], url: 'data:image/png;base64,' + this.getBase64(result) })
+          this.result.push({ name: data[i], url: 'data:image/png;base64,' + result })
         }
       }
     }

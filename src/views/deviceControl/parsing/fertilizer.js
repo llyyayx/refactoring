@@ -572,3 +572,5 @@ const controlItem = [
     version: ['V1.0']
   }
 ]
+
+export { deviceAttr }

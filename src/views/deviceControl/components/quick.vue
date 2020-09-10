@@ -38,15 +38,15 @@ export default {
       // 下拉箭头显示隐藏
       closeState: false,
       quickList: [
-        { title: '滴灌', icon: require('@/icons/device/run/dg.png'), obj: 'drops' },
-        { title: '喷灌', icon: require('@/icons/device/run/pg.png'), obj: 'spray' },
+        { title: '滴灌系统', icon: require('@/icons/device/run/dg.png'), obj: 'drops' },
+        { title: '喷灌系统', icon: require('@/icons/device/run/pg.png'), obj: 'spray' },
         { title: '气象站', icon: require('@/icons/device/run/qxz.png'), obj: 'weather' },
-        { title: '墒情站', icon: require('@/icons/device/run/sqz.png'), obj: 'soil' },
+        { title: '土壤墒情', icon: require('@/icons/device/run/sqz.png'), obj: 'soil' },
         { title: '施肥机', icon: require('@/icons/device/run/sf.png'), obj: 'fertilizer' },
-        { title: '冠层站', icon: require('@/icons/device/run/canopy.png'), obj: 'canopy' },
+        { title: '冠层温度', icon: require('@/icons/device/run/canopy.png'), obj: 'canopy' },
         { title: 'NDVI', icon: require('@/icons/device/run/ndvi.png'), obj: 'ndvi' },
         { title: '水泵', icon: require('@/icons/device/run/sb.png'), obj: 'pump' },
-        { title: '高度', icon: require('@/icons/device/run/height.png'), obj: 'height' }
+        { title: '植株高度', icon: require('@/icons/device/run/height.png'), obj: 'height' }
       ],
       // 下拉设备列表
       deviceList: []

@@ -7,3 +7,7 @@ export { spray } from './spray'
 export { ndvi } from './ndvi'
 export { height } from './height'
 export { canopy } from './canopy'
+
+export { deviceAttr as sprayAttr } from './spray'
+export { deviceAttr as ferAttr } from './fertilizer'
+export { deviceAttr as pumpAttr } from './pump'

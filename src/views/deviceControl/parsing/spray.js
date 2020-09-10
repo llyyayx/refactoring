@@ -192,7 +192,7 @@ const deviceAttr = {
     {
       mark: 'sprayPwm',
       name: '行走速率',
-      type: 'Number',
+      type: 'number',
       dataFun: (el) => {
         return el
       },
@@ -205,7 +205,7 @@ const deviceAttr = {
     {
       mark: 'sprayAngle',
       name: '当前角度',
-      type: 'Number',
+      type: 'number',
       dataFun: (el) => {
         return Math.floor(el * 10) / 10
       },
@@ -219,7 +219,7 @@ const deviceAttr = {
     {
       mark: 'direction',
       name: '行进方向',
-      type: 'Number',
+      type: 'number',
       dataFun: (el) => {
         return el ? '正向' : '反向'
       },
@@ -619,3 +619,6 @@ const controlItem = [
     version: ['V1.0', 'V2.0']
   }
 ]
+
+export { deviceAttr }
+

@@ -33,7 +33,7 @@ const deviceAttr = {
     {
       mark: 'DownNir',
       name: 'DownNir',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 1000) / 1000).toFixed(3)
@@ -53,7 +53,7 @@ const deviceAttr = {
     {
       mark: 'DownRed',
       name: 'DownRed',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 1000) / 1000).toFixed(3)
@@ -73,7 +73,7 @@ const deviceAttr = {
     {
       mark: 'UpNir',
       name: 'UpNir',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 1000) / 1000).toFixed(3)
@@ -93,7 +93,7 @@ const deviceAttr = {
     {
       mark: 'UpRed',
       name: 'UpRed',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 1000) / 1000).toFixed(3)
@@ -113,7 +113,7 @@ const deviceAttr = {
     {
       mark: 'ndvi',
       name: 'NDVI',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 1000) / 1000).toFixed(3)

@@ -5,7 +5,7 @@
       <el-input v-model="input" placeholder="请输入详细地址" />
       <el-button type="primary" @click="serach">搜索</el-button>
     </div>
-    <LMaps ref="gmps" @load="load" />
+    <LMaps ref="gmps" :map-data="mapData" @load="load" />
   </div>
 </template>
 
@@ -17,20 +17,41 @@ export default {
   components: {
     LMaps
   },
+  props: {
+    mapData: {
+      type: Object,
+      required: false,
+      default: () => {
+        return {
+          center: [38.123456, 118.123456],
+          zoom: 20
+        }
+      }
+    }
+  },
   data: function() {
     return {
       // 地图对象
       maps: {},
       // 点击标点集合
       markers: [],
-      // 经纬度
+      // 选择点的经纬度
       location: {},
       // 位置提示文字
-      tag: '当前位置: 0.0,0.0',
+      tag: `当前位置: ${this.mapData.center[1]}，${this.mapData.center[0]}`,
       // 输入地址转地理编码
       input: '',
       // 加载
       loading: false
+    }
+  },
+  watch: {
+    mapData: {
+      handler(newValue, oldValue) {
+        this.addMarker(latLng({ lat: newValue.center[0], lng: newValue.center[1] }))
+      },
+      deep: true,
+      immediate: false
     }
   },
   methods: {
@@ -40,9 +61,10 @@ export default {
      */
     load(map) {
       this.maps = map
-      const _this = this
+      const self = this
+      self.addMarker(latLng({ lat: this.mapData.center[0], lng: this.mapData.center[1] }))
       map.on('click', function(event) {
-        _this.addMarker(event.latlng)
+        self.addMarker(event.latlng)
       })
     },
 
@@ -50,7 +72,7 @@ export default {
      * 地理编码：将地址转为经纬度坐标，并定位至此
      */
     serach() {
-      const _this = this
+      const self = this
       const address = this.input
       const provider = new OpenStreetMapProvider()
       this.loading = true
@@ -58,15 +80,15 @@ export default {
         if (e.length > 0) {
           const lat = e[0].y
           const lng = e[0].x
-          _this.addMarker(latLng({ lat: lat, lng: lng }))
-          _this.maps.panTo({ lat: lat, lng: lng })
+          self.addMarker(latLng({ lat: lat, lng: lng }))
+          self.maps.panTo({ lat: lat, lng: lng })
         } else {
-          _this.$message({
+          self.$message({
             type: 'error',
             message: '未查询到结果'
           })
         }
-        _this.loading = false
+        self.loading = false
       })
     },
 
@@ -87,7 +109,7 @@ export default {
         lng: location.lng,
         lat: location.lat
       }
-      const text = '当前位置: [' + location.lng.toPrecision(9) + ',' + location.lat.toPrecision(9) + ']'
+      const text = '当前位置: [' + location.lng.toPrecision(9) + '，' + location.lat.toPrecision(9) + ']'
       this.tag = text
       const myIcon = icon({
         iconUrl: require('@/icons/device/marker.png'),

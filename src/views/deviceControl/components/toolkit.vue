@@ -25,12 +25,12 @@
             </div>
             <div class="tool__title">土质分布计算</div>
           </div>
-          <div class="too_content--item" @click="natHistroy">
+          <!-- <div class="too_content--item" @click="natHistroy">
             <div class="tool__img">
               <svg-icon icon-class="histroy" class="icon--histroy" />
             </div>
             <div class="tool__title">土质计算历史</div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

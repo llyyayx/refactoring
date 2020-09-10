@@ -54,7 +54,7 @@ const deviceAttr = {
     {
       mark: 'flow',
       name: '瞬时流量',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return Math.floor(el * 10) / 10
@@ -70,7 +70,7 @@ const deviceAttr = {
     {
       mark: 'addFlow',
       name: '累计流量',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return Math.floor(el * 10) / 10
@@ -86,7 +86,7 @@ const deviceAttr = {
     {
       mark: 'pressure',
       name: '压力',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return Math.floor(el * 10) / 10
@@ -380,3 +380,5 @@ const controlItem = [
     version: ['V1.0']
   }
 ]
+
+export { deviceAttr }

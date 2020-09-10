@@ -13,11 +13,19 @@
       <el-table-column
         prop="longitude"
         label="设备经度"
-      />
+      >
+        <template slot-scope="scope">
+          {{ scope.row.longitude === undefined ? '--' : scope.row.longitude }}
+        </template>
+      </el-table-column>
       <el-table-column
         prop="latitude"
         label="设备纬度"
-      />
+      >
+        <template slot-scope="scope">
+          {{ scope.row.latitude === undefined ? '--' : scope.row.latitude }}
+        </template>
+      </el-table-column>
       <el-table-column
         prop="rtu.interping"
         label="状态读取间隔(s)"
@@ -85,7 +93,7 @@
       :visible.sync="dialogVisible"
       width="65%"
     >
-      <Location ref="mark" />
+      <Location ref="mark" :map-data="mapData" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="getGps">确 定</el-button>
@@ -118,6 +126,11 @@ export default {
       editShow: false,
       // 选择的设备信息
       editData: {},
+      // 地图初始化经纬度
+      mapData: {
+        center: [38.123456, 118.123456],
+        zoom: 20
+      },
       editRules: {
         dname: [
           { required: true, message: '请输入设备名称', trigger: 'blur' }
@@ -147,6 +160,12 @@ export default {
     },
     // 打开编辑弹框
     handleEdit(index, row) {
+      if (row.latitude && row.longitude) {
+        this.mapData = {
+          center: [row.latitude, row.longitude],
+          zoom: 20
+        }
+      }
       row.interping = row.rtu.interping
       this.editData = clone(row)
       this.editShow = true

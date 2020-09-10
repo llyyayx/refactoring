@@ -27,11 +27,19 @@
       <el-table-column
         prop="weixin"
         label="微信"
-      />
+      >
+        <template slot-scope="scope">
+          {{ scope.row.weixin === undefined ? '--' : scope.row.weixin }}
+        </template>
+      </el-table-column>
       <el-table-column
         prop="qq"
         label="QQ"
-      />
+      >
+        <template slot-scope="scope">
+          {{ scope.row.qq === undefined ? '--' : scope.row.qq }}
+        </template>
+      </el-table-column>
       <el-table-column
         prop="email"
         label="邮箱"
@@ -85,10 +93,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="微信" class="edit__item" prop="weixin">
-          <el-input v-model="editData.weixin" placeholder="微信 (必填)" class="edit__put" />
+          <el-input v-model="editData.weixin" placeholder="微信 (选填)" class="edit__put" />
         </el-form-item>
         <el-form-item label="QQ" class="edit__item" prop="qq">
-          <el-input v-model="editData.qq" placeholder="QQ (必填)" class="edit__put" />
+          <el-input v-model="editData.qq" placeholder="QQ (选填)" class="edit__put" />
         </el-form-item>
         <el-form-item label="邮箱" class="edit__item" prop="email">
           <el-input v-model="editData.email" placeholder="邮箱 (必填)" class="edit__put" />
@@ -128,21 +136,21 @@
           </el-select>
         </el-form-item>
         <el-form-item label="微信" class="edit__item" prop="weixin">
-          <el-input v-model="addData.weixin" placeholder="微信 (必填)" class="edit__put" />
+          <el-input v-model="addData.weixin" placeholder="微信 (选填)" class="edit__put" />
         </el-form-item>
         <el-form-item label="QQ" class="edit__item" prop="qq">
-          <el-input v-model="addData.qq" placeholder="QQ (必填)" class="edit__put" />
+          <el-input v-model="addData.qq" placeholder="QQ (选填)" class="edit__put" />
         </el-form-item>
         <el-form-item label="邮箱" class="edit__item" prop="email">
           <el-input v-model="addData.email" placeholder="邮箱 (必填)" class="edit__put" />
         </el-form-item>
-        <el-form-item label="密码" class="edit__item">
+        <el-form-item label="密码" class="edit__item" prop="password">
           <el-input v-model="addData.password" placeholder="密码 (必填)" class="edit__put" />
         </el-form-item>
       </el-form>
       <div class="btn__group">
         <el-button type="primary" class="bml" @click="subUser">添加</el-button>
-        <el-button @click="addShow = false">取消</el-button>
+        <el-button @click="addShow = false; addData = initUser()">取消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -200,12 +208,6 @@ export default {
         noticeto: [
           { required: true, message: '请选择推送方式', trigger: 'blur' }
         ],
-        weixin: [
-          { required: true, message: '请输入微信号', trigger: 'blur' }
-        ],
-        qq: [
-          { required: true, message: '请输入QQ号', trigger: 'blur' }
-        ],
         email: [
           { required: true, message: '请输入邮件', trigger: 'blur' }
         ],
@@ -216,17 +218,7 @@ export default {
       // 添加用户弹框
       addShow: false,
       // 添加用户数据
-      addData: {
-        uname: '',
-        phone: '',
-        roles: '',
-        noticeto: '',
-        weixin: '',
-        qq: '',
-        email: '',
-        password: '',
-        groupid: 1
-      },
+      addData: this.initUser(),
       addRules: {
         uname: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
@@ -240,14 +232,11 @@ export default {
         noticeto: [
           { required: true, message: '请选择推送方式', trigger: 'blur' }
         ],
-        weixin: [
-          { required: true, message: '请输入微信号', trigger: 'blur' }
-        ],
-        qq: [
-          { required: true, message: '请输入QQ号', trigger: 'blur' }
-        ],
         email: [
           { required: true, message: '请输入邮件', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
         ]
       }
     }
@@ -369,6 +358,20 @@ export default {
         }
       })
     },
+    // 用户信息初始化
+    initUser() {
+      return {
+        uname: '',
+        phone: '',
+        roles: '',
+        noticeto: '',
+        weixin: '',
+        qq: '',
+        email: '',
+        password: '',
+        groupid: 1
+      }
+    },
     // 添加用户
     subUser() {
       this.$refs.add.validate((valid) => {
@@ -385,9 +388,11 @@ export default {
             self.addShow = false
             loading.close()
             self.refresh()
+            self.addData = self.initUser()
           }).catch((e) => {
             self.error('添加用户失败')
             self.addShow = false
+            self.addData = self.initUser()
             loading.close()
           })
         }

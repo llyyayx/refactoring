@@ -171,7 +171,7 @@ export default {
     stateAll() {
       this.dropValveState()
       this.sprayValveState()
-      this.sprayValvePwm()
+      // this.sprayValvePwm()
       this.soilState()
       this.canopyState()
       this.ndviState()

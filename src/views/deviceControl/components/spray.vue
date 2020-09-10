@@ -52,10 +52,22 @@
         </el-row>
         <el-row v-for="(item,index) in groups = valveCtrGroup(pgValve)" :key="'pt'+index" type="flex" :gutter="20" class="spray__row">
           <el-col :lg="4" :sm="2" :xs="2">
-            <div class="spray__imgBox">
+            <div class="spray__imgBox" @dblclick="ctrOn(item)">
               <img src="@/icons/device/run/fm.png" alt="喷头图标">
             </div>
-            <div class="spray__name">{{ value ? item[0]['descri'] : '第' + ( index -1 + 2 ) + '跨' }}</div>
+            <div class="spray__name">{{ value ? item[0]['descri'] : kNmae(item, index) }}</div>
+            <div v-show="value" class="spary_dk">
+              <el-dropdown @command="singleRef">
+                <el-button type="primary" size="mini">
+                  单控
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item :command="{action:'on', device: item}">打开脉冲</el-dropdown-item>
+                  <el-dropdown-item :command="{action:'off', device: item}">关闭脉冲</el-dropdown-item>
+                  <el-dropdown-item :command="{action:'ref', device: item}">刷新脉冲</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
           </el-col>
           <el-col :lg="20" :sm="22" :xs="22">
             <el-row :gutter="10">
@@ -121,9 +133,9 @@
           <div v-for="(item, index) in sprayCtr" v-show="sprayObj.controlItem ? sprayObj.controlItem.includes(item.mark) : true" :key="index" class="coler">
             <div class="colf">{{ item.name }}</div>
             <div class="corg">
-              <el-radio-group v-model="item.value" size="small" @change="(val) => sprayModel(val,index)">
-                <el-radio-button v-for="item2 in item.selete" :key="item2.label" :label="item2.label">{{ item2.title }}</el-radio-button>
-              </el-radio-group>
+              <el-button-group>
+                <el-button v-for="item2 in item.selete" :key="item2.label" size="small" @click="sprayModel(item2.label, index)">{{ item2.title }}</el-button>
+              </el-button-group>
             </div>
           </div>
         </div>
@@ -162,7 +174,7 @@ export default {
       subPray: -1,
       // 每个喷灌机框选的喷头(二维)
       subValve: [],
-      // 控制对话框显示隐藏
+      // 喷头控制对话框显示隐藏
       dialog: false,
       // 喷灌机对话框显示隐藏
       sprayDialog: false,
@@ -178,8 +190,8 @@ export default {
       sprayObj: {},
       // 喷灌机模式
       sprayCtr: [
-        { name: '灌机控制', value: '0', selete: [{ title: '启动', label: 'openSpray' }, { title: '停止', label: 'closeSpray' }], mark: 'sprayRun' },
         { name: '行进方向', value: '0', selete: [{ title: '正向', label: 'positive' }, { title: '反向', label: 'reverse' }], mark: 'direction' },
+        { name: '灌机控制', value: '0', selete: [{ title: '启动', label: 'openSpray' }, { title: '停止', label: 'closeSpray' }], mark: 'sprayRun' },
         { name: '行进方式', value: '0', selete: [{ title: '有水', label: 'haveWater' }, { title: '无水', label: 'noWater' }], mark: 'mode' },
         { name: '尾枪设置', value: '0', selete: [{ title: '打开', label: 'openGun' }, { title: '关闭', label: 'closeGun' }], mark: 'gunSetting' },
         { name: '控制模式', value: '1', selete: [{ title: '手动', label: 1 }, { title: '自动', label: 2 }], mark: 'plan' }
@@ -403,14 +415,16 @@ export default {
      * @param { Object } valve 喷头对象
      * @param { String } namekey 指令
      * @param { String } params 指令参数
+     * @param { Funcion } actions 自定义指令数据
+     * @param { Boolean } port namekey后是否接喷头序号，true接false不接
      */
-    ctrlValve(valve, namekey, params, actions) {
+    ctrlValve(valve, namekey, params, actions, port = true) {
       let array
       if (Object.prototype.toString.call(actions) === '[object Function]') {
         array = actions(namekey, params)
       } else {
         array = [{
-          namekey: namekey + valve.port,
+          namekey: namekey + (port ? valve.port : ''),
           params: params
         }]
       }
@@ -585,6 +599,51 @@ export default {
     pwmState() {
       this.sprayValvePwm()
       this.success('PWM状态刷新成功')
+    },
+
+    /**
+     * 单控刷新
+     * @param { Object } obj 参数对象
+     * obj.action { String } 用户选择的模式，ref刷新pwm/on打开脉冲/关闭脉冲
+     * obj.device { Array } 阀控器下的喷头
+     */
+    singleRef(obj) {
+      const device = obj.device[0]
+      switch (obj.action) {
+        case 'ref':
+          this.ctrlValve(device, device.command.refPwm.nameKey, device.command.refPwm.params(), device.command.refPwm.actions)
+          break
+        case 'on':
+          this.ctrlValve(device, device.command.openPwm.nameKey, device.command.openPwm.params(), device.command.openPwm.actions, false)
+          break
+        case 'off':
+          this.ctrlValve(device, device.command.closePwm.nameKey, device.command.closePwm.params(), device.command.closePwm.actions, false)
+          break
+      }
+    },
+
+    /**
+     * 阀控器 || 跨，双击事件
+     * @param { Array } device 阀控器(跨)下的喷头
+     */
+    ctrOn(device) {
+      this.ctrlDev = device
+      this.dialog = true
+    },
+
+    /**
+     * 设置跨名称
+     * @param { Object } item 当前跨设备
+     * @param { Number } index 当前跨序号(v-for从0开始的)
+     */
+    kNmae(item, index) {
+      let name = ''
+      switch (item[0].ctlGroup) {
+        case 99: name = '悬臂'; break
+        case 100: name = '尾枪'; break
+        default: name = '第' + (index - 1 + 2) + '跨'
+      }
+      return name
     }
 
   }
@@ -621,6 +680,33 @@ export default {
   font-size: 14px;
   text-align: center;
   color: #333;
+}
+.spary_dk {
+  text-align: center;
+  font-size: 14px;
+  position: relative;
+  & ul {
+    position: absolute;
+    top: 0;
+    right: -50px;
+    display: none;
+    z-index: 9;
+    & li {
+      width: 50px;
+      height: 30px;
+      line-height: 30px;
+      color: #FFF;
+      background-color: #409EFF;
+    }
+  }
+  & ul , li {
+    padding:0;
+    margin:0;
+    list-style:none;
+  }
+}
+.spary_dk:hover ul{
+  display: block;
 }
 .spray__row {
     margin: 10px 0;

@@ -33,7 +33,7 @@ const deviceAttr = {
     {
       mark: 'height',
       name: '高度',
-      type: 'Number',
+      type: 'number',
       // 转换nameKey得到值
       dataFun: (el) => {
         return (Math.floor(el * 100) / 100).toFixed(2)

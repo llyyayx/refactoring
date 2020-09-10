@@ -20,9 +20,9 @@
             <div v-for="(ferItem, idx) in ferCtr" v-show="ferDevice.controlItem ? ferDevice.controlItem.includes(ferItem.mark) : true" :key="idx" class="coler">
               <div class="colf">{{ ferItem.name }}</div>
               <div class="corg">
-                <el-radio-group v-model="ferItem.value" size="small" @change="(val) => ferModel(val,index,item)">
-                  <el-radio-button v-for="item2 in ferItem.selete" :key="item2.label" :label="item2.label">{{ item2.title }}</el-radio-button>
-                </el-radio-group>
+                <el-button-group>
+                  <el-button v-for="item2 in ferItem.selete" :key="item2.label" size="small" @click="ferModel(item2.label, index, item)">{{ item2.title }}</el-button>
+                </el-button-group>
               </div>
             </div>
           </div>
