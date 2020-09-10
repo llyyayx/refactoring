@@ -3,7 +3,11 @@ import config from '@/utils/config'
 import mapFun from '@/utils/lmapFun'
 import { getAttr, getCommand } from '@/utils/setDevice'
 
-// 解析分区 => 解析滴灌阀门
+/**
+ * 解析分区 => 解析滴灌阀门
+ * @param { Array } cells 滴灌下分区
+ * @param { Object } parent 滴灌(轮灌)控制器对象
+ */
 export function dropValve(cells, parent) {
   const drops = []
   cells.forEach((item, index) => {
@@ -18,8 +22,8 @@ export function dropValve(cells, parent) {
         case config.DROPS_VALVE_CLASS : {
           const { dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort, model } = item2
           // 阀门标点
-          const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/fm.png') })
-          clickEvent(mapSpot)
+          const mapSpot = marKer({ lat: latitude, lng: longitude, icon: require('@/icons/device/close/fm.png'), dname })
+          clickEvent(mapSpot, parent)
           drops.push({
             dclass, dname, latitude, longitude, rtuSerialno, serialno, pserialno, rtuPort, mapSpot,
             areaName: item.name, areaId: id, icon: require('@/icons/device/close/fm.png'), pname: parent.dname,
@@ -48,10 +52,11 @@ function marKer(obj) {
 /**
  * 标点点击事件
  * @param { Object } mapSpot 地图标点实例化对象
- * @param { Object } self 组件指针this
+ * @param { Object } parent 滴灌(轮灌)控制器对象
  */
-function clickEvent(mapSpot, self) {
+function clickEvent(mapSpot, parent) {
   mapFun.marKerClickEvent(mapSpot, () => {
+    store.dispatch('control/dropDevice', parent)
     store.dispatch('control/dropShow', true)
   })
 }

@@ -87,6 +87,7 @@ export default {
     dropValve() {
       return this.$store.state.device.dropsValve
     },
+    // 滴灌(轮灌)控制器
     dropDevice() {
       return this.$store.state.control.dropDevice
     }

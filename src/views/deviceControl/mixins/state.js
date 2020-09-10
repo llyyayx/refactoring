@@ -41,17 +41,17 @@ export default {
         if (res.status === 2 || !res.regs) {
           const breake = require('@/icons/device/break/fm.png')
           valve.icon && (valve.icon = breake)
-          valve.mapSpot && valve.mapSpot.setIcon(breake)
+          valve.mapSpot && valve.mapSpot.setIcon(mapFun.getIcon(breake))
         } else {
           const port = (valve.rtuPort || valve.port) - 1
           if (res.regs['DO.' + port.toString()]) {
             const run = require('@/icons/device/run/fm.png')
             valve.icon && (valve.icon = run)
-            valve.mapSpot && valve.mapSpot.setIcon(run)
+            valve.mapSpot && valve.mapSpot.setIcon(mapFun.getIcon(run))
           } else {
             const close = require('@/icons/device/close/fm.png')
             valve.icon && (valve.icon = close)
-            valve.mapSpot && valve.mapSpot.setIcon(close)
+            valve.mapSpot && valve.mapSpot.setIcon(mapFun.getIcon(close))
           }
         }
       })

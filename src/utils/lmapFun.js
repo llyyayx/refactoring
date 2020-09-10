@@ -126,7 +126,7 @@ export default {
    * @param { Array } kml 区域经纬度数组-二维数组
    * @param { String } color 区域颜色
    */
-  mapPolygon(map, kml, color) {
+  mapPolygon(map, kml, color = '#FF0000') {
     // eslint-disable-next-line no-eval
     const areaKml = eval(kml)
     areaKml.forEach((item) => {

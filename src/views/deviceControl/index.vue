@@ -155,8 +155,10 @@ export default {
       const keys = Object.keys(allDevice)
       keys.forEach((el) => {
         if (Object.prototype.toString.call(allDevice[el]) === '[object Array]') {
-          if (Object.prototype.toString.call(allDevice[el][0]) !== '[object Array]') {
-            serialno(allDevice[el])
+          if (allDevice[el][0] !== undefined && Object.prototype.toString.call(allDevice[el][0]) === '[object Object]') {
+            if (allDevice[el][0].hasOwnProperty('serialno')) {
+              serialno(allDevice[el])
+            }
           }
         }
       })

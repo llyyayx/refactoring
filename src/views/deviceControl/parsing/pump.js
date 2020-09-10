@@ -1,14 +1,34 @@
 import store from '@/store'
+import mapFun from '@/utils/lmapFun'
 import { getAttr, getCommand, getControlItem } from '@/utils/setDevice'
 
 // 解析水泵
 export function pump(item) {
   const { dclass, serialno, dname, latitude, longitude, model, rtu } = item
-  store.dispatch('device/setPump', { dname, latitude, longitude, dclass, serialno, rtu,
+  const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/sb.png') })
+  clickEvent(mapSpot, { serialno, dname })
+  store.dispatch('device/setPump', { dname, latitude, longitude, dclass, serialno, rtu, mapSpot,
     icon: require('@/icons/device/close/sb.png'),
     attr: getAttr(deviceAttr, model || 'V1.0'),
     command: getCommand(deviceCommand, model || 'V1.0'),
     controlItem: getControlItem(controlItem, model || 'V1.0')
+  })
+}
+
+// 创建地图标点
+function marKer(obj) {
+  return mapFun.setMarker(store.state.map.map, obj)
+}
+
+/**
+ * 标点点击事件
+ * @param { Object } mapSpot 地图标点实例化对象
+ * @param { Object } pump 水泵对象
+ */
+function clickEvent(mapSpot, pump) {
+  mapFun.marKerClickEvent(mapSpot, () => {
+    store.dispatch('control/pumpDevice', pump)
+    store.dispatch('control/pumpShow', true)
   })
 }
 

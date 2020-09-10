@@ -82,9 +82,11 @@ export default {
     show() {
       return this.$store.state.control.pumpShow
     },
+    // 所有水泵
     pump() {
       return this.$store.state.device.pump
     },
+    // 当前控制的水泵
     pumpDevice() {
       return this.$store.state.control.pumpDevice
     }
