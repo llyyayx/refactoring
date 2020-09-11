@@ -256,12 +256,14 @@ export default {
      * 合并模式：给实例化对象赋值
      */
     mergeSetData() {
+      console.log('-----------')
       const attr = this.device.attr
       const array = []
       const legend = []
       attr.forEach((el) => {
         if (el.ecShow) {
           const dataObj = this.fromatting(this.histData[el.nameKey])
+          console.log(dataObj)
           array.push({
             name: el.name,
             type: el.ecType || 'line',
@@ -302,6 +304,8 @@ export default {
           ecLen += 1
         }
       })
+      // 清一下历史数据
+      self.histData = {}
       attr.forEach((el, index) => {
         if (el.ecShow) {
           new Promise((resolve, reject) => {

@@ -11,9 +11,9 @@ export function height(item) {
 /* -----------------------属性装载-------------------------- */
 
 /**
- * 属性值加载回调：设置喷头图标
- * @param { String } el 喷头状态属性值
- * @param { Object } vueX 喷头设备对象
+ * 属性值加载回调：设置图标
+ * @param { String } el 状态属性值
+ * @param { Object } vueX 设备对象
  */
 function stateIcon(el, vueX) {
   if (el) {

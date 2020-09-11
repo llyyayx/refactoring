@@ -38,9 +38,9 @@ function marKer(obj) {
 /* -----------------------属性装载-------------------------- */
 
 /**
- * 属性值加载回调：设置喷头图标
- * @param { String } el 喷头状态属性值
- * @param { Object } vueX 喷头设备对象
+ * 属性值加载回调：设置图标
+ * @param { String } el 状态属性值
+ * @param { Object } vueX 设备对象
  */
 function stateIcon(el, vueX) {
   if (el) {
@@ -56,13 +56,13 @@ function stateIcon(el, vueX) {
 
 /**
  * 属性值加载回调：设置地图infowindow信息
- * @param { String } el 喷头状态属性值
- * @param { Object } vueX 喷头设备对象
+ * @param { String } el 状态属性值
+ * @param { Object } vueX 设备对象
  */
 function setInfoWindow(el, vueX) {
   let content = ''
   vueX.attr.forEach((el) => {
-    content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
+    content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.name +
       ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
   })
   vueX.infowindow && vueX.infowindow.setContent(content)

@@ -111,7 +111,7 @@ export default {
     if (Object.prototype.toString.call(attr) === '[object Array]' && attr.length > 0) {
       let content = ''
       attr.forEach((el) => {
-        content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.nameKey +
+        content += '<div style="display: flex; align-items: center;"><p style="margin: 0; font-weight:600;">' + el.name +
         ':</p><p style="margin: 0 0 0 5px; font-weight:600;">' + el.val + el.unit + '</p></div>'
       })
       const layer = popup({ autoClose: false, closeOnClick: false }).setContent('<div class="' + serialno + '">' + content + '</div>')
