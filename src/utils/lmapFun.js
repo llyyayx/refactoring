@@ -1,4 +1,4 @@
-import { Control, icon, marker, popup, polygon, point } from 'leaflet'
+import { Control, icon, marker, popup, polygon, point, polyline } from 'leaflet'
 
 export default {
 
@@ -98,6 +98,17 @@ export default {
       }
     })
     new LControl().addTo(map)
+  },
+
+  /**
+   * 地图折线
+   * @param { Object } map 地图实例化对象
+   * @param { Array } data 折线数据
+   * @param { String } color 折线颜色
+   * @param { Number } weight 折线宽度，默认为3
+   */
+  mapLine(map, data, color, weight = 3) {
+    polyline(data, { color: color, weight: weight }).addTo(map)
   },
 
   /**

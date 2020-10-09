@@ -35,21 +35,21 @@ function clickEvent(mapSpot, pump) {
 /* -----------------------属性装载-------------------------- */
 
 /**
- * 属性值加载回调：设置喷灌机图标
- * @param { String } el 喷灌机状态属性值
- * @param { Object } vueX 喷灌机设备对象
+ * 属性值加载回调：设置水泵图标
+ * @param { String } el 水泵状态属性值
+ * @param { Object } vueX 水泵设备对象
  */
 function stateIcon(el, vueX) {
   let icon
   if (el === '启动') {
-    icon = require('@/icons/device/run/pg.png')
+    icon = require('@/icons/device/run/sb.png')
   } else if (el === '停止') {
-    icon = require('@/icons/device/close/pg.png')
+    icon = require('@/icons/device/close/sb.png')
   } else {
-    icon = require('@/icons/device/break/pg.png')
+    icon = require('@/icons/device/break/sb.png')
   }
   vueX.icon && (vueX.icon = icon)
-  vueX.mapSpot && vueX.mapSpot.setIcon(icon)
+  vueX.mapSpot && vueX.mapSpot.setIcon(mapFun.getIcon(icon))
 }
 
 const deviceAttr = {
@@ -163,7 +163,7 @@ const deviceAttr = {
       mark: 'pumpState',
       fun: (el) => {
         if (el.regs !== undefined) {
-          if (el.res.RUN_HMI) {
+          if (el.regs.RUN_HMI) {
             return '启动'
           } else {
             return '停止'
