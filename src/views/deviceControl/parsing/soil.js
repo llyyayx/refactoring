@@ -145,6 +145,132 @@ const deviceAttr = {
       rules: false,
       callback: [stateIcon, setInfoWindow],
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'temp1',
+      name: '10cm温度',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el * 0.01
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '℃',
+      max: 50,
+      min: 0,
+      ecType: 'line',
+      ecShow: true,
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon, setInfoWindow],
+      version: ['V3.0']
+    },
+    {
+      mark: 'humidity1',
+      name: '10cm湿度',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el * 0.01
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '%RH',
+      max: 100,
+      min: 0,
+      ecType: 'line',
+      ecShow: true,
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon, setInfoWindow],
+      version: ['V3.0']
+    },
+    {
+      mark: 'ec1',
+      name: '10cm电导率',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el * 0.01
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: 'us/cm',
+      max: 100,
+      min: 0,
+      ecType: 'line',
+      ecShow: true,
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon, setInfoWindow],
+      version: ['V3.0']
+    },
+    {
+      mark: 'temp2',
+      name: '20cm温度',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el * 0.01
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '℃',
+      max: 50,
+      min: 0,
+      ecType: 'line',
+      ecShow: true,
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon, setInfoWindow],
+      version: ['V3.0']
+    },
+    {
+      mark: 'humidity2',
+      name: '20cm湿度',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el * 0.01
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: '%RH',
+      max: 100,
+      min: 0,
+      ecType: 'line',
+      ecShow: true,
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon, setInfoWindow],
+      version: ['V3.0']
+    },
+    {
+      mark: 'ec2',
+      name: '20cm电导率',
+      type: 'number',
+      // 转换nameKey得到值
+      dataFun: (el) => {
+        el = el * 0.01
+        return (Math.floor(el * 10) / 10).toFixed(1)
+      },
+      nameKey: '',
+      val: '0.0',
+      unit: 'us/cm',
+      max: 100,
+      min: 0,
+      ecType: 'line',
+      ecShow: true,
+      // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
+      rules: false,
+      callback: [stateIcon, setInfoWindow],
+      version: ['V3.0']
     }
   ],
   attrNameKey: [
@@ -167,6 +293,36 @@ const deviceAttr = {
       mark: 'humidity4',
       key: 'CH4',
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'temp1',
+      key: 'T1',
+      version: ['V3.0']
+    },
+    {
+      mark: 'humidity1',
+      key: 'M1',
+      version: ['V3.0']
+    },
+    {
+      mark: 'ec1',
+      key: 'E1',
+      version: ['V3.0']
+    },
+    {
+      mark: 'temp2',
+      key: 'T2',
+      version: ['V3.0']
+    },
+    {
+      mark: 'humidity2',
+      key: 'M2',
+      version: ['V3.0']
+    },
+    {
+      mark: 'ec2',
+      key: 'E2',
+      version: ['V3.0']
     }
   ]
 

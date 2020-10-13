@@ -136,8 +136,10 @@ export default {
    * @param { Object } map 地图实例化对象
    * @param { Array } kml 区域经纬度数组-二维数组
    * @param { String } color 区域颜色
+   * @param { String } borderColor 边线颜色
+   * @param { String } weight 边线宽度
    */
-  mapPolygon(map, kml, color = '#FF0000') {
+  mapPolygon(map, kml, color = '#FF0000', borderColor = '#FF0000', weight = 1) {
     // eslint-disable-next-line no-eval
     const areaKml = eval(kml)
     areaKml.forEach((item) => {
@@ -149,7 +151,7 @@ export default {
           lat: parseFloat(el.lat)
         })
       })
-      polygon(array, { color: '#FF0000', fillColor: color, weight: 1 }).addTo(map)
+      polygon(array, { color: borderColor, fillColor: color, weight: weight }).addTo(map)
     })
   },
 

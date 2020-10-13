@@ -256,14 +256,12 @@ export default {
      * 合并模式：给实例化对象赋值
      */
     mergeSetData() {
-      console.log('-----------')
       const attr = this.device.attr
       const array = []
       const legend = []
       attr.forEach((el) => {
         if (el.ecShow) {
           const dataObj = this.fromatting(this.histData[el.nameKey])
-          console.log(dataObj)
           array.push({
             name: el.name,
             type: el.ecType || 'line',

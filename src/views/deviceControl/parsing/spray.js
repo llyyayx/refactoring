@@ -174,7 +174,7 @@ const deviceAttr = {
       // val值不采用nameKey读取方式，直接把返回状态传入即返回值, 设为false此项无效
       rules: false,
       callback: [stateIcon],
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'sprayModel',
@@ -187,7 +187,7 @@ const deviceAttr = {
       val: '本地',
       unit: '',
       rules: false,
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'sprayPwm',
@@ -200,7 +200,7 @@ const deviceAttr = {
       val: '100',
       unit: '%',
       rules: false,
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'sprayAngle',
@@ -214,7 +214,7 @@ const deviceAttr = {
       unit: '°',
       rules: false,
       callback: [setAngle],
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'direction',
@@ -228,7 +228,7 @@ const deviceAttr = {
       unit: '',
       rules: false,
       callback: [direction],
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     }
 
   ],
@@ -354,56 +354,56 @@ const deviceCommand = {
       name: '启动喷灌机',
       nameKey: '',
       params: '',
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'closeSpray',
       name: '停止喷灌机',
       nameKey: '',
       params: '',
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'positive',
       name: '正向行进',
       nameKey: '',
       params: '',
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'reverse',
       name: '反向行进',
       nameKey: '',
       params: '',
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     },
     {
       mark: 'haveWater',
       name: '有水行进',
       nameKey: '',
       params: '',
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'noWater',
       name: '无水行进',
       nameKey: '',
       params: '',
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'openGun',
       name: '打开尾枪',
       nameKey: '',
       params: '',
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'closeGun',
       name: '关闭尾枪',
       nameKey: '',
       params: '',
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'sprayPwm',
@@ -412,7 +412,7 @@ const deviceCommand = {
       params: '',
       // 设置此项后，自动返回API中actions数组(用于适应actios中设置多个值)
       actions: false,
-      version: ['V1.0', 'V2.0']
+      version: ['V1.0', 'V2.0', 'V3.0']
     }
   ],
 
@@ -428,6 +428,11 @@ const deviceCommand = {
       version: ['V2.0']
     },
     {
+      mark: 'openSpray',
+      key: 'Start_Ctrl ',
+      version: ['V3.0']
+    },
+    {
       mark: 'closeSpray',
       key: 'Stop_Pivot',
       version: ['V1.0']
@@ -436,6 +441,11 @@ const deviceCommand = {
       mark: 'closeSpray',
       key: 'REG_CMD_PWR',
       version: ['V2.0']
+    },
+    {
+      mark: 'closeSpray',
+      key: 'Stop_Ctrl',
+      version: ['V3.0']
     },
     {
       mark: 'positive',
@@ -448,6 +458,11 @@ const deviceCommand = {
       version: ['V2.0']
     },
     {
+      mark: 'positive',
+      key: 'Fwd_Stt',
+      version: ['V3.0']
+    },
+    {
       mark: 'reverse',
       key: 'Backward_C',
       version: ['V1.0']
@@ -458,9 +473,19 @@ const deviceCommand = {
       version: ['V2.0']
     },
     {
+      mark: 'reverse',
+      key: 'Bwd_Stt',
+      version: ['V3.0']
+    },
+    {
       mark: 'haveWater',
       key: 'Nowater_C',
       version: ['V1.0']
+    },
+    {
+      mark: 'haveWater',
+      key: 'Open_Wet_Mod',
+      version: ['V3.0']
     },
     {
       mark: 'noWater',
@@ -468,14 +493,29 @@ const deviceCommand = {
       version: ['V1.0']
     },
     {
+      mark: 'noWater',
+      key: 'Open_Dry_Mod',
+      version: ['V3.0']
+    },
+    {
       mark: 'openGun',
       key: 'Open_EndGun',
       version: ['V1.0']
     },
     {
+      mark: 'openGun',
+      key: 'Open_End_Gun',
+      version: ['V3.0']
+    },
+    {
       mark: 'closeGun',
       key: 'Close_EndGun',
       version: ['V1.0']
+    },
+    {
+      mark: 'closeGun',
+      key: 'Close_End_Gun',
+      version: ['V3.0']
     },
     {
       mark: 'sprayPwm',
@@ -486,6 +526,11 @@ const deviceCommand = {
       mark: 'sprayPwm',
       key: 'REG_CMD_PWM',
       version: ['V2.0']
+    },
+    {
+      mark: 'sprayPwm',
+      key: 'Man_Pct_Config',
+      version: ['V3.0']
     }
   ],
 
@@ -493,7 +538,7 @@ const deviceCommand = {
     {
       mark: 'openSpray',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'openSpray',
@@ -503,7 +548,7 @@ const deviceCommand = {
     {
       mark: 'closeSpray',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'closeSpray',
@@ -513,7 +558,7 @@ const deviceCommand = {
     {
       mark: 'positive',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'positive',
@@ -523,7 +568,7 @@ const deviceCommand = {
     {
       mark: 'reverse',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'reverse',
@@ -533,29 +578,29 @@ const deviceCommand = {
     {
       mark: 'haveWater',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'noWater',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'openGun',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'closeGun',
       fun: () => { return true },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'sprayPwm',
       fun: (val) => {
         return val
       },
-      version: ['V1.0']
+      version: ['V1.0', 'V3.0']
     },
     {
       mark: 'sprayPwm',
@@ -590,22 +635,22 @@ const controlItem = [
   {
     mark: 'sprayRun',
     name: '灌机控制',
-    version: ['V1.0', 'V2.0']
+    version: ['V1.0', 'V2.0', 'V3.0']
   },
   {
     mark: 'direction',
     name: '行进方向',
-    version: ['V1.0', 'V2.0']
+    version: ['V1.0', 'V2.0', 'V3.0']
   },
   {
     mark: 'mode',
     name: '行进方式',
-    version: ['V1.0']
+    version: ['V1.0', 'V3.0']
   },
   {
     mark: 'gunSetting',
     name: '尾枪设置',
-    version: ['V1.0']
+    version: ['V1.0', 'V3.0']
   },
   {
     mark: 'plan',
@@ -616,7 +661,7 @@ const controlItem = [
   {
     mark: 'sprayPwm',
     name: '行走速率',
-    version: ['V1.0', 'V2.0']
+    version: ['V1.0', 'V2.0', 'V3.0']
   }
 ]
 

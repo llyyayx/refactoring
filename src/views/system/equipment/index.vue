@@ -2,6 +2,7 @@
   <div v-loading="loading" class="equipment-container">
     <el-table
       :data="device"
+      row-key="serialno"
       height="calc(100% - 60px)"
       style="width: 100%"
       class="table"
@@ -150,6 +151,7 @@ export default {
     this.loading = true
     getDevices().then((device) => {
       this.allDevice = device
+      this.drop(device)
       this.loading = false
     })
   },
@@ -157,6 +159,31 @@ export default {
     // 设备状态解析
     status(row, column, value) {
       return value === 0 ? '有效' : '无效'
+    },
+    // 滴灌阀门解析
+    drop(devices) {
+      const config = this.$config
+      devices.forEach((item, index) => {
+        switch (item.dclass) {
+          case config.DROPS_CLASS:
+            var cells = item.cells
+            cells.forEach((item2) => {
+              item2.devices.forEach((dev) => {
+                if (!dev.interping) {
+                  dev.rtu = {}
+                  dev.rtu.interping = 0
+                }
+              })
+              if (devices[index].children) {
+                devices[index].children = devices[index].children.concat(item2.devices)
+              } else {
+                devices[index].children = item2.devices
+              }
+            })
+            break
+        }
+      })
+      this.allDevice = devices
     },
     // 打开编辑弹框
     handleEdit(index, row) {

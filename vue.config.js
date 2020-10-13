@@ -43,7 +43,7 @@ module.exports = {
         pathRewrite: { '^/php': '' }
       },
       '/api': {
-        target: 'http://127.0.0.1:8080', // http://192.168.8.63:9088
+        target: 'http://10.18.0.130:8080', // http://192.168.8.63:9088
         changeOrigin: true,
         pathRewrite: { '^/api': '' }
       }
