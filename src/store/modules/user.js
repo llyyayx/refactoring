@@ -37,13 +37,13 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      if (username.trim() === 'admin' && password === 'admin') {
+      if (username.trim() === '18600636163' && password === 'Dev1@3$5') {
         const { data } = { data: { token: 'admin-token' }}
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         resolve()
       } else {
-        reject()
+        reject({ msg: '账号或密码错误' })
       }
       /* login({ username: username.trim(), password: password }).then(response => {
         const { data } = response = { data: { token: 'admin-token' }}

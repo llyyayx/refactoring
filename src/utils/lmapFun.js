@@ -13,6 +13,15 @@ export default {
   },
 
   /**
+  * 设置地图缩放几把
+  * @param { Object } map 地图对象
+  * @param { Number } zoom 缩放级别
+  */
+  setZoom(map, zoom) {
+    map.setZoom(zoom)
+  },
+
+  /**
   * 设置点
   * @param { Object } map 地图对象
   * @param { Object } obj 点对象

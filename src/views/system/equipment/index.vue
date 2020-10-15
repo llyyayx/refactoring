@@ -245,6 +245,7 @@ export default {
               self.success('修改信息成功')
               getDevices().then((device) => {
                 this.allDevice = device
+                this.drop(device)
               })
             } else {
               self.error(e.message)

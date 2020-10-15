@@ -229,8 +229,59 @@ const deviceAttr = {
       rules: false,
       callback: [direction],
       version: ['V1.0', 'V2.0', 'V3.0']
+    },
+    {
+      mark: 'gunState',
+      name: '尾枪状态',
+      type: 'boolean',
+      dataFun: (el) => {
+        return el ? '打开' : '关闭'
+      },
+      nameKey: '',
+      val: '关闭',
+      unit: '',
+      rules: false,
+      version: ['V3.0']
+    },
+    {
+      mark: 'waterPressure',
+      name: '管道水压',
+      type: 'number',
+      dataFun: (el) => {
+        return Math.floor(el * 100) / 100
+      },
+      nameKey: '',
+      val: '0.00',
+      unit: 'Mpa',
+      rules: false,
+      version: ['V3.0']
+    },
+    {
+      mark: 'instant',
+      name: '瞬时流量',
+      type: 'number',
+      dataFun: (el) => {
+        return Math.floor(el * 100) / 100
+      },
+      nameKey: '',
+      val: '0.00',
+      unit: 'm³/h',
+      rules: false,
+      version: ['V3.0']
+    },
+    {
+      mark: 'cumulative',
+      name: '累计流量',
+      type: 'number',
+      dataFun: (el) => {
+        return Math.floor(el * 100) / 100
+      },
+      nameKey: '',
+      val: '0.00',
+      unit: 'm³',
+      rules: false,
+      version: ['V3.0']
     }
-
   ],
 
   // 属性对应的nameKey根据版本返回
@@ -246,6 +297,11 @@ const deviceAttr = {
       version: ['V2.0']
     },
     {
+      mark: 'sprayState',
+      key: 'Pvt_Run_Sta',
+      version: ['V3.0']
+    },
+    {
       mark: 'sprayModel',
       key: 'Pivot_LocationSel',
       version: ['V1.0']
@@ -254,6 +310,11 @@ const deviceAttr = {
       mark: 'sprayModel',
       key: 'REMOTE_LOCAL',
       version: ['V2.0']
+    },
+    {
+      mark: 'sprayModel',
+      key: 'Loc_Rem_Sta',
+      version: ['V3.0']
     },
     {
       mark: 'sprayPwm',
@@ -266,9 +327,39 @@ const deviceAttr = {
       version: ['V2.0']
     },
     {
+      mark: 'sprayPwm',
+      key: 'Curt_Run_V',
+      version: ['V3.0']
+    },
+    {
       mark: 'sprayAngle',
       key: 'Angle',
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'sprayAngle',
+      key: 'Curt_Ang',
+      version: ['V3.0']
+    },
+    {
+      mark: 'gunState',
+      key: 'End_Gun_Sta',
+      version: ['V3.0']
+    },
+    {
+      mark: 'waterPressure',
+      key: 'Pip_Prs',
+      version: ['V3.0']
+    },
+    {
+      mark: 'instant',
+      key: 'Inst_Flw',
+      version: ['V3.0']
+    },
+    {
+      mark: 'cumulative',
+      key: 'Acum_Flw',
+      version: ['V3.0']
     }
   ],
 
@@ -298,23 +389,53 @@ const deviceAttr = {
     {
       mark: 'sprayState',
       fun: (el) => {
-        if (el.regs.TROUBLE_HMI) {
-          return '故障'
-        } else {
-          if (el.regs.FWD_HMI !== undefined && el.regs.REV_HMI !== undefined) {
-            if (el.regs.FWD_HMI || el.regs.REV_HMI) {
-              return '运行'
-            } else {
-              return '停止'
+        if (el.regs !== undefined) {
+          if (el.regs.TROUBLE_HMI) {
+            return '故障'
+          } else {
+            if (el.regs.FWD_HMI !== undefined && el.regs.REV_HMI !== undefined) {
+              if (el.regs.FWD_HMI || el.regs.REV_HMI) {
+                return '运行'
+              } else {
+                return '停止'
+              }
             }
+          }
+        } else {
+          if (el.status === 'offline') {
+            return '掉线'
           }
         }
       },
       version: ['V2.0']
     },
     {
+      mark: 'sprayState',
+      fun: (el) => {
+        if (el.regs !== undefined) {
+          if (el.regs.Safety_Sta === false) {
+            return '故障'
+          } else {
+            if (el.regs.Pvt_Run_Sta !== undefined) {
+              if (el.regs.Pvt_Run_Sta) {
+                return '运行'
+              } else {
+                return '停止'
+              }
+            }
+          }
+        } else {
+          if (el.status === 'offline') {
+            return '掉线'
+          }
+        }
+      },
+      version: ['V3.0']
+    },
+    {
       mark: 'direction',
       fun: (el) => {
+        debugger
         if (el.regs.Forward_HMI !== undefined && el.regs.Backward_HMI !== undefined) {
           if (el.regs.Forward_HMI) {
             return '正向'
@@ -341,6 +462,21 @@ const deviceAttr = {
         }
       },
       version: ['V2.0']
+    },
+    {
+      mark: 'direction',
+      fun: (el) => {
+        if (el.regs.Fwd_Sta !== undefined && el.regs.Bwd_Sta !== undefined) {
+          if (el.regs.Fwd_Sta) {
+            return '正向'
+          } else if (el.regs.Bwd_Sta) {
+            return '反向'
+          } else {
+            return '未运行'
+          }
+        }
+      },
+      version: ['V3.0']
     }
   ]
 }
@@ -429,7 +565,7 @@ const deviceCommand = {
     },
     {
       mark: 'openSpray',
-      key: 'Start_Ctrl ',
+      key: 'Start_Ctrl',
       version: ['V3.0']
     },
     {

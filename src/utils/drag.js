@@ -130,7 +130,7 @@ export function drag(sub, child, callback) {
 
   // 键盘按下事件
   document.addEventListener('keydown', (e) => {
-    if (e.keyCode === 17) {
+    if (e.ctrlKey) {
       ctrl = true
     } else {
       ctrl = false

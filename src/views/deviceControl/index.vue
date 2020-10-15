@@ -88,8 +88,9 @@ export default {
      */
     async getContent() {
       const response = await getDevice(1)
-      const { lat, lng, devices } = response[0]
+      const { lat, lng, devices, maplevel } = response[0]
       this.setMap(lat, lng)
+      this.setZoom(maplevel)
       const config = this.$config
       devices.forEach((item, index) => {
         switch (item.dclass) {
@@ -139,6 +140,14 @@ export default {
       mapFun.setCenter(this.map, lat, lng)
     },
 
+    /**
+     * 设置地图缩放级别
+     * @param { String } maplevel 缩放级别
+     */
+    setZoom(maplevel) {
+      mapFun.setZoom(this.map, maplevel)
+    },
+
     // 地图右上栏
     mapRgTop() {
       mapFun.mapRgTop(this.map, '工具箱', require('@/icons/device/tool.png'), () => {
@@ -159,6 +168,10 @@ export default {
             if (allDevice[el][0].hasOwnProperty('serialno')) {
               serialno(allDevice[el])
             }
+          } else if (allDevice[el][0] !== undefined && Object.prototype.toString.call(allDevice[el][0]) === '[object Array]') {
+            allDevice[el].forEach((item) => {
+              serialno(item)
+            })
           }
         }
       })

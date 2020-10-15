@@ -5,6 +5,9 @@
       <el-form-item label="项目名称：" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
+      <el-form-item label="缩放级别：" prop="maplevel">
+        <el-input v-model="form.maplevel" />
+      </el-form-item>
       <el-form-item label="项目位置：" prop="location">
         <el-input v-model="form.location" :disabled="true" />
       </el-form-item>
@@ -51,6 +54,7 @@ export default {
       // 表单数据
       form: {
         name: '',
+        maplevel: '',
         location: '', // iput框展示的经纬度
         lat: '', // 纬度
         lng: '', // 经度
@@ -62,6 +66,9 @@ export default {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' },
           { min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur' }
+        ],
+        maplevel: [
+          { required: true, message: '请输入缩放级别', trigger: 'blur' }
         ],
         location: [
           { required: true, message: '请设置经纬度', trigger: 'blur' }
@@ -82,6 +89,7 @@ export default {
     getDevice(1).then(function(e) {
       const data = e[0]
       self.form.name = data.name
+      self.form.maplevel = data.maplevel
       self.form.location = '经度：' + data.lng + '，' + '纬度：' + data.lat
       self.form.lat = data.lat
       self.form.lng = data.lng
@@ -111,8 +119,8 @@ export default {
     },
     // 提交
     update() {
-      const { lat, lng, name, id, js } = this.form
-      updateMsg({ lat, lng, name, id, js }).then((e) => {
+      const { lat, lng, name, id, js, maplevel } = this.form
+      updateMsg({ lat, lng, name, id, js, maplevel }).then((e) => {
         if (e.code === 0) {
           this.$alert('信息修改成功', '提示', {
             showClose: false,
