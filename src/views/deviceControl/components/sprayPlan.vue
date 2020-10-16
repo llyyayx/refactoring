@@ -58,7 +58,7 @@
     </el-drawer>
     <!-- 计划列表end -->
     <!-- 添加计划go -->
-    <el-dialog :visible.sync="dialog" :close-on-click-modal="false" class="dialog" width="650px">
+    <el-dialog :visible.sync="dialog" :close-on-click-modal="false" class="dialog" width="720px">
       <el-steps :active="active" :align-center="true" style="margin-bottom: 20px">
         <el-step title="喷灌机设置" />
         <el-step title="分区设置" />
@@ -142,6 +142,11 @@
               prop="smallName"
               label="小分区"
             />
+            <el-table-column prop="speed" label="行走速率(%)">
+              <template slot-scope="scope">
+                <el-input v-model.number="scope.row.speed" placeholder="必填" @input="putSpeed(scope)" />
+              </template>
+            </el-table-column>
             <el-table-column prop="cycle" label="脉冲周期(S)">
               <template slot-scope="scope">
                 <el-input v-model.number="scope.row.cycle" placeholder="必填" />
@@ -152,9 +157,12 @@
                 <el-input v-model.number="scope.row.radio" placeholder="必填" />
               </template>
             </el-table-column>
-            <el-table-column prop="speed" label="行走速率(%)">
+            <el-table-column prop="radio" label="尾枪">
               <template slot-scope="scope">
-                <el-input v-model.number="scope.row.speed" placeholder="必填" @input="putSpeed(scope)" />
+                <el-select v-model="scope.row.endGun" placeholder="必选">
+                  <el-option :label="'开'" :value="1" />
+                  <el-option :label="'关'" :value="0" />
+                </el-select>
               </template>
             </el-table-column>
             <el-table-column label="操作">
@@ -725,6 +733,7 @@ export default {
             bigArea: el.value,
             smallArea: item.value,
             smallName: item.name,
+            endGun: 1,
             cycle: 60,
             radio: 50,
             speed: 100
@@ -960,7 +969,8 @@ export default {
           p: el.cycle,
           d: el.radio,
           lc: el.bigArea,
-          sc: el.smallArea
+          sc: el.smallArea,
+          endGun: el.endGun
         })
       })
       /** * 集成指令 ***/
