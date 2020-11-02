@@ -212,7 +212,7 @@ const deviceCommand = {
     },
     {
       mark: 'refPwm',
-      name: '刷新PWM值',
+      name: '刷新状态',
       nameKey: [],
       params: '',
       version: ['V1.0', 'V2. 0']

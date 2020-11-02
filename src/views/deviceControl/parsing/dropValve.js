@@ -147,6 +147,13 @@ const deviceCommand = {
       nameKey: '',
       params: '',
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'refState',
+      name: '刷新状态',
+      nameKey: [],
+      params: '',
+      version: ['V1.0', 'V2. 0']
     }
   ],
   commandNameKey: [
@@ -159,6 +166,11 @@ const deviceCommand = {
       mark: 'closeValve',
       key: 'Close_PulseValve_',
       version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'refState',
+      key: ['READ_ALL_AIS'],
+      version: ['V1.0', 'V2.0']
     }
   ],
   params: [
@@ -170,6 +182,27 @@ const deviceCommand = {
     {
       mark: 'closeValve',
       fun: () => { return true },
+      version: ['V1.0', 'V2.0']
+    },
+    {
+      mark: 'refState',
+      fun: () => { return true },
+      version: ['V1.0', 'V2.0']
+    }
+  ],
+  actions: [
+    {
+      mark: 'refState',
+      fun: (nameKey, val) => {
+        const actions = []
+        nameKey.forEach((el) => {
+          actions.push({
+            namekey: el,
+            params: val
+          })
+        })
+        return actions
+      },
       version: ['V1.0', 'V2.0']
     }
   ]

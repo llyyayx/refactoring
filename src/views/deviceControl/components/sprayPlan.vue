@@ -98,12 +98,12 @@
                 <el-option value="2" label="无水" />
               </el-select>
             </el-form-item>
-            <el-form-item v-show="sprayDevice.controlItem ? sprayDevice.controlItem.includes('gunSetting') : true" label="尾枪设置" prop="gun">
+            <!-- <el-form-item v-show="sprayDevice.controlItem ? sprayDevice.controlItem.includes('gunSetting') : true" label="尾枪设置" prop="gun">
               <el-select v-model="form.gun" placeholder="请选择">
                 <el-option value="1" label="打开" />
                 <el-option value="2" label="关闭" />
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="选择水泵" prop="pump">
               <el-select v-model="form.pump" placeholder="请选择">
                 <el-option
@@ -157,9 +157,9 @@
                 <el-input v-model.number="scope.row.radio" placeholder="必填" />
               </template>
             </el-table-column>
-            <el-table-column prop="radio" label="尾枪">
+            <el-table-column v-if="sprayDevice.controlItem ? sprayDevice.controlItem.includes('gunSetting') : true" prop="endGun" label="尾枪">
               <template slot-scope="scope">
-                <el-select v-model="scope.row.endGun" placeholder="必选">
+                <el-select v-model="scope.row.endGun" placeholder="必选" @change="putEndGun(scope)">
                   <el-option :label="'开'" :value="1" />
                   <el-option :label="'关'" :value="0" />
                 </el-select>
@@ -178,8 +178,8 @@
             </el-table-column>
           </el-table>
           <div class="btn__group">
-            <el-button type="primary" class="bml" @click="goBack">上一步</el-button>
-            <el-button type="primary" @click="submitPlan">提交</el-button>
+            <el-button type="primary" class="bml" @click="submitPlan">提交</el-button>
+            <el-button type="primary" @click="goBack">上一步</el-button>
           </div>
         </el-carousel-item>
       </el-carousel>
@@ -222,6 +222,12 @@
           <el-input :value="seting.speed" placeholder="请输入行走速率" class="form__item" @input="speedLimit">
             <template slot="append">%</template>
           </el-input>
+        </el-form-item>
+        <el-form-item v-if="sprayDevice.controlItem ? sprayDevice.controlItem.includes('gunSetting') : true" prop="endGun" label="尾枪">
+          <el-select v-model="seting.endGun" placeholder="请选择尾枪状态">
+            <el-option :label="'开'" :value="1" />
+            <el-option :label="'关'" :value="0" />
+          </el-select>
         </el-form-item>
         <div class="btn__group">
           <el-button type="primary" size="small" @click="addArea('form2')">添加</el-button>
@@ -281,11 +287,19 @@
           prop="lc"
           label="大分区"
           width="70"
-        />
+        >
+          <template slot-scope="scope">
+            {{ scope.row.lc + '大区' }}
+          </template>
+        </el-table-column>
         <el-table-column
-          prop="sc"
+          prop="name"
           label="小分区"
-        />
+        >
+          <template slot-scope="scope">
+            {{ scope.row.name + '小区' }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="v"
           label="行走速度"
@@ -298,6 +312,15 @@
           prop="d"
           label="占空比"
         />
+        <el-table-column
+          v-if="sprayDevice.controlItem ? sprayDevice.controlItem.includes('gunSetting') : true"
+          prop="endGun"
+          label="尾枪"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.endGun === 1 ? '打开' : '关闭' }}
+          </template>
+        </el-table-column>
       </el-table>
     </el-dialog>
     <!-- 计划详情end -->
@@ -366,7 +389,8 @@ export default {
         smallName: '',
         cycle: '',
         radio: '',
-        speed: ''
+        speed: '',
+        endGun: 1
       },
       // 计划项验证
       rules: {
@@ -412,6 +436,9 @@ export default {
         speed: [
           { required: true, message: '请输入行走速率', trigger: 'blur' },
           { pattern: /^-?\d+\.?\d*$/, message: '必须为数值类型', trigger: 'change' }
+        ],
+        endGun: [
+          { required: true, message: '请选择尾枪状态', trigger: 'blur' }
         ]
       },
       // 当前步骤
@@ -519,7 +546,9 @@ export default {
     },
 
     // 查看计划详情
-    details() {
+    async details() {
+      const response = await partition(this.serialno)
+      const area = response.data
       const selectPlan = this.selectPlan
       const plan = {
         // 计划名称
@@ -557,13 +586,27 @@ export default {
           plan.device.push({ mark: '运行模式', value: '无水' })
         }
       })
-      plan.cell = JSON.parse(sprayItem.options).cells
+      const cells = JSON.parse(sprayItem.options).cells
+      /** 查找小分区名称 idx->name **/
+      cells.forEach((el) => {
+        for (var i = 0; i < area.length; i++) {
+          if (area[i].id === el.lc && area[i].idx === el.sc) {
+            el.name = area[i].name
+            break
+          }
+        }
+      })
+      plan.cell = cells
       this.parsingPlan = plan
       this.content = true
     },
 
     // 复制计划
-    copy() {
+    async copy() {
+      const response = await partition(this.serialno)
+      const area = response.data
+      this.area = sortAttr(area, 'id')
+      this.option()
       // 1、灌机
       const selectPlan = this.selectPlan
       const sprayItem = selectPlan.devices[0]
@@ -595,12 +638,21 @@ export default {
       const cells = JSON.parse(sprayItem.options).cells
       const tableData = []
       cells.forEach((el) => {
+        let name
+        for (var i = 0; i < area.length; i++) {
+          if (area[i].id === el.lc && area[i].idx === el.sc) {
+            name = area[i].name
+            break
+          }
+        }
         tableData.push({
           bigArea: el.lc,
-          smallName: el.sc,
+          smallArea: el.sc,
+          smallName: name + '小区',
           cycle: el.p,
           radio: el.d,
-          speed: el.v
+          speed: el.v,
+          endGun: el.endGun
         })
       })
       this.tableData = tableData
@@ -807,6 +859,7 @@ export default {
       table.forEach((el) => {
         if (el.bigArea === seting.bigArea) {
           el.speed = seting.speed
+          el.endGun = seting.endGun
         }
         if (el.bigArea === seting.bigArea && el.smallArea === seting.smallArea) {
           result = false
@@ -841,6 +894,16 @@ export default {
       this.tableData.forEach((el) => {
         if (el.bigArea === row.bigArea) {
           el.speed = row.speed
+        }
+      })
+    },
+
+    // 手动输入分区尾枪_统一大区尾枪
+    putEndGun(event) {
+      const row = event.row
+      this.tableData.forEach((el) => {
+        if (el.bigArea === row.bigArea) {
+          el.endGun = row.endGun
         }
       })
     },
@@ -963,15 +1026,20 @@ export default {
       /** * 分区设置 ***/
       const sprayOptions = {}
       sprayOptions.cells = []
+      // 判断设备是否包含尾枪
+      const endGun = this.sprayDevice.controlItem ? this.sprayDevice.controlItem.includes('gunSetting') : true
       this.tableData.forEach((el) => {
-        sprayOptions.cells.push({
+        const command = {
           v: el.speed,
           p: el.cycle,
           d: el.radio,
           lc: el.bigArea,
-          sc: el.smallArea,
-          endGun: el.endGun
-        })
+          sc: el.smallArea
+        }
+        if (endGun) {
+          command.endGun = el.endGun
+        }
+        sprayOptions.cells.push(command)
       })
       /** * 集成指令 ***/
       plans.devices.push({

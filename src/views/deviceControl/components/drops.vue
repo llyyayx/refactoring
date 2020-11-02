@@ -10,6 +10,7 @@
       <div v-for="(dgValve, idx) in screenValve(dropValve, dropDevice)" :key="'dg'+idx" class="dgzzle">
         <div class="dgzzle__heder">
           <div class="drops__title">{{ dgValve[0].pname }}</div>
+          <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="fmState">刷新状态</el-button>
           <transition name="el-fade-in">
             <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="dgzzle__btn" round @click="multi(idx)">控制已选中</el-button>
           </transition>
@@ -20,6 +21,18 @@
               <img src="@/icons/device/run/fm.png" alt="阀门图标">
             </div>
             <div class="drops__name">{{ item[0].areaName }}</div>
+            <div class="drop_dk">
+              <el-dropdown @command="singleRef">
+                <el-button type="primary" size="mini">
+                  群控
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item :command="{action:'on', device: item}">打开阀门</el-dropdown-item>
+                  <el-dropdown-item :command="{action:'off', device: item}">关闭阀门</el-dropdown-item>
+                  <el-dropdown-item :command="{action:'ref', device: item}">刷新状态</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
           </el-col>
           <el-col :lg="20" :sm="22" :xs="22">
             <el-row :gutter="10">
@@ -57,10 +70,12 @@ import Panel from '@/components/Panel'
 import { drag } from '@/utils/drag'
 import { action } from '@/api/deviceControl'
 import { debounce } from '@/utils'
+import state from '../mixins/state'
 export default {
   components: {
     Panel
   },
+  mixins: [state],
   data() {
     return {
       // 全屏模式下：阀门lg列数
@@ -178,6 +193,12 @@ export default {
       return valveGrop
     },
 
+    // 刷新阀门状态
+    fmState() {
+      this.dropValveRef(this.dropDevice)
+      this.success('刷新状态成功')
+    },
+
     /**
      * 阀门控制
      * @param { Array } device 需控制的设备列表
@@ -201,6 +222,32 @@ export default {
         return
       }
       this.control(this.subValve[index])
+    },
+
+    /**
+     * 按分区控制
+     * @param { Object } obj 参数对象
+     * obj.action { String } 用户选择的模式，ref刷新状态/on打开脉冲/关闭脉冲
+     * obj.device { Array } 阀控器下的喷头
+     */
+    singleRef(obj) {
+      const [...device] = obj.device
+      switch (obj.action) {
+        case 'ref':
+          var controller = this.group(device, 'rtuSerialno')
+          controller.forEach((el) => {
+            this.ctrlValve(el[0], el[0].command.refState.nameKey, el[0].command.refState.params(), el[0].command.refState.actions)
+          })
+          break
+        case 'on':
+          this.ctrlDev = device
+          this.openValve()
+          break
+        case 'off':
+          this.ctrlDev = device
+          this.closeValve()
+          break
+      }
     },
 
     /**
@@ -322,6 +369,9 @@ export default {
         padding: 10px 0px 10px 10px;
         box-sizing: border-box;
       }
+      & .nozzle__heder--btn {
+        margin-left: 46px;
+      }
       & .drops__row {
           margin: 10px 0;
           & .drops__col__mb{
@@ -366,6 +416,31 @@ export default {
         padding-top: 4px;
         font-size: 14px;
         text-align: center;
+      }
+      & .drop_dk {
+        margin-top: 4px;
+        text-align: center;
+        font-size: 14px;
+        position: relative;
+        & ul {
+          position: absolute;
+          top: 0;
+          right: -50px;
+          display: none;
+          z-index: 9;
+          & li {
+            width: 50px;
+            height: 30px;
+            line-height: 30px;
+            color: #FFF;
+            background-color: #409EFF;
+          }
+        }
+        & ul , li {
+          padding:0;
+          margin:0;
+          list-style:none;
+        }
       }
       & .pointer{
         cursor: pointer;

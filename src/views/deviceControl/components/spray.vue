@@ -43,7 +43,7 @@
             <el-button-group class="nozzle__heder--pwm">
               <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmSwitch(pgValve, true)">打开脉冲</el-button>
               <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmSwitch(pgValve, false)">关闭脉冲</el-button>
-              <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmState">刷新脉冲</el-button>
+              <el-button type="primary" round size="mini" class="nozzle__heder--btn" @click="pwmState">刷新状态</el-button>
             </el-button-group>
             <transition name="el-fade-in">
               <el-button v-show="(subValve[idx]) && (subValve[idx].length != 0)" type="primary" size="mini" class="nozzle__heder--btn nozzle__lf" round @click="multi(idx)">控制已选中</el-button>
@@ -64,7 +64,7 @@
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item :command="{action:'on', device: item}">打开脉冲</el-dropdown-item>
                   <el-dropdown-item :command="{action:'off', device: item}">关闭脉冲</el-dropdown-item>
-                  <el-dropdown-item :command="{action:'ref', device: item}">刷新脉冲</el-dropdown-item>
+                  <el-dropdown-item :command="{action:'ref', device: item}">刷新状态</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
@@ -246,6 +246,8 @@ export default {
      * @param { Boolean } fullScreen 全屏true 非全屏false
      */
     full(fullScreen) {
+      console.log(this.$store.state.device.spray)
+      console.log(this.$store.state.device.sprayValve)
       if (fullScreen) {
         this.pgSpan = 2
         this.valveSpan = 2
@@ -597,14 +599,14 @@ export default {
 
     // 刷新脉冲
     pwmState() {
-      this.sprayValvePwm()
-      this.success('PWM状态刷新成功')
+      this.sprayValvePwm(this.sprayDevice)
+      this.success('刷新状态成功')
     },
 
     /**
      * 单控刷新
      * @param { Object } obj 参数对象
-     * obj.action { String } 用户选择的模式，ref刷新pwm/on打开脉冲/关闭脉冲
+     * obj.action { String } 用户选择的模式，ref刷新状态/on打开脉冲/关闭脉冲
      * obj.device { Array } 阀控器下的喷头
      */
     singleRef(obj) {

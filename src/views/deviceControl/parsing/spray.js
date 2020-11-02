@@ -786,7 +786,7 @@ const controlItem = [
   {
     mark: 'gunSetting',
     name: '尾枪设置',
-    version: ['V1.0', 'V3.0']
+    version: ['V1.0', 'V2.0', 'V3.0']
   },
   {
     mark: 'plan',

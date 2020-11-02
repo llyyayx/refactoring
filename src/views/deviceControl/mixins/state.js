@@ -102,16 +102,65 @@ export default {
       })
     },
 
-    // 召回喷灌机喷头pwm状态
-    sprayValvePwm() {
+    /**
+     * 召回喷灌机喷头状态
+     * @param { Object } spray 喷灌对象
+     */
+    sprayValvePwm(spray = {}) {
       const _this = this
-      const sprayValve = this.$store.state.device.sprayValve
+      let sprayValve = this.$store.state.device.sprayValve
+      // 找到当前喷灌机下的喷头
+      if (spray.hasOwnProperty('serialno')) {
+        for (let i = 0; i < sprayValve.length; i++) {
+          if (sprayValve[i][0]['pSerialno'] === spray.serialno) {
+            sprayValve = [sprayValve[i]]
+            break
+          }
+        }
+      }
       sprayValve.forEach((item) => {
         // 将喷灌下边的喷头按照阀控器分组
         const controller = _this.group(item, 'rtuSerialno')
         controller.forEach((el) => {
           const nameKey = el[0].command.refPwm.nameKey
           const params = el[0].command.refPwm.params()
+          const data = []
+          nameKey.forEach((item) => {
+            data.push({
+              namekey: item,
+              params: params
+            })
+          })
+          action({
+            serialno: el[0].rtuSerialno,
+            actions: data
+          })
+        })
+      })
+    },
+
+    /**
+     * 召回滴灌阀门状态
+     * @param { Object } drop 滴灌对象
+     */
+    dropValveRef(drop = {}) {
+      const _this = this
+      let dropsValve = this.$store.state.device.dropsValve
+      // 找到当前滴灌下的阀门
+      if (drop.hasOwnProperty('serialno')) {
+        for (let i = 0; i < dropsValve.length; i++) {
+          if (dropsValve[i][0]['dSerialno'] === drop.serialno) {
+            dropsValve = [dropsValve[i]]
+            break
+          }
+        }
+      }
+      dropsValve.forEach((item) => {
+        // 将滴灌下边的阀门按照阀控器分组
+        const controller = _this.group(item, 'rtuSerialno')
+        controller.forEach((el) => {
+          const nameKey = el[0].command.refState.nameKey
+          const params = el[0].command.refState.params()
           const data = []
           nameKey.forEach((item) => {
             data.push({
