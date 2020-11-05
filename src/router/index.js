@@ -39,6 +39,13 @@ export const constantRoutes = [
   },
 
   {
+    path: '/retrieve',
+    name: 'Retrieve',
+    component: () => import('@/views/login/retrieve/index'),
+    hidden: true
+  },
+
+  {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true

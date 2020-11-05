@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import Draggabilly from 'draggabilly'
 export default {
   data() {
     return {
@@ -49,7 +50,9 @@ export default {
         { title: '植株高度', icon: require('@/icons/device/run/height.png'), obj: 'height' }
       ],
       // 下拉设备列表
-      deviceList: []
+      deviceList: [],
+      // 防止拖动完成触发点击事件
+      touches: false
     }
   },
   computed: {
@@ -81,6 +84,15 @@ export default {
       return this.$store.state.device.height
     }
   },
+  mounted() {
+    // 拖动
+    const draggie = new Draggabilly('.quick-container', {
+      containment: '.device-container'
+    })
+    draggie.on('dragStart', () => {
+      this.touches = true
+    })
+  },
   methods: {
 
     // 打开快捷栏
@@ -95,6 +107,10 @@ export default {
 
     // 转换
     onOff() {
+      if (this.touches) {
+        this.touches = false
+        return
+      }
       if (this.state === 'off') {
         this.open()
       } else {
@@ -118,8 +134,12 @@ export default {
      * @param { String } device 设备对象名称
      */
     setDevice(device) {
-      this.deviceList = this[device]
-      this.open()
+      if (!this.touches) {
+        this.deviceList = this[device]
+        this.open()
+      } else {
+        this.touches = false
+      }
     },
 
     /* 快捷菜单控制设备 */
@@ -190,8 +210,7 @@ export default {
     width: 620px;
     position: absolute;
     top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: calc(50% - 310px);
     background-color: #FFFFFF;
     overflow: hidden;
     & .quick__box--item{

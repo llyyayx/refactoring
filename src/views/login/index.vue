@@ -44,7 +44,7 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登陆</el-button>
-
+      <router-link target="_blank" class="retrieve" to="/retrieve">忘记密码?</router-link>
     </el-form>
     <div class="copyright">Copyright © 2020 中农智冠(北京)科技有限公司 保留所有权利</div>
   </div>
@@ -258,6 +258,11 @@ $light_gray:#eee;
     transform: translateX(-50%);
     font-size: 14px;
     color: #FFF;
+  }
+  & .retrieve {
+    font-size: 12px;
+    color: #00a1d6;
+    cursor: pointer;
   }
 }
 </style>
