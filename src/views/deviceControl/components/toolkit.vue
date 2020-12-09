@@ -25,6 +25,24 @@
             </div>
             <div class="tool__title">土质分布计算</div>
           </div>
+          <div class="too_content--item" @click="irrigation">
+            <div class="tool__img">
+              <svg-icon icon-class="irrigation" class="icon--irrigation" />
+            </div>
+            <div class="tool__title">喷灌机水量计算</div>
+          </div>
+          <div class="too_content--item" @click="fert">
+            <div class="tool__img">
+              <svg-icon icon-class="fert" class="icon--fert" />
+            </div>
+            <div class="tool__title">变量施肥计算</div>
+          </div>
+          <div class="too_content--item" @click="setFer">
+            <div class="tool__img">
+              <svg-icon icon-class="setting" class="icon--setting" />
+            </div>
+            <div class="tool__title">变量施肥设置</div>
+          </div>
           <!-- <div class="too_content--item" @click="natHistroy">
             <div class="tool__img">
               <svg-icon icon-class="histroy" class="icon--histroy" />
@@ -78,6 +96,24 @@ export default {
     natHistroy() {
       this.closeTool()
       this.$store.dispatch('control/natHistroyShow', true)
+    },
+
+    // 喷灌机灌水量计算
+    irrigation() {
+      this.closeTool()
+      this.$store.dispatch('control/irrigationShow', true)
+    },
+
+    // 喷灌分区施肥计算
+    fert() {
+      this.closeTool()
+      this.$store.dispatch('control/fertilizationShow', true)
+    },
+
+    // 施肥计算设置
+    setFer() {
+      this.closeTool()
+      this.$store.dispatch('control/setFerShow', true)
     }
 
   }
@@ -129,15 +165,16 @@ export default {
       & .too_content--item{
         width: 25%;
         margin: 0 0 10px 0;
+        cursor: pointer;
         & .tool__img{
           margin: 0 auto 4px;
-          cursor: pointer;
           text-align: center;
           & img{
             display: block;
             width: 100%;
           }
-          & .icon--plan, .icon--zoon, .icon--natural, .icon--histroy{
+          & .icon--plan, .icon--zoon, .icon--natural, .icon--histroy, .icon--irrigation, .icon--fert,
+          .icon--setting {
             font-size: 56px;
           }
         }

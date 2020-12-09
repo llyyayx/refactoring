@@ -246,8 +246,6 @@ export default {
      * @param { Boolean } fullScreen 全屏true 非全屏false
      */
     full(fullScreen) {
-      console.log(this.$store.state.device.spray)
-      console.log(this.$store.state.device.sprayValve)
       if (fullScreen) {
         this.pgSpan = 2
         this.valveSpan = 2

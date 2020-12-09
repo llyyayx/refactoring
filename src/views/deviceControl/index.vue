@@ -13,6 +13,9 @@
     <DataPanel />
     <Natural />
     <NatHistroy />
+    <Irrigation />
+    <Fertilization />
+    <SetFer />
   </div>
 </template>
 
@@ -30,6 +33,9 @@ import Quick from './components/quick'
 import DataPanel from './components/dataPanel'
 import Natural from './components/natural'
 import NatHistroy from './components/natHistroy'
+import Irrigation from './components/irrigation'
+import Fertilization from './components/fertilization'
+import SetFer from './components/setFer'
 import state from './mixins/state'
 import mapFun from '@/utils/lmapFun'
 import Paho from './mqttws31'
@@ -51,7 +57,10 @@ export default {
     Quick,
     DataPanel,
     Natural,
-    NatHistroy
+    NatHistroy,
+    Irrigation,
+    Fertilization,
+    SetFer
   },
   mixins: [state],
   data() {

@@ -9,24 +9,26 @@ export function spray(item) {
   const { dname, latitude, longitude, dclass, serialno, extension, portarrays, cells, model, rtu } = item
   // 绘制喷灌圈
   let canvas = {}
+  // 解析过的分区
+  let jxCell = {}
   if (cells) {
-    canvas = draw({ latitude, longitude, extension, cells })
+    jxCell = jxZone(cells)
+    canvas = draw({ latitude, longitude, extension, jxCell })
   }
   // 地图标点
   const mapSpot = marKer({ lat: latitude, lng: longitude, dname, icon: require('@/icons/device/close/pg.png') })
   clickEvent(mapSpot, serialno)
 
   // vuex管理
-  store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, cells, canvas, rtu,
+  store.dispatch('device/setSpray', { dname, latitude, longitude, dclass, serialno, extension, cells, jxCell, canvas, rtu,
     mapSpot, attr: getAttr(deviceAttr, model || 'V1.0'), icon: require('@/icons/device/close/pg.png'), command: getCommand(deviceCommand, model || 'V1.0'),
     controlItem: getControlItem(controlItem, model || 'V1.0') })
   if (portarrays) sprayValve(portarrays, { dname, serialno })
 }
 
-// 绘制喷灌圈
-function draw(param) {
+// 解析分区
+function jxZone(cells) {
   let id
-  const cells = param.cells
   const partition = []
   const big = { smallArea: [] }
   cells.forEach((el, index) => {
@@ -49,6 +51,11 @@ function draw(param) {
       partition.push(JSON.parse(JSON.stringify(big)))
     }
   })
+  return partition
+}
+
+// 绘制喷灌圈
+function draw(param) {
   var extension = param.extension ? JSON.parse(param.extension.replace(/"/g, ' ').replace(/'/g, '"')) : {}
   var long = extension.arm || 150
   var lngC = 40030173
@@ -76,7 +83,7 @@ function draw(param) {
     textShow: true,
     displayDirection: true,
     direction: true,
-    allArea: partition,
+    allArea: param.jxCell,
     arm: long,
     parentClass: 'device-container',
     callback: () => {

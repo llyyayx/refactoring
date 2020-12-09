@@ -15,6 +15,12 @@ const state = {
   naturalShow: false,
   // deviceControl-土质计算历史
   natHistroyShow: false,
+  // deviceControl-喷灌机灌水量计算
+  irrigationShow: false,
+  // deviceControl-变量施肥计算计算
+  fertilizationShow: false,
+  // deviceControl-变量施肥设置
+  setFerShow: false,
   // deviceControl-数据面板显隐
   dataPanelShow: false,
   // deviceControl-施肥机面板显隐
@@ -67,6 +73,15 @@ const mutations = {
   SET_PUMPSHOW: (state, show) => {
     state.pumpShow = show
   },
+  SET_IRRIGATIONSHOW: (state, device) => {
+    state.irrigationShow = device
+  },
+  SET_FER: (state, device) => {
+    state.fertilizationShow = device
+  },
+  SET_SETFER: (state, device) => {
+    state.setFerShow = device
+  },
   SET_DATAPANELOBJ: (state, device) => {
     state.dataPanelObj = device
   },
@@ -117,6 +132,15 @@ const actions = {
   },
   dataPanelShow: ({ commit }, show) => {
     commit('SET_DATAPANELSHOW', show)
+  },
+  irrigationShow: ({ commit }, show) => {
+    commit('SET_IRRIGATIONSHOW', show)
+  },
+  fertilizationShow: ({ commit }, show) => {
+    commit('SET_FER', show)
+  },
+  setFerShow: ({ commit }, show) => {
+    commit('SET_SETFER', show)
   },
   dataPanelObj: ({ commit }, device) => {
     commit('SET_DATAPANELOBJ', device)
